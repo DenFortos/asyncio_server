@@ -1,0 +1,23 @@
+# Виртуальное окружение
+.venv/
+
+# Настройки PyCharm
+.idea/
+
+# Кэш Python
+__pycache__/
+*.pyc
+
+# Логи и временные файлы
+*.log
+*.tmp
+
+# Файлы базы данных SQLite (если есть)
+*.sqlite3
+
+# Файлы сборки Python
+*.egg
+*.egg-info/
+dist/
+build/
+
