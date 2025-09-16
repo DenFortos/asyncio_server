@@ -3,7 +3,8 @@ import multiprocessing
 from loguru import logger
 from config import IP, PORT, NUM_WORKERS
 from .client_connection import client_handler
-
+from .ui import operator_interface
+from .queue_worker import module_worker
 
 async def start_server():
     server = await asyncio.start_server(client_handler, IP, PORT, reuse_address=True, backlog=1000)
