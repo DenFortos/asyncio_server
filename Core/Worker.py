@@ -44,7 +44,6 @@ async def worker_task(worker_id: str):
             logger.error(f"[Worker {worker_id}] General error: {e}")
             await asyncio.sleep(0.01)
 
-
 def module_worker(log_queue):
     worker_id = multiprocessing.current_process().name
     logger.for_worker(log_queue)
