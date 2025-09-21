@@ -14,7 +14,7 @@ module_map = {
     "InputForge": input_forge,
 }
 
-# Явный реэкспорт для from modules import *
+# Явный реэкспорт для from Modules import *
 __all__ = [
     "data_scribe",
     "screen_watch",

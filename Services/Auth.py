@@ -1,7 +1,7 @@
 import asyncio
 import json
-from loguru import logger
-from config import AUTH_KEY
+from LoggerWrapper import Log as logger
+from Config import AUTH_KEY
 
 MAX_PAYLOAD = 64 * 1024
 
