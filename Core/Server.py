@@ -5,7 +5,7 @@ import zmq.asyncio
 from LoggerWrapper import Log as logger
 from Config import IP, PORT, NUM_WORKERS
 from .ClientConnection import client_handler
-from UI import operator_interface
+from CLI import operator_interface
 from .Worker import module_worker
 from BenchUtils import add_bytes, start_benchmark
 

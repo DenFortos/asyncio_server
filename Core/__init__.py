@@ -1,7 +1,7 @@
 from .Server import start_server
 from .ClientConnection import client_handler, read_module_header
 from .Worker import module_worker
-from UI.CLI import operator_interface
+from CLI.CLI import operator_interface
 
 __all__ = [
     "start_server",
