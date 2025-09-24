@@ -1,5 +1,7 @@
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QTabWidget, QLabel
-from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QTabWidget
+from UsersTab import UsersTab
+from GlobalFunctionsTab import GlobalFunctionsTab
+from services import list_clients  # Импортируем функцию для получения клиентов
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -16,11 +18,16 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         root_layout.addWidget(self.tabs)
 
-        # Пустые вкладки, можно позже подключать панели
-        self.users_tab = QWidget()
+        # Users вкладка
+        self.users_tab = UsersTab()
         self.tabs.addTab(self.users_tab, "Users")
 
-        self.global_tab = QWidget()
+        # Заполняем таблицу клиентов
+        clients = list_clients()
+        self.users_tab.fill_table(clients)
+
+        # Global Functions вкладка
+        self.global_tab = GlobalFunctionsTab()
         self.tabs.addTab(self.global_tab, "Global Functions")
 
         # Тёмная тема
@@ -28,24 +35,3 @@ class MainWindow(QMainWindow):
             QMainWindow { background-color: #2b2b2b; }
             QTabWidget::pane { border: 0; }
         """)
-
-        # Заголовок клиента (справа при выборе клиента)
-        def set_client_info_title(self, text: str) -> None:
-            """Метод для обновления шапки клиента"""
-            if not self.client_info_title:
-                self.client_info_title = QWidget(self.users_tab)
-                layout = QVBoxLayout(self.client_info_title)
-                self.client_info_title_label = QLabel(text)
-                f = QFont()
-                f.setPointSize(12)
-                f.setBold(True)
-                self.client_info_title_label.setFont(f)
-                self.client_info_title_label.setStyleSheet("color: #FFFFFF;")
-                layout.addWidget(self.client_info_title_label)
-                layout.setContentsMargins(0, 0, 0, 0)
-                if not self.users_tab.layout():
-                    self.users_tab.setLayout(QVBoxLayout())
-                self.users_tab.layout().addWidget(self.client_info_title)
-            else:
-                self.client_info_title_label.setText(text)
-
