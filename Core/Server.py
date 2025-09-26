@@ -16,9 +16,9 @@ async def start_server():
 
     # --- Общий PUSH-сокет для всех клиентов ---
     push_socket = zmq_ctx.socket(zmq.PUSH)
-    push_socket.bind(f"tcp://{IP}:5555")
+    push_socket.bind(f"tcp://{IP}:50000")
     push_socket.set_hwm(0)  # Без ограничений на очередь
-    logger.info(f"[+] ZeroMQ PUSH socket bound to tcp://{IP}:5555")
+    logger.info(f"[+] ZeroMQ PUSH socket bound to tcp://{IP}:50000")
 
     # --- TCP сервер ---
     server = await asyncio.start_server(

@@ -1,4 +1,4 @@
-IP = "188.190.156.120"
-PORT = 50051
+IP = "127.0.0.1"
+PORT = 50001
 AUTH_KEY = "super_secret"
 NUM_WORKERS = 8

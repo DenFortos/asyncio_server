@@ -5,7 +5,7 @@ import zmq.asyncio
 import multiprocessing
 from LoggerWrapper import Log as logger
 
-ZMQ_PULL_ADDR = "tcp://188.190.156.120:5555"
+ZMQ_PULL_ADDR = "tcp://127.0.0.1:50000"
 
 async def worker_task(worker_id: str):
     zmq_ctx = zmq.asyncio.Context()
