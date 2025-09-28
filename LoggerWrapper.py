@@ -1,4 +1,3 @@
-# LoggerWrapper.py
 from loguru import logger as _logger
 import sys
 from prompt_toolkit.patch_stdout import patch_stdout
