@@ -1,4 +1,4 @@
-// Функция обновления статистики (онлайн/оффлайн/всего)
+// Обновление статистики "Online", "Offline", "Total".
 function updateStats() {
   const online = window.clients.filter(c => c.status === 'online').length;
   const offline = window.clients.filter(c => c.status === 'offline').length;

@@ -30,7 +30,7 @@ function renderGrid(data) {
       </div>
     `;
     card.onclick = () => {
-      window.location.href = `client_control.html?clientId=${client.id}`;
+      window.location.href = `../client_control/client_control.html?clientId=${client.id}`;
     };
     gridView.appendChild(card);
   });

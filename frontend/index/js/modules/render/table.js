@@ -1,4 +1,4 @@
-// Функция рендера таблицы (все клиенты)
+// Функция отвечает за обновление всей таблицы и подтягивает информацию из clients.js
 function renderTable(data) {
   const clientsList = document.getElementById('clients-list');
   clientsList.innerHTML = '';
@@ -15,7 +15,7 @@ function renderTable(data) {
       <td>${client.id}</td>
     `;
     row.onclick = () => {
-      window.location.href = `client_control.html?clientId=${client.id}`;
+      window.location.href = `../client_control/client_control.html?clientId=${client.id}`;
     };
     clientsList.appendChild(row);
   });

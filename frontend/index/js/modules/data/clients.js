@@ -1,4 +1,4 @@
-// Данные клиентов (заглушка, оставляем как есть)
+// Данные клиентов (в будущем будут приходить с бекенда) пока что заглушка
 const clients = [
   { id: 'cl_123456789012345', location: 'US', user: 'user1', pc: 'PC-001', lastActive: '2 min ago', ip: '192.168.1.10', activeWindow: 'Chrome', status: 'online', screenshot: 'images/pc1.jpg' },
   { id: 'cl_234567890123456', location: 'DE', user: 'user2', pc: 'PC-002', lastActive: '5 min ago', ip: '10.0.0.5', activeWindow: 'VSCode', status: 'offline', screenshot: 'images/pc2.jpg' },

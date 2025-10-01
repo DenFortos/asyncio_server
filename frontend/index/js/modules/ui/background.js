@@ -1,9 +1,9 @@
 // Функции управления фоном (выбор и сохранение)
 const backgrounds = [
-  'images/bg1.jpg',
-  'images/bg2.jpg',
-  'images/bg3.jpg',
-  'images/bg4.jpg'
+  '../images/bg1.jpg',
+  '../images/bg2.jpg',
+  '../images/bg3.jpg',
+  '../images/bg4.jpg'
 ];
 
 function setBg(image) {
@@ -22,7 +22,7 @@ document.getElementById('closeModal').addEventListener('click', () => {
 document.querySelectorAll('.bg-option').forEach(option => {
   option.addEventListener('click', () => {
     const bgName = option.getAttribute('data-bg');
-    setBg(`images/${bgName}.jpg`);
+    setBg(`../images/${bgName}.jpg`); // Исправленный путь
     document.getElementById('bgModal').style.display = 'none';
   });
 });
