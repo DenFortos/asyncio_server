@@ -1,0 +1,459 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+:root {
+  /* Цвета */
+  --sidebar-bg: rgba(255, 255, 255, 0.1);
+  --main-bg: #0f0f1a;
+  --card-bg: rgba(255, 255, 255, 0.1);
+  --text-color: #e0e0ff;
+  --accent-color: #6c5ce7;
+  --accent-glow: #00f3ff;
+  --border-color: rgba(255, 255, 255, 0.2);
+  --success-color: #00b894;
+  --danger-color: #ff7675;
+  --modal-bg: rgba(0, 0, 0, 0.6);
+
+  /* Размеры */
+  --sidebar-width: 80px;
+  --transition-speed: 0.3s;
+
+  /* Шрифты */
+  --font-family: 'Segoe UI', sans-serif;
+  --neon-font: 'Orbitron', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--main-bg);
+  color: var(--text-color);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  transition: background-image var(--transition-speed) ease;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  background-image: url('images/bg1.jpg'); /* Установка фона по умолчанию */
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: -1;
+}
+
+/* Остальной CSS без изменений */
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--sidebar-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  transition: width var(--transition-speed);
+  z-index: 10;
+  border-right: 1px solid var(--border-color);
+  box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
+}
+
+.sidebar.expanded {
+  width: 200px;
+}
+
+.sidebar .filter-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sidebar button {
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all var(--transition-speed);
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(108, 92, 231, 0.3), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+
+.sidebar button:hover::after {
+  transform: translateX(100%);
+}
+
+.sidebar button:hover {
+  box-shadow: 0 0 10px var(--accent-color);
+}
+
+.sidebar button.active {
+  background: var(--accent-color);
+  color: black;
+}
+
+.menu-toggle {
+  position: absolute;
+  top: 15px;
+  right: -30px;
+  background: var(--accent-color);
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--accent-color);
+}
+
+.icons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.icons .icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(5px);
+}
+
+.icons .icon:hover {
+  background: var(--accent-color);
+  color: black;
+  box-shadow: 0 0 10px var(--accent-color);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-family: var(--neon-font);
+  font-size: 2rem;
+  color: var(--accent-color);
+  text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color), 0 0 30px var(--accent-color);
+  letter-spacing: 2px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Единый стиль для кнопок */
+button {
+  transition: all var(--transition-speed);
+  cursor: pointer;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px var(--accent-color);
+}
+
+.bg-btn {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stats {
+  display: flex;
+  gap: 15px;
+}
+
+.stat-box {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 10px 15px;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 80px;
+  border: 1px solid var(--border-color);
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+/* Прямоугольный поиск по центру */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 8px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  width: 300px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+  margin: 20px auto;
+}
+
+.search-bar input {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  width: 100%;
+  padding: 5px;
+  outline: none;
+}
+
+.search-bar i {
+  color: #aaa;
+  margin-right: 10px;
+}
+
+.table-container {
+  flex: 1;
+  overflow: auto;
+}
+
+.clients-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text-color);
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.clients-table th,
+.clients-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.clients-table th {
+  background: rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.clients-table tr {
+  transition: all 0.3s ease;
+}
+
+.clients-table tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-online {
+  background: var(--success-color);
+}
+
+.status-offline {
+  background: var(--danger-color);
+}
+
+/* Модальное окно */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--modal-bg);
+}
+
+.modal-content {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+  border: 1px solid var(--border-color);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.close {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.bg-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.bg-option {
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.bg-option:hover {
+  border-color: var(--accent-color);
+}
+
+.bg-option img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+/* Убедимся, что контейнер таблицы не мешает */
+.table-container {
+  flex: 1;
+  overflow: auto;
+}
+
+.clients-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 10px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  background: transparent;
+}
+
+.client-card {
+  width: 320px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.client-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border-color: var(--accent-color);
+}
+
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+}
+
+.client-card .preview-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.preview-info {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  font-size: 0.8rem;
+}
+
+.info-label {
+  color: #aaa;
+  font-weight: bold;
+}
+
+.info-value {
+  color: var(--text-color);
+  word-break: break-all;
+}
