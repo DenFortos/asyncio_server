@@ -1,25 +1,149 @@
-// Основной файл инициализации (переключение вида и глобальные переменные)
 document.addEventListener('DOMContentLoaded', () => {
-  // Обработчик для переключения вида таблица/сетка
-  document.getElementById('toggleView').addEventListener('click', () => {
-    window.isGridView = !window.isGridView;
-
-    const toggleBtn = document.getElementById('toggleView');
-    if (window.isGridView) {
-      toggleBtn.innerHTML = '<i class="fas fa-table"></i> Table View';
-    } else {
-      toggleBtn.innerHTML = '<i class="fas fa-th"></i> Grid View';
-    }
-
-    document.querySelector('.filter-buttons .active').classList.remove('active');
-    document.getElementById('filter-all').classList.add('active');
-    window.currentFilter = 'all';
-    filterClients('all');
-  });
-
-  // Инициализация
+  // Инициализация переменных
   window.isGridView = false;
   window.currentFilter = 'all';
-  window.renderClients(window.clients);
-  window.updateStats();
+
+  const toggleViewBtn = document.getElementById('toggleView');
+  const tableView = document.getElementById('table-view');
+  const gridView = document.getElementById('grid-view');
+  const tableContainer = document.querySelector('.table-container');
+  const filesContainer = document.querySelector('.files-container');
+
+  // Фильтрация клиентов
+  function filterClients(clients, filter) {
+    if (filter === 'all') return clients;
+    return clients.filter(client => client.status === filter);
+  }
+
+  // Функция для смены контейнера
+  function showContainer(container) {
+    document.querySelectorAll('.files-container, .table-container').forEach(el => {
+      el.classList.remove('active');
+      el.style.display = 'none';
+    });
+    container.style.display = 'block';
+    container.classList.add('active');
+  }
+
+  // Функция для активации кнопки в сайдбаре
+  function setActiveButton(button) {
+    document.querySelectorAll('.icon, #filter-all, #filter-online, #filter-offline').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    button.classList.add('active');
+  }
+
+  // Функция для отключения toggleView
+  function disableToggleView() {
+    toggleViewBtn.classList.add('inactive');
+    toggleViewBtn.disabled = true;
+  }
+
+  // Функция для включения toggleView
+  function enableToggleView() {
+    toggleViewBtn.classList.remove('inactive');
+    toggleViewBtn.disabled = false;
+  }
+
+  // Обработчик для переключения между таблицей и сеткой
+  toggleViewBtn.addEventListener('click', () => {
+    window.isGridView = !window.isGridView;
+    if (window.isGridView) {
+      tableView.style.display = 'none';
+      gridView.style.display = 'flex';
+      toggleViewBtn.innerHTML = '<i class="fas fa-list"></i> Table View';
+    } else {
+      tableView.style.display = 'table';
+      gridView.style.display = 'none';
+      toggleViewBtn.innerHTML = '<i class="fas fa-th"></i> Grid View';
+    }
+    // Возвращаем к основному виду
+    window.switchToMainView && window.switchToMainView(document.querySelector('.filter-buttons .active'));
+    // Обновляем содержимое
+    const filtered = filterClients(window.clients || [], window.currentFilter);
+    if (window.isGridView) {
+      window.renderGrid && window.renderGrid(filtered);
+    } else {
+      window.renderTable && window.renderTable(filtered);
+    }
+  });
+
+  // Обработчик для кнопки "Files"
+  const filesIcon = document.querySelector('.icon[title="Files"]');
+  filesIcon.addEventListener('click', () => {
+    showContainer(filesContainer);
+    setActiveButton(filesIcon);
+    disableToggleView();
+  });
+
+  // Фильтры: all, online, offline
+  document.querySelectorAll('#filter-all, #filter-online, #filter-offline').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Снимаем активность со всех кнопок
+      document.querySelectorAll('#filter-all, #filter-online, #filter-offline, .icon').forEach(b => {
+        b.classList.remove('active');
+      });
+      // Устанавливаем активность на фильтр
+      btn.classList.add('active');
+      window.currentFilter = btn.id.replace('filter-', '');
+      // Возвращаем к основному виду
+      window.switchToMainView && window.switchToMainView(btn);
+      // Фильтруем и обновляем содержимое
+      const filtered = filterClients(window.clients || [], window.currentFilter);
+      if (window.isGridView) {
+        window.renderGrid && window.renderGrid(filtered);
+        document.getElementById('table-view').style.display = 'none';
+        document.getElementById('grid-view').style.display = 'flex';
+      } else {
+        window.renderTable && window.renderTable(filtered);
+        document.getElementById('table-view').style.display = 'table';
+        document.getElementById('grid-view').style.display = 'none';
+      }
+      // Обновляем статистику
+      window.updateStats && window.updateStats();
+    });
+  });
+
+  // Функция для возврата к основному виду
+  window.switchToMainView = (filterBtn) => {
+    showContainer(tableContainer);
+    setActiveButton(filterBtn);
+    enableToggleView();
+  };
+
+  // Инициализация: таблица видна, toggleView кликабельна, all активен
+  tableView.style.display = 'table';
+  gridView.style.display = 'none';
+  document.getElementById('filter-all').classList.add('active');
+
+  // Вызов рендера и статистики при загрузке
+  window.renderClients && window.renderClients(window.clients || []);
+  window.updateStats && window.updateStats();
+
+  // Функция для открытия страницы управления клиентом
+  window.openClientControl = (clientId) => {
+    window.location.href = `../client_control/client_control.html?id=${clientId}`;
+  };
+
+  // Обработчики кликов на таблицу
+  document.addEventListener('click', (e) => {
+    const row = e.target.closest('tbody tr');
+    if (row) {
+      const clientId = row.cells[6]?.textContent?.trim(); // 7-я колонка (ID)
+      if (clientId) {
+        window.openClientControl(clientId);
+      }
+    }
+  });
+
+  // Обработчики кликов на сетку
+  document.addEventListener('click', (e) => {
+    const card = e.target.closest('.client-card');
+    if (card) {
+      const clientId = card.getAttribute('data-client-id'); // Убедитесь, что ID передаётся в data-атрибуте
+      if (clientId) {
+        window.openClientControl(clientId);
+      }
+    }
+  });
 });

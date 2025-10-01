@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpectralWeb C2 Dashboard</title>
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/files.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -83,6 +84,33 @@
             </table>
             <div class="clients-grid" id="grid-view" style="display: none;"></div>
         </div>
+
+        <!-- Контейнер Files -->
+        <div class="files-container">
+            <div class="files-header">
+                <h2>Files from All Clients</h2>
+            </div>
+            <div class="files-grid" id="files-grid">
+                <!-- Сюда будут добавлены блоки файлов -->
+            </div>
+        </div>
+
+        <!-- Модальное окно просмотра файла -->
+        <div class="modal" id="fileViewModal">
+            <div class="modal-content" id="fileModalContent">
+                <div class="modal-header">
+                    <h2 id="fileModalTitle">File Preview</h2>
+                    <span class="close" id="closeFileModal">&times;</span>
+                </div>
+                <div class="modal-body" id="fileModalBody">
+                    <!-- Содержимое файла -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="copyFileContent">Copy</button>
+                    <button class="btn-primary" id="downloadFileModal">Download</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal" id="bgModal">
@@ -122,7 +150,8 @@
     <script src="js/modules/ui/sidebar.js"></script>
     <script src="js/modules/ui/filters.js"></script>
     <script src="js/modules/ui/search.js"></script>
+    <script src="js/modules/ui/files/files.js"></script>  <!-- Сначала files.js -->
     <script src="js/modules/websocket/connection.js"></script>
-    <script src="js/index.js"></script>
+    <script src="js/index.js"></script>  <!-- Потом основной скрипт -->
 </body>
 </html>

@@ -457,3 +457,21 @@ button:hover {
   color: var(--text-color);
   word-break: break-all;
 }
+
+.icons .icon.active {
+  background: var(--accent-color);
+  color: black;
+  box-shadow: 0 0 15px var(--accent-color);
+}
+
+.bg-btn.inactive {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.bg-btn.inactive:hover {
+  box-shadow: none;
+  transform: none;
+}

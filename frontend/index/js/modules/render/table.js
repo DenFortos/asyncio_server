@@ -1,25 +1,21 @@
-// Функция отвечает за обновление всей таблицы и подтягивает информацию из clients.js
-function renderTable(data) {
-  const clientsList = document.getElementById('clients-list');
-  clientsList.innerHTML = '';
+window.renderTable = (clients) => {
+  const tbody = document.querySelector('#clients-list');
+  tbody.innerHTML = '';
 
-  data.forEach(client => {
+  clients.forEach(client => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${client.location}</td>
-      <td><span class="status-indicator status-${client.status}"></span>${client.user}</td>
-      <td>${client.pc}</td>
-      <td>${client.lastActive}</td>
-      <td>${client.ip}</td>
-      <td>${client.activeWindow}</td>
+      <td>
+        <span class="status-indicator ${client.status === 'online' ? 'status-online' : 'status-offline'}"></span>
+        ${client.location || 'N/A'}
+      </td>
+      <td>${client.user || 'N/A'}</td>
+      <td>${client.pcName || 'N/A'}</td>
+      <td>${client.lastActive || 'N/A'}</td>
+      <td>${client.ip || 'N/A'}</td>
+      <td>${client.activeWindow || 'N/A'}</td>
       <td>${client.id}</td>
     `;
-    row.onclick = () => {
-      window.location.href = `../client_control/client_control.html?clientId=${client.id}`;
-    };
-    clientsList.appendChild(row);
+    tbody.appendChild(row);
   });
-}
-
-// Экспортируем всё в глобальный объект window
-window.renderTable = renderTable;
+};
