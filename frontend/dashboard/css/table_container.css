@@ -1,0 +1,121 @@
+.table-container {
+  flex: 1;
+  overflow: auto;
+}
+
+.clients-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text-color);
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.clients-table th,
+.clients-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.clients-table th {
+  background: rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.clients-table tr {
+  transition: all 0.3s ease;
+}
+
+.clients-table tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-online {
+  background: var(--success-color);
+}
+
+.status-offline {
+  background: var(--danger-color);
+}
+
+.clients-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 10px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  background: transparent;
+}
+
+.client-card {
+  width: 320px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.client-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border-color: var(--accent-color);
+}
+
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+}
+
+.client-card .preview-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.preview-info {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  font-size: 0.8rem;
+}
+
+.info-label {
+  color: #aaa;
+  font-weight: bold;
+}
+
+.info-value {
+  color: var(--text-color);
+  word-break: break-all;
+}

