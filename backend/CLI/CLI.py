@@ -1,8 +1,8 @@
 import asyncio
-from LoggerWrapper import Log as logger
+from logs import Log as logger
 from prompt_toolkit import PromptSession
 from prompt_toolkit.patch_stdout import patch_stdout
-from Services import close_client, close_all_client, list_clients, send_command
+from backend.Services import close_client, close_all_client, list_clients, send_command
 
 async def operator_interface(server):
     session = PromptSession()

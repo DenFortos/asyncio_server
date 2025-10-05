@@ -1,4 +1,4 @@
-from LoggerWrapper import Log as logger
+from logs import Log as logger
 
 def data_scribe(data: bytes):
     try:

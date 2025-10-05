@@ -1,7 +1,7 @@
 import asyncio
 import json
-from LoggerWrapper import Log as logger
-from Config import AUTH_KEY
+from logs import Log as logger
+from backend import AUTH_KEY
 
 MAX_PAYLOAD = 64 * 1024
 

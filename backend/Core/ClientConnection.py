@@ -1,8 +1,8 @@
 import asyncio
 import json
-from LoggerWrapper import Log as logger
-from Services import authorize_client, close_client, client, client_info, fsmap
-from BenchUtils import add_bytes
+from logs import Log as logger
+from backend.Services import authorize_client, close_client, client, client_info, fsmap
+from backend.BenchUtils import add_bytes
 import zmq
 
 CHUNK_SIZE = 16 * 1024  # 16 KB

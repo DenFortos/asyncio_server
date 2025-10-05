@@ -2,12 +2,12 @@ import asyncio
 import multiprocessing
 import zmq
 import zmq.asyncio
-from LoggerWrapper import Log as logger
-from Config import *
+from logs import Log as logger
+from backend import IP, PORT, NUM_WORKERS, ZMQ_PUSH_PULL_ADDR
 from .ClientConnection import client_handler
-from CLI import operator_interface
+from backend.CLI import operator_interface
 from .Worker import module_worker
-from BenchUtils import add_bytes, start_benchmark
+from backend import start_benchmark
 
 
 async def start_server():

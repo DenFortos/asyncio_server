@@ -1,7 +1,6 @@
-# bench_utils.py
 import asyncio
 import time
-from LoggerWrapper import Log as logger
+from logs.LoggerWrapper import Log as logger
 
 # глобальные счётчики
 _total_bytes = 0

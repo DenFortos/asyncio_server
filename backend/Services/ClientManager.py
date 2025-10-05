@@ -1,4 +1,4 @@
-from LoggerWrapper import Log as logger
+from logs import Log as logger
 
 client = {}
 client_info = {}

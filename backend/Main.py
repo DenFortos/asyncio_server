@@ -1,7 +1,7 @@
 import asyncio
 import sys
-from LoggerWrapper import Log as logger
-from Core import start_server
+from logs import Log as logger
+from backend.Core.Server import start_server
 
 if sys.platform.startswith("win"): # FIX для Windows + ZeroMQ
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())

