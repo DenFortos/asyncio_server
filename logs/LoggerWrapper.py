@@ -4,6 +4,8 @@ from prompt_toolkit.patch_stdout import patch_stdout
 import asyncio
 from multiprocessing import Queue
 from typing import Optional
+from datetime import datetime
+
 
 class Log:
     """Универсальный логгер для всего проекта с поддержкой CLI и логов воркеров"""
@@ -17,7 +19,7 @@ class Log:
         _logger.add(
             sink,
             colorize=colorize,
-            format="{time:HH:mm:ss} | {level} | {message}",
+            format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
             enqueue=enqueue,
         )
 
@@ -28,13 +30,18 @@ class Log:
         return Log
 
     @staticmethod
-    async def start_queue_listener(queue: Queue):
+    async def start_queue_listener(queue: Queue, websocket_handler=None):
         """Асинхронный слушатель очереди логов от воркеров"""
         Log._queue = queue
         while True:
             msg = await asyncio.to_thread(queue.get)  # блокирующий get через поток
             if msg == "STOP":
                 break
+
+            # Отправляем в WebSocket (если передан обработчик)
+            if websocket_handler:
+                await websocket_handler.send_log(msg.strip())
+
             with patch_stdout():
                 print(msg, end="")
 
@@ -42,7 +49,9 @@ class Log:
     @staticmethod
     def info(msg, *args, **kwargs):
         if Log._queue:
-            Log._queue.put(f"[INFO] {msg}\n")
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log_line = f"{timestamp} | INFO | {msg}"
+            Log._queue.put(log_line + "\n")
         else:
             with patch_stdout():
                 _logger.info(msg, *args, **kwargs)
@@ -50,7 +59,9 @@ class Log:
     @staticmethod
     def warning(msg, *args, **kwargs):
         if Log._queue:
-            Log._queue.put(f"[WARNING] {msg}\n")
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log_line = f"{timestamp} | WARNING | {msg}"
+            Log._queue.put(log_line + "\n")
         else:
             with patch_stdout():
                 _logger.warning(msg, *args, **kwargs)
@@ -58,7 +69,9 @@ class Log:
     @staticmethod
     def error(msg, *args, **kwargs):
         if Log._queue:
-            Log._queue.put(f"[ERROR] {msg}\n")
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log_line = f"{timestamp} | ERROR | {msg}"
+            Log._queue.put(log_line + "\n")
         else:
             with patch_stdout():
                 _logger.error(msg, *args, **kwargs)
@@ -66,7 +79,9 @@ class Log:
     @staticmethod
     def debug(msg, *args, **kwargs):
         if Log._queue:
-            Log._queue.put(f"[DEBUG] {msg}\n")
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log_line = f"{timestamp} | DEBUG | {msg}"
+            Log._queue.put(log_line + "\n")
         else:
             with patch_stdout():
                 _logger.debug(msg, *args, **kwargs)
@@ -74,7 +89,9 @@ class Log:
     @staticmethod
     def critical(msg, *args, **kwargs):
         if Log._queue:
-            Log._queue.put(f"[CRITICAL] {msg}\n")
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log_line = f"{timestamp} | CRITICAL | {msg}"
+            Log._queue.put(log_line + "\n")
         else:
             with patch_stdout():
                 _logger.critical(msg, *args, **kwargs)
@@ -82,7 +99,9 @@ class Log:
     @staticmethod
     def exception(msg, *args, **kwargs):
         if Log._queue:
-            Log._queue.put(f"[EXCEPTION] {msg}\n")
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log_line = f"{timestamp} | EXCEPTION | {msg}"
+            Log._queue.put(log_line + "\n")
         else:
             with patch_stdout():
                 _logger.exception(msg, *args, **kwargs)

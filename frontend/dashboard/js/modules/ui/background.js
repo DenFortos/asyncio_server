@@ -1,36 +1,69 @@
-// Функции управления фоном (выбор и сохранение)
-const backgrounds = [
-  '../images/bg1.jpg',
-  '../images/bg2.jpg',
-  '../images/bg3.jpg',
-  '../images/bg4.jpg'
-];
+// js/modules/ui/background.js
 
-function setBg(image) {
-  document.body.style.backgroundImage = `url(${image})`;
-  localStorage.setItem('selectedBackground', image);
+/**
+ * Устанавливает фон страницы и сохраняет его в локальном хранилище.
+ * @param {string} imagePath - Путь к фоновому изображению.
+ */
+function setBackground(imagePath) {
+  document.body.style.backgroundImage = `url(${imagePath})`;
+  localStorage.setItem('selectedBackground', imagePath);
 }
 
-document.getElementById('bgButton').addEventListener('click', () => {
-  document.getElementById('bgModal').style.display = 'block';
-});
+/**
+ * Инициализирует функционал модального окна выбора фона.
+ */
+function initializeBackgroundUI() {
+  const bgModal = document.getElementById('bgModal');
+  const bgButton = document.getElementById('bgButton');
+  const closeModal = document.getElementById('closeModal');
+  const bgOptions = document.querySelectorAll('.bg-option');
 
-document.getElementById('closeModal').addEventListener('click', () => {
-  document.getElementById('bgModal').style.display = 'none';
-});
-
-document.querySelectorAll('.bg-option').forEach(option => {
-  option.addEventListener('click', () => {
-    const bgName = option.getAttribute('data-bg');
-    setBg(`../images/${bgName}.jpg`); // Исправленный путь
-    document.getElementById('bgModal').style.display = 'none';
+  // 1. Открытие модального окна
+  bgButton?.addEventListener('click', () => {
+    if (bgModal) bgModal.style.display = 'block';
   });
-});
 
-// Загружаем сохраненный фон при загрузке DOM
-document.addEventListener('DOMContentLoaded', () => {
-  const savedBg = localStorage.getItem('selectedBackground');
-  if (savedBg) {
-    document.body.style.backgroundImage = `url(${savedBg})`;
-  }
-});
+  // 2. Закрытие модального окна
+  closeModal?.addEventListener('click', () => {
+    if (bgModal) bgModal.style.display = 'none';
+  });
+
+  // 3. Обработка выбора фона
+  bgOptions.forEach(option => {
+    option.addEventListener('click', (e) => {
+      const bgName = e.currentTarget.getAttribute('data-bg');
+      const imagePath = `../images/${bgName}.jpg`;
+
+      setBackground(imagePath);
+      if (bgModal) bgModal.style.display = 'none';
+    });
+  });
+
+  // 4. Закрытие по клику вне модального окна
+  window.addEventListener('click', (e) => {
+      if (e.target === bgModal) {
+          if (bgModal) bgModal.style.display = 'none';
+      }
+  });
+}
+
+// ----------------------------------------------------------------
+// ГЛАВНОЕ ИСПРАВЛЕНИЕ: Мгновенное применение фона
+// ----------------------------------------------------------------
+
+// 1. Сначала загружаем сохраненный фон немедленно, как только скрипт загружен.
+const savedBg = localStorage.getItem('selectedBackground');
+if (savedBg) {
+  document.body.style.backgroundImage = `url(${savedBg})`;
+} else {
+  // 2. Если фона нет, устанавливаем фон по умолчанию.
+  // Если у вас есть фон по умолчанию в CSS, этот блок можно удалить.
+  // Если нет, вставьте путь к фону по умолчанию:
+  // setBackground('../images/bg1.jpg');
+}
+
+
+// 3. Инициализация UI (кнопки, модальное окно) запускается только после DOMContentLoaded.
+document.addEventListener('DOMContentLoaded', initializeBackgroundUI);
+
+export { setBackground, initializeBackgroundUI };

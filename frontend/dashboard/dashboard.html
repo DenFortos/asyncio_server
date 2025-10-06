@@ -152,25 +152,29 @@
         </div>
     </div>
 
-    <!-- Остальные скрипты -->
-    <script src="js/modules/data/clients.js"></script>
-    <script src="js/modules/data/stats.js"></script>
-    <script src="js/modules/render/table.js"></script>
-    <script src="js/modules/render/grid.js"></script>
-    <script src="js/modules/render/main.js"></script>
-    <script src="js/modules/ui/background.js"></script>
-    <script src="js/modules/ui/sidebar.js"></script>
-    <script src="js/modules/ui/filters.js"></script>
-    <script src="js/modules/ui/search.js"></script>
-    <script type="module" src="js/modules/ui/files/files.js"></script>  <!-- Основной файл Files -->
-    <script type="module">
-        import { AlertsManager } from 'js/modules/ui/alerts/AlertsManager.js';
+    <script type="module" src="js/modules/data/clients.js"></script>
+    <script type="module" src="js/modules/data/stats.js"></script>
 
+    <script type="module" src="js/modules/render/table.js"></script>
+    <script type="module" src="js/modules/render/grid.js"></script>
+    <script type="module" src="js/modules/render/main.js"></script>
+
+    <script type="module" src="js/modules/ui/background.js"></script>
+    <script type="module" src="js/modules/ui/sidebar.js"></script>
+    <script type="module" src="js/modules/ui/filters.js"></script>
+    <script type="module" src="js/modules/ui/search.js"></script>
+    <script type="module" src="js/modules/ui/files/files.js"></script>
+
+    <script type="module">
+        import { AlertsManager } from './js/modules/ui/alerts/AlertsManager.js';
         document.addEventListener('DOMContentLoaded', () => {
             window.alertsManager = new AlertsManager('alerts-grid');
         });
     </script>
-    <script src="js/modules/websocket/connection.js"></script>
-    <script src="js/dashboard.js"></script>
+
+    <script type="module" src="js/modules/websocket/connection.js"></script>
+
+    <script type="module" src="js/dashboard.js"></script>
+
 </body>
 </html>

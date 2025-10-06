@@ -1,18 +1,16 @@
-// Функции фильтрации клиентов (все/онлайн/оффлайн)
-document.querySelectorAll('.filter-buttons button').forEach(button => {
-  button.addEventListener('click', () => {
-    document.querySelector('.filter-buttons .active').classList.remove('active');
-    button.classList.add('active');
-    const filter = button.id.replace('filter-', '');
-    filterClients(filter);
-  });
-});
+// js/modules/ui/filters.js
 
-function filterClients(filter) {
-  window.currentFilter = filter; // Сохраняем текущий фильтр
-  let filtered = window.clients;
-  if (filter === 'online') filtered = window.clients.filter(c => c.status === 'online');
-  else if (filter === 'offline') filtered = window.clients.filter(c => c.status === 'offline');
-
-  window.renderClients(filtered);
+/**
+ * Применяет фильтр по статусу к списку клиентов.
+ * @param {Array<Object>} clients - Массив клиентов.
+ * @param {string} filter - Тип фильтра ('all', 'online', 'offline').
+ * @returns {Array<Object>} Отфильтрованный массив.
+ */
+export function applyStatusFilter(clients, filter) {
+  if (filter === 'all' || !filter) {
+    return clients;
+  }
+  return clients.filter(c => c.status === filter);
 }
+
+// Удалены все document.addEventListener, чтобы избежать конфликта с dashboard.js

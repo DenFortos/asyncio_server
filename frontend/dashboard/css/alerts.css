@@ -1,161 +1,138 @@
+:root {
+  /* Цвета для логов (можно вынести в глобальные переменные, если нужно) */
+  --log-color-debug: #64b5f6;
+  --log-color-info: #90caf9;
+  --log-color-warning: #fff176;
+  --log-color-error: #e57373;
+  --log-color-critical: #f44336;
+  --log-color-exception: #e91e63;
+}
+
 .alerts-container {
   display: none;
-  flex-direction: column;
-  padding: 10px;
+  padding: 15px;
   color: var(--text-color);
-  background: rgba(30, 30, 46, 0.3);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(10, 10, 20, 0.5); /* Немного фона для читаемости */
   border-radius: 8px;
-  border: 1px solid rgba(108, 92, 231, 0.2);
-  box-shadow: 0 0 15px rgba(108, 92, 231, 0.2);
-  max-height: calc(100vh - 150px);
-  overflow: auto;
-  flex: 1;
-  margin-top: 10px;
+  max-height: calc(100vh - 200px); /* Ограничение высоты */
+  overflow-y: auto; /* Вертикальная прокрутка */
+  display: flex;
+  flex-direction: column;
 }
 
 .alerts-container.active {
-  display: block;
+  display: flex;
 }
 
 .alerts-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding: 0 10px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
-.alerts-search {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  padding: 0 10px;
-}
-
-.alerts-search input {
-  flex: 1;
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  color: var(--text-color);
-}
-
-.alerts-search select {
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  color: var(--text-color);
-  cursor: pointer;
-}
-
-.alerts-actions {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  padding: 0 10px;
-}
-
-.alert-btn {
-  padding: 8px 15px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.3);
-  color: var(--text-color);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.alert-btn:hover {
-  background: rgba(108, 92, 231, 0.2);
-  box-shadow: 0 0 8px var(--accent-color);
-}
-
-.alerts-grid-content {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  padding: 10px;
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.alert-item {
-  background: rgba(30, 30, 46, 0.4);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border-radius: 8px;
-  border: 1px solid rgba(108, 92, 231, 0.3);
-  padding: 12px;
-  transition: all 0.2s;
-}
-
-.alert-item:hover {
-  transform: translateX(5px);
-  border-color: var(--accent-color);
-}
-
-.alert-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 0.9rem;
-}
-
-.alert-type {
-  font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-}
-
-.alert-type.connection {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4caf50;
-}
-
-.alert-type.file {
-  background: rgba(33, 150, 243, 0.2);
-  color: #2196f3;
-}
-
-.alert-type.action {
-  background: rgba(255, 152, 0, 0.2);
-  color: #ff9800;
-}
-
-.alert-type.error {
-  background: rgba(244, 67, 54, 0.2);
-  color: #f44336;
-}
-
-.alert-content {
-  margin-bottom: 5px;
-  line-height: 1.4;
-}
-
-.alert-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.7rem;
-  color: #aaa;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 8px;
-}
-
-.alert-client {
+.alerts-title {
+  font-size: 1.2rem;
   font-weight: bold;
   color: var(--accent-color);
 }
 
-.no-alerts {
+.alerts-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: rgba(108, 92, 231, 0.2);
+  border: 1px solid transparent;
+  color: var(--text-color);
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.filter-btn:hover {
+  opacity: 1;
+  border-color: rgba(108, 92, 231, 0.5);
+}
+
+/* Стили для активных кнопок фильтров */
+.filter-btn.active {
+  opacity: 1;
+  color: #fff;
+}
+.filter-btn[data-filter="debug"].active { background-color: var(--log-color-debug); }
+.filter-btn[data-filter="info"].active { background-color: var(--log-color-info); color: #000; }
+.filter-btn[data-filter="warning"].active { background-color: var(--log-color-warning); color: #000; }
+.filter-btn[data-filter="error"].active { background-color: var(--log-color-error); }
+.filter-btn[data-filter="critical"].active { background-color: var(--log-color-critical); }
+.filter-btn[data-filter="exception"].active { background-color: var(--log-color-exception); }
+
+
+.clear-logs-btn {
+  background: rgba(255, 118, 117, 0.2);
+  border: 1px solid transparent;
+  color: var(--danger-color);
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+.clear-logs-btn:hover {
+  background: var(--danger-color);
+  color: #fff;
+}
+
+.logs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-grow: 1;
+  overflow-y: auto; /* Позволяет контейнеру расти и скроллиться */
+}
+
+.log-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(30, 30, 46, 0.4);
+  border-radius: 4px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.9rem;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+  white-space: pre; /* Сохраняет форматирование от padEnd */
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Цвета текста для каждого типа лога */
+.log-item.debug { color: var(--log-color-debug); }
+.log-item.info { color: var(--log-color-info); }
+.log-item.warning { color: var(--log-color-warning); }
+.log-item.error { color: var(--log-color-error); }
+.log-item.critical { color: var(--log-color-critical); }
+.log-item.exception { color: var(--log-color-exception); }
+
+.log-icon {
+  margin-right: 10px;
+  width: 18px;
   text-align: center;
-  padding: 20px;
-  color: #aaa;
-  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.log-content {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

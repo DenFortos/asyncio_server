@@ -26,3 +26,8 @@
   color: #aaa;
   margin-right: 10px;
 }
+
+/* Скрываем search bar когда активна вкладка alerts */
+.main-content.alerts-active .search-bar {
+  display: none;
+}
