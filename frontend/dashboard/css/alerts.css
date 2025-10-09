@@ -16,7 +16,6 @@
   border-radius: 8px;
   max-height: calc(100vh - 200px); /* Ограничение высоты */
   overflow-y: auto; /* Вертикальная прокрутка */
-  display: flex;
   flex-direction: column;
 }
 

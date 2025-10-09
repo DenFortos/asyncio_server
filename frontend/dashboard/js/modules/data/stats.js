@@ -1,4 +1,4 @@
-// js/modules/data/stats.js (или js/modules/stats/stats.js, в зависимости от вашей структуры)
+// js/modules/data/stats.js
 
 import { getAllClients } from './clients.js'; // Убедитесь, что путь правильный
 
