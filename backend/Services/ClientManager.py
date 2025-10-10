@@ -42,17 +42,28 @@ async def close_all_client() -> int:
 
 
 def list_clients() -> list[dict]:
-    """Возвращает список подключённых клиентов в виде словарей."""
-    return [
-        {
-            "id": cid,
-            "os": info.get("os", "?"),
+    """
+    Возвращает список подключённых клиентов в виде словарей,
+    с полями, необходимыми для отображения на фронтенде.
+    """
+    # Шапка таблицы фронтенда:
+    # "loc | user | pc-name | last active | ip | active window | id"
+
+    client_list = []
+    for cid, info in client_info.items():
+        client_list.append({
+            "id": info.get("id", "N/A"),
+            "status": info.get("status", "offline"),  # Поле "status" полезно для стилизации
+
+            # Поля для таблицы:
+            "loc": info.get("loc", "?"),
             "user": info.get("user", "?"),
-            "hostname": info.get("hostname", "?"),
-            "arch": info.get("arch", "?")
-        }
-        for cid, info in client_info.items()
-    ]
+            "pc_name": info.get("pc_name", "?"),
+            "lastActive": info.get("lastActive", "?"),
+            "ip": info.get("ip", "?"),
+            "activeWindow": info.get("activeWindow", "")
+        })
+    return client_list
 
 
 async def send_command(cid: str, command: str) -> bool:

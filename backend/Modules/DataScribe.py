@@ -1,8 +1,13 @@
+# backend/Modules.py
+
 from logs import Log as logger
 
-def data_scribe(data: bytes):
+def data_scribe(data: bytes) -> str | None:
+    """Декодирует байты в текст и возвращает его."""
     try:
         text = data.decode("utf-8")
-        # logger.info(f"[DataScribe] Получены текстовые данные: {text[:50]}{'...' if len(text) > 50 else ''}")
+        logger.info(f"[DataScribe] Получены текстовые данные.")
+        return text # <-- ВОЗВРАЩАЕМ ГОТОВЫЙ ТЕКСТ
     except UnicodeDecodeError:
-        logger.info("[DataScribe] Ошибка декодирования текста")
+        logger.error("[DataScribe] Ошибка декодирования текста")
+        return None
