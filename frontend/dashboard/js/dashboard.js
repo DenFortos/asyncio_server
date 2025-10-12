@@ -5,12 +5,14 @@ import { getAllClients } from './modules/data/clients.js';
 import { renderClients, toggleView } from './modules/render/main.js';
 import { applyStatusFilter } from './modules/ui/filters.js';
 import { applySearchFilter } from './modules/ui/search.js';
+import { connectWebSocket } from './modules/websocket/connection.js';
+//import { AlertsManager } from './modules/ui/alerts/AlertsManager.js'; // ⬅️ ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ #1: Импорт AlertsManager
 
 
 // 2. ЛОКАЛЬНОЕ СОСТОЯНИЕ
-let currentFilter = 'all';        // Текущий фильтр статуса ('all', 'online', 'offline')
-let currentSearchQuery = '';      // Текущий поисковый запрос
-let activeTab = 'clients';        // Активная вкладка ('clients', 'files', 'alerts', 'stats', 'settings')
+let currentFilter = 'all';
+let currentSearchQuery = '';
+let activeTab = 'clients';
 
 
 // 3. УПРАВЛЕНИЕ UI И КАРКАСОМ
@@ -23,7 +25,6 @@ let activeTab = 'clients';        // Активная вкладка ('clients',
 function showTab(tabName) {
     activeTab = tabName;
 
-    // Получение элементов
     const searchBar = document.querySelector('.search-bar');
     const tableContainer = document.querySelector('.table-container');
     const toggleViewBtn = document.getElementById('toggleView');
@@ -58,7 +59,6 @@ function showTab(tabName) {
 
     // Показываем целевой контейнер
     if (targetContainer) {
-        // Используем block или flex в зависимости от того, как выглядит контейнер в CSS
         targetContainer.style.display = (tabName === 'alerts' || tabName === 'files' || tabName === 'clients') ? 'block' : 'flex';
     }
 
@@ -66,27 +66,21 @@ function showTab(tabName) {
     const showSearch = (tabName !== 'alerts' && tabName !== 'stats' && tabName !== 'settings');
     if (searchBar) searchBar.style.display = showSearch ? 'flex' : 'none';
 
-    // -----------------------------------------------------------------
-    // КОРРЕКТНАЯ ЛОГИКА УПРАВЛЕНИЯ КНОПКОЙ ToggleView (для решения бага)
-    // -----------------------------------------------------------------
+    // Управление кнопкой ToggleView
     const isActiveTab = (tabName === 'clients');
 
     if (toggleViewBtn) {
-        // Делаем кнопку видимой, но управляем её активностью/неактивностью
         toggleViewBtn.style.display = 'block';
 
         if (isActiveTab) {
-            // Вкладка Clients: кнопка активна и доступна
             toggleViewBtn.classList.remove('inactive');
             toggleViewBtn.disabled = false;
         } else {
-            // Вкладка Files, Alerts, Stats, Settings: кнопка неактивна и заблокирована
             toggleViewBtn.classList.add('inactive');
             toggleViewBtn.disabled = true;
         }
     }
 
-    // Если перешли на вкладку клиентов или файлов (которые используют данные), вызываем рендер
     if (tabName === 'clients' || tabName === 'files') {
         updateView();
     }
@@ -111,19 +105,11 @@ function setActiveButton(button) {
 
 /**
  * Применяет все активные фильтры (статус, поиск) и вызывает рендер.
- * Эта функция вызывается после ЛЮБОГО изменения, чтобы гарантировать актуальность вида.
  */
 function updateView() {
-    // Получаем исходные данные
     let clients = getAllClients();
-
-    // 1. Фильтрация по статусу
     clients = applyStatusFilter(clients, currentFilter);
-
-    // 2. Фильтрация по поиску
     clients = applySearchFilter(clients, currentSearchQuery);
-
-    // 3. Вызов рендера (из main.js), передаем УЖЕ ОТФИЛЬТРОВАННЫЕ данные.
     renderClients(clients);
 }
 
@@ -135,7 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toggleViewBtn = document.getElementById('toggleView');
 
-    // --- Обработчики иконок в Sidebar (Переключение вкладок) ---
+    // ⬅️ ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ #2: Инициализация AlertsManager
+    // Теперь, когда модуль импортирован, его можно инициализировать.
+    //window.alertsManager = new AlertsManager('alerts-grid');
+
+
+    // --- Обработчики иконок в Sidebar ---
 
     document.querySelector('.icon[title="Files"]')?.addEventListener('click', (e) => {
         showTab('files');
@@ -158,39 +149,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // --- Обработчики кнопок фильтров (Возврат на вкладку Clients) ---
+    // --- Обработчики кнопок фильтров ---
 
     document.querySelectorAll('#filter-all, #filter-online, #filter-offline').forEach(btn => {
       btn.addEventListener('click', (e) => {
-
-        // 1. Устанавливаем текущий фильтр и активность
         currentFilter = e.currentTarget.id.replace('filter-', '');
         setActiveButton(e.currentTarget);
-
-        // 2. Переключаемся на основной вид ('clients')
         showTab('clients');
       });
     });
 
     // --- Обработчик Toggle View ---
-
     toggleViewBtn?.addEventListener('click', () => {
-        // Вызываем функцию из main.js, которая меняет состояние и генерирует событие 'viewToggled'
         toggleView();
     });
 
     // --- Обработчики внутренних событий (Синхронизация) ---
 
-    // Обновление после изменения данных в clients.js
     window.addEventListener('clientsUpdated', updateView);
     window.addEventListener('clientUpdated', updateView);
     window.addEventListener('clientRemoved', updateView);
 
-    // Событие после смены состояния isGridView в main.js
     window.addEventListener('viewToggled', (e) => {
         const isGridView = e.detail;
 
-        // Обновление UI кнопки
         if (toggleViewBtn) {
             if (isGridView) {
                 toggleViewBtn.innerHTML = '<i class="fas fa-list"></i> Table View';
@@ -198,15 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleViewBtn.innerHTML = '<i class="fas fa-th"></i> Grid View';
             }
         }
-
-        // Вызываем центральный рендер с активными фильтрами/поиском
         updateView();
     });
 
-    // Обновление после ввода текста в search.js
     window.addEventListener('searchUpdated', (e) => {
         currentSearchQuery = e.detail;
-        // Обновляем вид, если мы на вкладке, использующей поиск
         if (activeTab === 'clients' || activeTab === 'files') {
              updateView();
         }
@@ -235,10 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Инициализация при загрузке ---
 
-    // Устанавливаем начальное активное состояние
+    connectWebSocket();
+
     const initialFilterButton = document.getElementById('filter-all');
     setActiveButton(initialFilterButton);
 
-    // Устанавливаем основной вид
     showTab('clients');
+
+    // ⬅️ ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ #3: Принудительный вызов рендера
+    updateView(); // <-- Это заставляет рендер произойти сразу
 });

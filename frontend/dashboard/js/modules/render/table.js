@@ -5,6 +5,13 @@
  * @param {Array<Object>} clients - Массив объектов клиентов для отображения.
  */
 export function renderTable(clients) {
+  // === ВРЕМЕННЫЙ КРИТИЧЕСКИЙ ЛОГ ДЛЯ ДИАГНОСТИКИ ===
+  console.log('--- RENDER TABLE ---');
+  console.log('Clients count:', clients.length);
+  if (clients.length > 0) {
+      console.log('First client data:', clients[0]);
+  }
+  // ===============================================
   const tbody = document.querySelector('#clients-list');
   if (!tbody) return;
   

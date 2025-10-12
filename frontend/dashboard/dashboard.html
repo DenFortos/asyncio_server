@@ -92,23 +92,19 @@
             <div class="clients-grid" id="grid-view" style="display: none;"></div>
         </div>
 
-        <!-- Контейнер Files -->
         <div class="files-container">
             <div class="files-header">
                 <h2>Files from All Clients</h2>
             </div>
             <div class="files-grid" id="files-grid">
-                <!-- Сюда будут добавлены блоки файлов -->
-            </div>
+                </div>
         </div>
 
         <div class="alerts-container">
             <div id="alerts-grid">
-                <!-- Сюда будут добавлены записи логов -->
-            </div>
+                </div>
         </div>
 
-        <!-- Модальное окно просмотра файла -->
         <div class="modal" id="fileViewModal">
             <div class="modal-content" id="fileModalContent">
                 <div class="modal-header">
@@ -116,8 +112,7 @@
                     <span class="close" id="closeFileModal">&times;</span>
                 </div>
                 <div class="modal-body" id="fileModalBody">
-                    <!-- Содержимое файла -->
-                </div>
+                    </div>
                 <div class="modal-footer">
                     <button class="btn-primary" id="downloadFileModal">Download</button>
                 </div>
@@ -164,13 +159,6 @@
     <script type="module" src="js/modules/ui/filters.js"></script>
     <script type="module" src="js/modules/ui/search.js"></script>
     <script type="module" src="js/modules/ui/files/files.js"></script>
-
-    <script type="module">
-        import { AlertsManager } from './js/modules/ui/alerts/AlertsManager.js';
-        document.addEventListener('DOMContentLoaded', () => {
-            window.alertsManager = new AlertsManager('alerts-grid');
-        });
-    </script>
 
     <script type="module" src="js/modules/websocket/connection.js"></script>
 

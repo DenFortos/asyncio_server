@@ -7,7 +7,7 @@ from logs import Log as logger
 # Импортируем все необходимые адреса и порты
 from backend import IP, PORT, NUM_WORKERS, ZMQ_PUSH_PULL_ADDR, API_PORT
 # Импортируем функцию для запуска API-сервера
-from .API import run_fastapi_server
+from backend.API import run_fastapi_server
 from .ClientConnection import client_handler
 # Корректный импорт из вложенного модуля CLI
 from backend.CLI.CLI import operator_interface, print_c2_ready_message

