@@ -1,0 +1,5 @@
+uvicorn[standard]
+pyzmq
+fastapi
+prompt_toolkit
+loguru
