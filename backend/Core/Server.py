@@ -1,15 +1,12 @@
+# backend/Core/Server.py
 import asyncio
 import multiprocessing
-import zmq
 import zmq.asyncio
-import webbrowser  # <-- НОВОЕ ИСПРАВЛЕНИЕ: Добавлен импорт webbrowser
+import webbrowser
 from logs import Log as logger
-# Импортируем все необходимые адреса и порты
 from backend import IP, PORT, NUM_WORKERS, ZMQ_PUSH_PULL_ADDR, API_PORT
-# Импортируем функцию для запуска API-сервера
 from backend.API import run_fastapi_server
 from .ClientConnection import client_handler
-# Корректный импорт из вложенного модуля CLI
 from backend.CLI.CLI import operator_interface, print_c2_ready_message
 from .Worker import module_worker
 from backend import start_benchmark

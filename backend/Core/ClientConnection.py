@@ -1,17 +1,12 @@
 # backend/Core/ClientConnection.py
-
 import asyncio
 import json
 import time
 import zmq.asyncio
-# ⚡️ Используем только доступные адреса из Config.py
 from backend import ZMQ_WORKER_PUSH_ADDR, ZMQ_PUSH_PULL_ADDR
 from logs import Log as logger
-# Предполагаем, что импорты ниже остались верными
-# authorize_client должна возвращать (client_id: str, original_payload_bytes: bytes)
 from backend.Services import authorize_client, close_client, client, client_info, fsmap
 from backend.BenchUtils import add_bytes
-import zmq
 from typing import Optional, Tuple, Dict, Any
 
 CHUNK_SIZE = 16 * 1024  # 16 KB
