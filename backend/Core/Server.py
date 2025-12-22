@@ -23,8 +23,7 @@ async def start_server():
     logger.info(f"[+] ZeroMQ PUSH socket bound to {ZMQ_PUSH_PULL_ADDR}")
 
     # Запуск основного сервера
-    server = await asyncio.start_server(lambda r, w: client_handler(r, w, push_socket), IP, PORT, reuse_address=True,
-                                        backlog=1000)
+    server = await asyncio.start_server(lambda r, w: client_handler(r, w, push_socket), IP, PORT, reuse_address=True, backlog=1000)
     addr = server.sockets[0].getsockname()
     logger.info(f"[+] Server started on {addr}")
 

@@ -1,7 +1,6 @@
+# backend/main.py
 import asyncio
 import sys
-import platform
-import webbrowser
 from logs import Log as logger
 
 # ----------------------------------------------------------------------
@@ -23,6 +22,10 @@ from backend.CLI.CLI import operator_interface  # (Ваш исправленны
 
 
 async def main_startup():
+    # --- ДОБАВЬ ЭТОТ ВЫЗОВ САМЫМ ПЕРВЫМ ---
+    logger.setup(log_file_path="server.log")
+    # ---------------------------------------
+
     try:
         # Запуск start_server, который блокирует выполнение до выхода через CLI
         await start_server()

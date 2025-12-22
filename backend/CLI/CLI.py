@@ -1,3 +1,4 @@
+# backend/CLI/CLI.py
 import asyncio
 from logs import Log as logger
 from prompt_toolkit import PromptSession
@@ -24,7 +25,9 @@ def print_c2_ready_message():
         "  'sleep_all' — отключить всех\n"
         "  'list' — показать подключённых"
     )
-    logger.info(prompt_text)
+    # Выводим подсказку ТОЛЬКО в консоль через print_formatted_text
+    print_formatted_text(prompt_text)
+    # logger.info(prompt_text) # <-- Закомментировано, чтобы не дублировалось в файле
 
 
 # ----------------------------------------------------------------------
