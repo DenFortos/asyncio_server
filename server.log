@@ -1,18 +1,1 @@
-03:07:56 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
-03:07:56 | INFO     | [+] Server started on ('127.0.0.1', 50001)
-03:07:56 | INFO     | [+] 8 worker processes started
-03:07:56 | INFO     | [ZMQ Dispatch] [+] ZeroMQ PULL socket bound to tcp://127.0.0.1:50002
-03:07:57 | INFO     | [+] Worker Process-1 started. Pulling from tcp://127.0.0.1:50000 and PUSHing to tcp://127.0.0.1:50002
-03:07:57 | INFO     | [+] Worker Process-2 started. Pulling from tcp://127.0.0.1:50000 and PUSHing to tcp://127.0.0.1:50002
-03:07:57 | INFO     | [+] Worker Process-4 started. Pulling from tcp://127.0.0.1:50000 and PUSHing to tcp://127.0.0.1:50002
-03:07:57 | INFO     | [+] Worker Process-3 started. Pulling from tcp://127.0.0.1:50000 and PUSHing to tcp://127.0.0.1:50002
-03:07:57 | INFO     | [+] Worker Process-6 started. Pulling from tcp://127.0.0.1:50000 and PUSHing to tcp://127.0.0.1:50002
-03:07:57 | INFO     | [+] Worker Process-5 started. Pulling from tcp://127.0.0.1:50000 and PUSHing to tcp://127.0.0.1:50002
-03:07:57 | INFO     | [+] Worker Process-8 started. Pulling from tcp://127.0.0.1:50000 and PUSHing to tcp://127.0.0.1:50002
-03:07:57 | INFO     | [+] Worker Process-7 started. Pulling from tcp://127.0.0.1:50000 and PUSHing to tcp://127.0.0.1:50002
-03:07:57 | INFO     | [+] Dashboard should open shortly in your browser.
-03:07:58 | INFO     | [API] [+] New WebSocket connection established. Total: 1
-03:08:06 | INFO     | [+] Client TestClient_886 connected: ('127.0.0.1', 52009)
-03:08:06 | INFO     | [ZMQ Dispatcher IN] ID: TestClient_886 | Module: AuthUpdate | Payload Size: 251 bytes
-03:08:10 | INFO     | [API] [+] New WebSocket connection established. Total: 1
-03:08:10 | DEBUG    | [API] Sent initial list of 1 clients to new WS.
+
