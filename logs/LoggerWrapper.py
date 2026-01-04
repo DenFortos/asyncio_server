@@ -5,7 +5,7 @@ from multiprocessing import Queue
 from typing import Optional
 
 class Log:
-    _queue: Optional[Queue] = None # Анотация типа _queue = multiprocessing.Queue или None
+    _queue: Optional[Queue] = None
 
     @staticmethod
     def setup(log_file_path: str = "server.log"):
@@ -13,10 +13,9 @@ class Log:
         _logger.remove()
         _logger.add(
             log_file_path,
-            # Убираем rotation и retention для одного большого файла
-            format="{time:HH:mm:ss} | {level:8} | {message}", # Более краткий формат
+            format="{time:HH:mm:ss} | {level:8} | {message}",
             level="DEBUG",
-            enqueue=True, # Обязательно для multiprocessing и asyncio
+            enqueue=True,
         )
 
     @staticmethod
@@ -31,25 +30,25 @@ class Log:
             level, msg = await asyncio.to_thread(queue.get)
             if msg == "STOP":
                 break
+            _logger.log(level.upper(), msg)  # msg уже готовая строка
+
+    @staticmethod
+    def _log_worker(level: str, msg: str):
+        """Внутренний метод: воркер -> очередь, главный -> файл."""
+        if Log._queue:
+            Log._queue.put((level, msg))  # msg уже готовая строка
+        else:
             _logger.log(level.upper(), msg)
 
     @staticmethod
-    def _log_worker(level: str, msg: str, *args, **kwargs):
-        """Внутренний метод: воркер -> очередь, главный -> файл."""
-        if Log._queue:
-            Log._queue.put((level, msg.format(*args, **kwargs)))
-        else:
-            _logger.log(level.upper(), msg, *args, **kwargs)
-
+    def info(msg: str):      Log._log_worker("INFO", msg)
     @staticmethod
-    def info(msg, *args, **kwargs):    Log._log_worker("INFO", msg, *args, **kwargs)
+    def warning(msg: str):   Log._log_worker("WARNING", msg)
     @staticmethod
-    def warning(msg, *args, **kwargs): Log._log_worker("WARNING", msg, *args, **kwargs)
+    def error(msg: str):     Log._log_worker("ERROR", msg)
     @staticmethod
-    def error(msg, *args, **kwargs):   Log._log_worker("ERROR", msg, *args, **kwargs)
+    def debug(msg: str):     Log._log_worker("DEBUG", msg)
     @staticmethod
-    def debug(msg, *args, **kwargs):   Log._log_worker("DEBUG", msg, *args, **kwargs)
+    def critical(msg: str):  Log._log_worker("CRITICAL", msg)
     @staticmethod
-    def critical(msg, *args, **kwargs): Log._log_worker("CRITICAL", msg, *args, **kwargs)
-    @staticmethod
-    def exception(msg, *args, **kwargs): Log._log_worker("EXCEPTION", msg, *args, **kwargs)
+    def exception(msg: str): Log._log_worker("EXCEPTION", msg)

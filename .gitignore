@@ -10,13 +10,3 @@ __pycache__/
 
 # Логи и временные файлы
 *.log
-*.tmp
-
-# Файлы базы данных SQLite (если есть)
-*.sqlite3
-
-# Файлы сборки Python
-*.egg
-*.egg-info/
-dist/
-build/

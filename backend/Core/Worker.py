@@ -7,7 +7,7 @@ import multiprocessing
 import time
 from logs import Log as logger
 # Импортируем адреса из твоего конфигурационного файла
-from backend import ZMQ_PUSH_PULL_ADDR, ZMQ_WORKER_PUSH_ADDR
+from backend import ZMQ_CLIENT_PUSH_WORKER, ZMQ_WORKER_PUSH_API
 
 
 # --- Главная асинхронная задача воркера ---
@@ -17,18 +17,18 @@ async def worker_task(worker_id: str):
 
     # Сокет для приема задач от ClientHandler
     pull_socket = zmq_ctx.socket(zmq.PULL)
-    pull_socket.connect(ZMQ_PUSH_PULL_ADDR)
+    pull_socket.connect(ZMQ_CLIENT_PUSH_WORKER)
 
     # Сокет для отправки результатов в API/FastAPI (PUSH)
     push_to_api_socket = zmq_ctx.socket(zmq.PUSH)
-    push_to_api_socket.connect(ZMQ_WORKER_PUSH_ADDR)
+    push_to_api_socket.connect(ZMQ_WORKER_PUSH_API)
 
     # Важное замечание: я предполагаю, что все эти модули импортируются корректно
     # Импортируем модули, использующие функцию asyncio.to_thread
     from backend.Modules import module_map, data_scribe, screen_watch, bin_stream, echo_tap, cam_gaze, input_forge
 
     logger.info(
-        f"[+] Worker {worker_id} started. Pulling from {ZMQ_PUSH_PULL_ADDR} and PUSHing to {ZMQ_WORKER_PUSH_ADDR}")
+        f"[+] Worker {worker_id} started. Pulling from {ZMQ_CLIENT_PUSH_WORKER} and PUSHing to {ZMQ_WORKER_PUSH_API}")
 
     while True:
         try:

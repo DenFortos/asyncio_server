@@ -3,16 +3,15 @@ import asyncio
 import json
 import time
 import zmq.asyncio
-from backend import ZMQ_WORKER_PUSH_ADDR, ZMQ_PUSH_PULL_ADDR
+from backend import ZMQ_WORKER_PUSH_API, ZMQ_CLIENT_PUSH_WORKER
 from logs import Log as logger
 from backend.Services import authorize_client, close_client, client, client_info, fsmap
 from backend.BenchUtils import add_bytes
-from typing import Optional, Tuple, Dict, Any
 
 CHUNK_SIZE = 16 * 1024  # 16 KB
 
 
-async def read_module_header(reader: asyncio.StreamReader) -> Tuple[Optional[str], Optional[str], Optional[int]]:
+async def read_module_header(reader: asyncio.StreamReader):
     """
     Читает унифицированный заголовок: [ID_len] [ID] [Module_len] [Module_name] [Payload_len]
     Возвращает (client_id, module_name, payload_len).
@@ -78,13 +77,13 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
     # Инициализация ЛОКАЛЬНОГО ZMQ контекста
     zmq_ctx_local = zmq.asyncio.Context()
 
-    # ⚡️ Сокет для PUSH в API/Фронтенд (использует ZMQ_WORKER_PUSH_ADDR)
+    # ⚡️ Сокет для PUSH в API/Фронтенд (использует ZMQ_WORKER_PUSH_API)
     api_push_socket = zmq_ctx_local.socket(zmq.PUSH)
-    api_push_socket.connect(ZMQ_WORKER_PUSH_ADDR)
+    api_push_socket.connect(ZMQ_WORKER_PUSH_API)
 
-    # ⚡️ Сокет для PUSH в Воркеры (использует ZMQ_PUSH_PULL_ADDR)
+    # ⚡️ Сокет для PUSH в Воркеры (использует ZMQ_CLIENT_PUSH_WORKER)
     worker_push_socket = zmq_ctx_local.socket(zmq.PUSH)
-    worker_push_socket.connect(ZMQ_PUSH_PULL_ADDR)  # Вокерам нужно PULL'ить с этого адреса
+    worker_push_socket.connect(ZMQ_CLIENT_PUSH_WORKER)  # Вокерам нужно PULL'ить с этого адреса
 
     try:
         # 1. АВТОРИЗАЦИЯ
@@ -101,7 +100,8 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
         # ⚡️ ДОПОЛНЕНИЕ: Извлечение словаря данных клиента из байтов
         try:
-            client_data: Dict[str, Any] = json.loads(original_client_payload_bytes.decode('utf-8'))
+            # Переменная client_data не аннотирована типом Dict[str, Any]
+            client_data = json.loads(original_client_payload_bytes.decode('utf-8'))
         except (UnicodeDecodeError, json.JSONDecodeError):
             logger.error(f"[Handler] Failed to decode/parse client data after successful Auth for ID {client_id}")
             # Несмотря на успешный Auth, мы не можем работать с данными. Закрываем.
@@ -126,7 +126,7 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
         logger.info(f"[+] Client {client_id} connected: {addr}")
 
-        # 2. PUSH СТАТУСА 'ONLINE' В API (ZMQ_WORKER_PUSH_ADDR)
+        # 2. PUSH СТАТУСА 'ONLINE' В API (ZMQ_WORKER_PUSH_API)
         auth_update_header = {
             "client_id": client_id,
             "module": "AuthUpdate",

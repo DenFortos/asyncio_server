@@ -103,7 +103,7 @@ async def zmq_message_dispatcher(
 # Цикл приема ZMQ
 # ----------------------------------------------------------------------
 
-async def zmq_pull_task_loop(websocket_connections: Set[WebSocket], zmq_worker_push_addr: str):
+async def zmq_pull_task_loop(websocket_connections: Set[WebSocket], ZMQ_WORKER_PUSH_API: str):
     """
     Основной цикл для приема всех ZMQ-сообщений (статус и результаты)
     и передачи их в диспетчер.
@@ -114,9 +114,9 @@ async def zmq_pull_task_loop(websocket_connections: Set[WebSocket], zmq_worker_p
     try:
         pull_socket = zmq_ctx.socket(zmq.PULL)
         pull_socket.set_hwm(0)
-        pull_socket.bind(zmq_worker_push_addr)
+        pull_socket.bind(ZMQ_WORKER_PUSH_API)
 
-        logger.info(f"[ZMQ Dispatch] [+] ZeroMQ PULL socket bound to {zmq_worker_push_addr}")
+        logger.info(f"[ZMQ Dispatch] [+] ZeroMQ PULL socket bound to {ZMQ_WORKER_PUSH_API}")
 
         while True:
             try:

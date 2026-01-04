@@ -19,8 +19,8 @@ from .ZmqDispatcher import zmq_pull_task_loop, encode_to_binary_protocol
 # Импортируем list_clients для отправки начального списка на фронтенд
 from backend.Services import list_clients
 
-# Предполагаем, что IP, API_PORT и ZMQ_WORKER_PUSH_ADDR определены в backend
-from backend import IP, API_PORT, ZMQ_WORKER_PUSH_ADDR
+# Предполагаем, что IP, API_PORT и ZMQ_WORKER_PUSH_API определены в backend
+from backend import IP, API_PORT, ZMQ_WORKER_PUSH_API
 from logs import Log as logger
 
 
@@ -167,7 +167,7 @@ async def startup_event():
     # Запускаем импортированный цикл диспетчера, передавая ему
     # набор WS-соединений и адрес ZMQ.
     zmq_pull_task_handle = asyncio.create_task(
-        zmq_pull_task_loop(websocket_connections, ZMQ_WORKER_PUSH_ADDR)
+        zmq_pull_task_loop(websocket_connections, ZMQ_WORKER_PUSH_API)
     )
 
 
