@@ -6,141 +6,86 @@ import zmq.asyncio
 import multiprocessing
 import time
 from logs import Log as logger
-# Импортируем адреса из твоего конфигурационного файла
 from backend import ZMQ_CLIENT_PUSH_WORKER, ZMQ_WORKER_PUSH_API
 
-
-# --- Главная асинхронная задача воркера ---
 async def worker_task(worker_id: str):
-    # 1. Инициализация ZeroMQ сокетов
     zmq_ctx = zmq.asyncio.Context()
 
-    # Сокет для приема задач от ClientHandler
     pull_socket = zmq_ctx.socket(zmq.PULL)
     pull_socket.connect(ZMQ_CLIENT_PUSH_WORKER)
 
-    # Сокет для отправки результатов в API/FastAPI (PUSH)
     push_to_api_socket = zmq_ctx.socket(zmq.PUSH)
     push_to_api_socket.connect(ZMQ_WORKER_PUSH_API)
 
-    # Важное замечание: я предполагаю, что все эти модули импортируются корректно
-    # Импортируем модули, использующие функцию asyncio.to_thread
-    from backend.Modules import module_map, data_scribe, screen_watch, bin_stream, echo_tap, cam_gaze, input_forge
+    from backend.Modules import module_map
 
-    logger.info(
-        f"[+] Worker {worker_id} started. Pulling from {ZMQ_CLIENT_PUSH_WORKER} and PUSHing to {ZMQ_WORKER_PUSH_API}")
+    logger.info(f"[+] Worker {worker_id} started. Pulling from {ZMQ_CLIENT_PUSH_WORKER}")
 
     while True:
         try:
-            # 1. Прием задачи от ClientHandler
             frames = await pull_socket.recv_multipart()
-            if not frames:
+            if len(frames) < 2:
                 continue
 
-            # 2. Читаем и парсим унифицированный заголовок (Header JSON)
-            # Заголовок - это Фрейм 0
-            header_json_str = frames[0].decode('utf-8')
-            header = json.loads(header_json_str)
-
+            # 1. Парсим заголовок
+            header = json.loads(frames[0].decode('utf-8'))
             client_id = header.get("client_id", "?")
-            # Используем унифицированное поле "module"
             module_name = header.get("module", "")
-            # Используем унифицированное поле "size" (старое payload_len)
             incoming_payload_size = header.get("size", 0)
 
-            # 3. Ищем функцию модуля
+            # 2. Ищем функцию модуля
             func = module_map.get(module_name)
             if not func:
-                logger.warning(
-                    f"[Worker {worker_id}] Unknown module '{module_name}' from client {client_id}. Ignoring."
-                )
+                logger.warning(f"[Worker {worker_id}] Unknown module '{module_name}'")
                 continue
 
-            # 4. Собираем все чанки в один полный payload (Фреймы 1 и далее)
-            full_payload = b''.join(frames[1:])
+            # 3. Извлекаем payload (БЕЗ b''.join, просто берем второй фрейм)
+            full_payload = frames[1]
 
             if len(full_payload) != incoming_payload_size:
-                logger.error(
-                    f"[Worker {worker_id}] Size mismatch for module '{module_name}' from client {client_id}. "
-                    f"Expected: {incoming_payload_size} bytes, Received: {len(full_payload)} bytes."
-                )
+                logger.error(f"[Worker {worker_id}] Size mismatch for {module_name}")
                 continue
 
-            # Если payload - JSON, декодируем его перед передачей в функцию модуля.
-            # Если payload - бинарные данные, передаем как есть.
-            if header.get("type") == "json":
-                try:
-                    # ВАЖНО: Модуль ожидает JSON-объект или текстовую строку.
-                    decoded_payload = json.loads(full_payload.decode('utf-8'))
-                except json.JSONDecodeError:
-                    # Если модуль ожидал JSON, а пришла ерунда
-                    logger.error(
-                        f"[Worker {worker_id}] Failed to decode JSON payload for {module_name} from {client_id}.")
-                    continue
+            # 4. Декодирование (Доверяем клиенту на 100%)
+            if module_name == "DataScribe":
+                # Сразу превращаем в словарь, так как знаем, что там JSON
+                decoded_payload = json.loads(full_payload.decode('utf-8'))
             else:
-                decoded_payload = full_payload  # Бинарные данные
+                # Для всех остальных модулей просто прокидываем байты
+                decoded_payload = full_payload
 
-            # 5. Вызываем функцию модуля ОДИН РАЗ
-            result = None
-            try:
-                # ВАЖНО: Выносим CPU-интенсивную обработку в отдельный поток
-                result = await asyncio.to_thread(func, decoded_payload)
+            # 5. Вызываем функцию модуля
+            result = await asyncio.to_thread(func, decoded_payload)
 
-            except Exception as e:
-                logger.error(
-                    f"[Worker {worker_id}] Error executing module '{module_name}' for client {client_id}: {e}"
-                )
-
-            # 6. ОТПРАВКА РЕЗУЛЬТАТА В API/ФРОНТЕНД (УНИФИЦИРОВАННАЯ ЛОГИКА)
+            # 6. ОТПРАВКА РЕЗУЛЬТАТА В API
             if result is not None:
-                is_binary = module_name in ["screen_watch", "cam_gaze", "bin_stream"]
-                response_type = "binary" if is_binary else "json"
+                # Если это DataScribe, превращаем словарь в байты JSON.
+                # Для всего остального считаем, что модуль уже вернул байты (bytes).
+                res_bytes = json.dumps(result).encode('utf-8') if module_name == "DataScribe" else result
 
-                # --- A. Формирование Payload ---
-                if is_binary:
-                    # Чистые бинарные данные
-                    response_payload = result
-                else:
-                    # Текст или JSON-сериализуемый словарь. Оборачиваем, если это не словарь.
-                    if not isinstance(result, (dict, list)):
-                        data_to_serialize = {"result": result}
-                    else:
-                        data_to_serialize = result
-
-                    # Полезная нагрузка - это JSON-строка в байтах
-                    response_payload = json.dumps(data_to_serialize).encode('utf-8')
-
-                    # --- B. Формирование Header ---
+                # Формируем минимальную шапку
                 response_header = {
                     "client_id": client_id,
                     "module": module_name,
-                    "timestamp": time.time(),
-                    "type": response_type,
-                    "size": len(response_payload)
+                    "size": len(res_bytes)
                 }
 
-                # --- C. Отправка (ВСЕГДА ZMQ Multipart) ---
+                # Отправляем два фрейма: [Шапка JSON] [Данные байты]
                 await push_to_api_socket.send_multipart([
                     json.dumps(response_header).encode('utf-8'),
-                    response_payload  # Фрейм 1: Сырые байты (JSON-строка или бинарные данные)
+                    res_bytes
                 ])
 
-        # Обработка ошибок
         except asyncio.CancelledError:
             break
-        except json.JSONDecodeError as e:
-            logger.error(f"[Worker {worker_id}] Error decoding ZMQ header: {e}")
         except Exception as e:
             logger.error(f"[Worker {worker_id}] General error: {e}")
             await asyncio.sleep(0.01)
 
-    # 7. Очистка ресурсов
     push_to_api_socket.close()
     pull_socket.close()
     zmq_ctx.term()
 
-
-# --- Входная точка для процесса multiprocessing ---
 def module_worker(log_queue):
     worker_id = multiprocessing.current_process().name
     logger.for_worker(log_queue)

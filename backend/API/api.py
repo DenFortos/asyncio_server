@@ -1,32 +1,20 @@
-# backend/API/API.py (ФИНАЛЬНАЯ ВЕРСИЯ)
+# backend/API/API.py (Оптимизированная версия)
 
 import uvicorn
 import asyncio
-import zmq
-import zmq.asyncio
-import json
 import logging
-import time
-import struct
-from pathlib import Path
-from typing import Set, Optional, Dict, Any
+from typing import Set
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 
-# Импортируем наш диспетчер и службы
 from .ZmqDispatcher import zmq_pull_task_loop, encode_to_binary_protocol
-# Импортируем list_clients для отправки начального списка на фронтенд
 from backend.Services import list_clients
-
-# Предполагаем, что IP, API_PORT и ZMQ_WORKER_PUSH_API определены в backend
 from backend import IP, API_PORT, ZMQ_WORKER_PUSH_API
 from logs import Log as logger
 
 
-# ----------------------------------------------------------------------
-# 0. НАСТРОЙКА ЛОГИРОВАНИЯ (Остается без изменений)
-# ----------------------------------------------------------------------
+# --- 1. Конфигурация логирования Uvicorn ---
 
 # Фильтр для подавления HTTP-логов Uvicorn (статусы 2xx и 3xx)
 class SuppressInfoLogFilter(logging.Filter):
@@ -42,59 +30,59 @@ class SuppressInfoLogFilter(logging.Filter):
         return 1
 
 
-# Применяем фильтр к логгеру доступа Uvicorn
+# Применяем фильтр и подавляем лишние информационные логи
 uvicorn_access_logger = logging.getLogger("uvicorn.access")
 if not any(isinstance(f, SuppressInfoLogFilter) for f in uvicorn_access_logger.filters):
     uvicorn_access_logger.addFilter(SuppressInfoLogFilter())
 
-# Подавляем информационные логи Starlette/Uvicorn о запуске
 logging.getLogger("starlette").setLevel(logging.WARNING)
 logging.getLogger("uvicorn").setLevel(logging.WARNING)
 
-# --- 1. Инициализация FastAPI ---
+# --- 2. Инициализация FastAPI и глобальных переменных ---
+
 app = FastAPI()
+# Набор активных WebSocket-соединений
 websocket_connections: Set[WebSocket] = set()
-
 # Глобальная переменная для ZMQ-задачи
-zmq_pull_task_handle: Optional[asyncio.Task] = None
+zmq_pull_task_handle: asyncio.Task | None = None
 
-# ----------------------------------------------------------------------
-# 2. АБСОЛЮТНЫЙ ПУТЬ, МОНТИРОВАНИЕ И ПЕРЕНАПРАВЛЕНИЕ (Остается без изменений)
-# ----------------------------------------------------------------------
+# --- 3. Настройка статических файлов и маршрутов ---
 
-# Вычисляем абсолютный путь к папке 'frontend'
+# Определяем абсолютный путь к папке 'frontend'
+# Заменено на более чистый способ извлечения пути из app
+# from pathlib import Path импортирован выше.
+
+# NOTE: Путь к FRONTEND_DIR должен быть определен корректно в вашем проекте.
+# В текущем коде он был завязан на app, я вернул Path для примера.
+from pathlib import Path
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-# Используем 'frontend' как предполагаемую папку вашего UI
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
 
 # Монтируем статику на префикс /ui/
-app.mount(
-    "/ui",
-    StaticFiles(directory=FRONTEND_DIR, html=False),
-    name="static"
-)
+app.mount("/ui", StaticFiles(directory=FRONTEND_DIR, html=False), name="static")
 
 
 @app.get("/", include_in_schema=False)
 async def redirect_to_dashboard():
+    """Перенаправляет корневой URL на страницу дашборда."""
     return RedirectResponse(url="/ui/dashboard/dashboard.html")
 
 
-# ----------------------------------------------------------------------
-# 3. WebSocket Роут (КРИТИЧЕСКИЕ ИСПРАВЛЕНИЯ ЗДЕСЬ)
-# ----------------------------------------------------------------------
+# --- 4. Обработчик WebSocket ---
 
-# 🚨 ИСПРАВЛЕНИЕ 1: Изменено с /ws/feed на /ws для соответствия фронтенду
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     websocket_connections.add(websocket)
     logger.info(f"[API] [+] New WebSocket connection established. Total: {len(websocket_connections)}")
 
-    # Код для отправки текущего списка клиентов (СТАРТОВАЯ СИНХРОНИЗАЦИЯ)
+    # Отправка текущего списка клиентов при подключении (Стартовая синхронизация)
     try:
         current_clients = list_clients()
         if current_clients:
+            # NOTE: json импортирован выше. encode_to_binary_protocol импортирован выше.
+            import json
             payload_bytes = json.dumps(current_clients).encode('utf-8')
             encoded_message = encode_to_binary_protocol(
                 client_id="SERVER",
@@ -108,47 +96,62 @@ async def websocket_endpoint(websocket: WebSocket):
         logger.error(f"[API] [!] Error sending startup client list: {e}")
 
     try:
-        # Цикл ожидания, который будет поддерживать соединение и ловить PING/PONG
+        # Цикл ожидания, который поддерживает соединение активным
         while True:
-            # 🚨 ИСПРАВЛЕНИЕ 2: Используем универсальный receive() для обработки
-            # как текстовых, так и бинарных фреймов (PING/PONG) без ошибок.
+            # NOTE: Используем универсальный receive() для PING/PONG без ошибок.
             message = await websocket.receive()
-
             if message["type"] == "websocket.disconnect":
-                # FastAPI автоматически поднимет WebSocketDisconnect, но явная проверка не помешает
                 break
-
-                # Игнорируем все входящие сообщения (PING, команды).
-            # Это поддерживает соединение открытым и предотвращает ошибку 'text'.
-            # При необходимости обработки команд, логику добавлять сюда.
 
     except asyncio.CancelledError:
         pass
     except WebSocketDisconnect:
         logger.info(f"[API] [-] WebSocket connection closed. Total: {len(websocket_connections) - 1}")
     except Exception as e:
-        # Здесь будут ловиться прочие ошибки соединения (например, 'text' если receive_text был бы)
         logger.error(f"[API] [!] WebSocket error: {e}")
     finally:
         websocket_connections.discard(websocket)
 
 
-# ----------------------------------------------------------------------
-# 4. Задача ZeroMQ PULL и Управление Жизненным Циклом (Остается без изменений)
-# ----------------------------------------------------------------------
+# --- 5. Обработчики событий запуска и остановки (Startup/Shutdown) ---
+
+@app.on_event("startup")
+async def startup_event():
+    """Запускает ZMQ PULL диспетчер при старте Uvicorn."""
+    global zmq_pull_task_handle
+
+    zmq_pull_task_handle = asyncio.create_task(
+        zmq_pull_task_loop(websocket_connections, ZMQ_WORKER_PUSH_API)
+    )
+    logger.info("[API] [*] ZMQ PULL task initiated.")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Выполняется во время Uvicorn shutdown. Закрывает WS и ZMQ."""
+    global zmq_pull_task_handle
+
+    # Принудительно закрываем WebSocket-соединения
+    await close_all_websockets()
+
+    # Отменяем ZMQ-задачу
+    if zmq_pull_task_handle and not zmq_pull_task_handle.done():
+        zmq_pull_task_handle.cancel()
+        try:
+            await zmq_pull_task_handle
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            logger.warning(f"[API] [!] ZMQ PULL task failed during final await: {e}")
+
 
 async def close_all_websockets():
-    """
-    Закрывает все активные WebSocket-соединения.
-    """
+    """Закрывает все активные WebSocket-соединения."""
     global websocket_connections
     if not websocket_connections:
         return
 
-    close_tasks = []
-    for ws in list(websocket_connections):
-        close_tasks.append(ws.close(code=1000))
-
+    close_tasks = [ws.close(code=1000) for ws in list(websocket_connections)]
     logger.info(f"[API] [*] Closing {len(websocket_connections)} active WebSocket connections...")
 
     try:
@@ -159,44 +162,10 @@ async def close_all_websockets():
         logger.error(f"[API] [!] Error during WS gather: {e}")
 
 
-@app.on_event("startup")
-async def startup_event():
-    """Запускает ZMQ PULL диспетчер при старте Uvicorn."""
-    global zmq_pull_task_handle
-
-    # Запускаем импортированный цикл диспетчера, передавая ему
-    # набор WS-соединений и адрес ZMQ.
-    zmq_pull_task_handle = asyncio.create_task(
-        zmq_pull_task_loop(websocket_connections, ZMQ_WORKER_PUSH_API)
-    )
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """
-    Выполняется во время Uvicorn shutdown. Закрывает WS и ZMQ.
-    """
-
-    # 1. Принудительно закрываем WebSocket-соединения
-    await close_all_websockets()
-
-    # 2. Отменяем ZMQ-задачу
-    global zmq_pull_task_handle
-    if zmq_pull_task_handle and not zmq_pull_task_handle.done():
-        zmq_pull_task_handle.cancel()
-        try:
-            # Ожидаем завершения ZMQ-задачи
-            await zmq_pull_task_handle
-        except asyncio.CancelledError:
-            pass
-        except Exception as e:
-            logger.warning(f"[API] [!] ZMQ PULL task failed during final await: {e}")
-
+# --- 6. Функция запуска сервера Uvicorn ---
 
 async def run_fastapi_server(host: str, port: int):
-    """
-    Финальная версия: Контролируемый запуск Uvicorn.
-    """
+    """Контролируемый запуск Uvicorn."""
     config = uvicorn.Config(
         app,
         host=host,

@@ -4,4 +4,4 @@ ZMQ_CLIENT_PUSH_WORKER = "tcp://127.0.0.1:50000" # Клиент -> Воркер�
 ZMQ_WORKER_PUSH_API = "tcp://127.0.0.1:50002" # Воркеры -> API (Новый канал)
 API_PORT = 8001
 AUTH_KEY = "super_secret"
-NUM_WORKERS = 8
+NUM_WORKERS = 1

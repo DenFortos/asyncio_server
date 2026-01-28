@@ -55,7 +55,7 @@ async def authorize_client(reader: asyncio.StreamReader, ip_address: str):
             return None
 
         # 7. Возвращаем ID из payload и оригинальные БАЙТЫ Payload
-        return client_id, original_payload_bytes
+        return client_id, payload_dict
 
     except (asyncio.TimeoutError, asyncio.IncompleteReadError):
         logger.info(f'[!] Auth - таймаут соединения или неполное чтение от IP {ip_address}, ID: {client_id}')
