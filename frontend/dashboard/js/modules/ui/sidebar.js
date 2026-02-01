@@ -1,19 +1,14 @@
-// js/modules/ui/sidebar.js
-
 /**
- * Инициализирует логику сворачивания/разворачивания боковой панели.
+ * Управление состоянием боковой панели
  */
-function initializeSidebarToggle() {
-  const menuToggle = document.getElementById('menuToggle');
-  const sidebar = document.querySelector('.sidebar');
+export function initializeSidebarToggle() {
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.getElementById('menuToggle');
 
-  menuToggle?.addEventListener('click', () => {
-    sidebar?.classList.toggle('expanded');
-  });
-
-  // ВАЖНО: Мы удаляем весь блок document.querySelector('.sidebar').addEventListener('click', ...)
-  // так как он дублирует логику управления вкладками из dashboard.js.
+    toggleBtn?.addEventListener('click', () => {
+        sidebar?.classList.toggle('expanded');
+    });
 }
 
-// Запуск инициализации после загрузки DOM
+// Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', initializeSidebarToggle);

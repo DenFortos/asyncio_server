@@ -1,0 +1,17 @@
+{
+    "admin": {
+        "password": "123",
+        "role": "admin",
+        "prefix": "ALL"
+    },
+    "test1": {
+        "password": "123",
+        "role": "user",
+        "prefix": "u80a9"
+    },
+    "test2": {
+        "password": "123",
+        "role": "user",
+        "prefix": "ua4e1"
+    }
+}

@@ -48,7 +48,7 @@ async def start_server():
     start_benchmark(asyncio.get_running_loop(), interval=1)
 
     # ЗАПУСКАЕМ БРАУЗЕР
-    webbrowser.open(f"http://{IP}:{API_PORT}/ui/dashboard/dashboard.html")
+    webbrowser.open(f"http://{IP}:{API_PORT}/")
     logger.info("[+] Dashboard should open shortly in your browser.")
 
     # 2. Выводим чистую рамку подсказки ПОСЛЕ ЛОГА О БРАУЗЕРЕ
@@ -71,7 +71,7 @@ async def start_server():
             logger.info("[*] All workers terminated")
 
             log_queue.put("STOP")
-            api_task.cancel()  # <--- Ключевой вызов
+            api_task.cancel()
             cli_task.cancel()
 
             # Ожидаем завершения ВСЕХ отмененных задач.

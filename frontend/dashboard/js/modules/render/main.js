@@ -1,45 +1,29 @@
-// js/modules/render/main.js
-
 import { renderTable } from './table.js';
 import { renderGrid } from './grid.js';
-// Удаляем import { getAllClients } из этого файла, чтобы он не вызывал данные без фильтров
 
-// Локальное состояние для отслеживания текущего вида (по умолчанию - таблица)
 let isGridView = false;
 
-/**
- * Переключает внутреннее состояние вида (таблица/сетка).
- * Возвращает новое состояние.
- * @returns {boolean} Новое состояние isGridView.
- */
+/** Переключает вид и уведомляет систему */
 export function toggleView() {
     isGridView = !isGridView;
-    // Оповещаем dashboard.js о необходимости обновить UI (кнопку) и вызвать рендер
     window.dispatchEvent(new CustomEvent('viewToggled', { detail: isGridView }));
     return isGridView;
 }
 
+/** Рендерит переданные данные в зависимости от текущего режима */
+export function renderClients(clients) {
+    const table = document.getElementById('table-view');
+    const grid = document.getElementById('grid-view');
+    if (!table || !grid) return;
 
-/**
- * Основная функция рендера. Вызывает нужную функцию рендера в зависимости от состояния.
- * ВАЖНО: Принимает УЖЕ ОТФИЛЬТРОВАННЫЕ данные из dashboard.js.
- * @param {Array<Object>} clientsData - Отфильтрованный и отсортированный список клиентов.
- */
-export function renderClients(clientsData) {
-  const tableView = document.getElementById('table-view');
-  const gridView = document.getElementById('grid-view');
+    // Массив настроек для управления отображением
+    const views = [
+        { el: table, display: 'table', active: !isGridView, fn: renderTable },
+        { el: grid, display: 'flex', active: isGridView, fn: renderGrid }
+    ];
 
-  if (!tableView || !gridView) return;
-
-  if (isGridView) {
-    tableView.style.display = 'none';
-    gridView.style.display = 'flex'; // Используем flex для сетки
-    renderGrid(clientsData);
-  } else {
-    tableView.style.display = 'table';
-    gridView.style.display = 'none';
-    renderTable(clientsData);
-  }
+    views.forEach(v => {
+        v.el.style.display = v.active ? v.display : 'none';
+        if (v.active) v.fn(clients);
+    });
 }
-
-// Удалены все обработчики DOMContentLoaded и привязки к кнопке.

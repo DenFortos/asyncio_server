@@ -1,43 +1,26 @@
-// js/modules/ui/search.js
-
 /**
- * Применяет фильтр по поисковому запросу.
- * @param {Array<Object>} items - Массив объектов (клиентов, файлов, и т.д.).
- * @param {string} query - Строка поиска (пользовательский ввод).
- * @returns {Array<Object>} Отфильтрованный массив.
+ * Универсальный поиск по массиву объектов
+ * @param {Array} items - Данные (клиенты, файлы и т.д.)
+ * @param {string} query - Поисковый запрос
  */
-export function applySearchFilter(items, query) {
-  if (!query) {
-    return items;
-  }
+export const applySearchFilter = (items, query) => {
+    const q = query?.toLowerCase().trim();
+    if (!q) return items;
 
-  const lowerQuery = query.toLowerCase().trim();
-
-  // Поиск по ключевым полям: id и ip (как вы указали)
-  return items.filter(item => {
-    // Проверка наличия и поиск в ключевых полях клиента
-    return (
-      item.id?.toLowerCase().includes(lowerQuery) ||
-      item.ip?.includes(lowerQuery) ||
-      item.pc_name?.toLowerCase().includes(lowerQuery) // Добавляем pc_name для удобства
-      // Здесь можно добавить логику поиска по файлам, когда будет готов модуль files
+    return items.filter(item =>
+        // Ищем совпадение в ID, IP или имени ПК
+        [item.id, item.ip, item.pc_name, item.user]
+            .some(field => field?.toLowerCase().includes(q))
     );
-  });
-}
+};
 
-// ----------------------------------------------------------------------
-// Подписка на ввод
-// ----------------------------------------------------------------------
-
+// Инициализация слушателя ввода
 document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('search-input');
+    const input = document.getElementById('search-input');
 
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            // Оповещаем dashboard.js о необходимости обновить вид
-            window.dispatchEvent(new CustomEvent('searchUpdated', {
-                detail: searchInput.value
-            }));
-        });
-    }
+    input?.addEventListener('input', () => {
+        window.dispatchEvent(new CustomEvent('searchUpdated', {
+            detail: input.value
+        }));
+    });
 });

@@ -1,31 +1,33 @@
-// js/modules/data/stats.js
-
-import { getAllClients } from './clients.js'; // Убедитесь, что путь правильный
+import { getAllClients } from './clients.js';
 
 /**
- * Обновляет статистику "Online", "Offline", "Total" в HTML-элементах.
+ * Обновляет счетчики в хедере или на дашборде
  */
-function updateStats() {
-  const clients = getAllClients();
+const updateStats = () => {
+    const clients = getAllClients();
 
-  const online = clients.filter(c => c.status === 'online').length;
-  const offline = clients.filter(c => c.status === 'offline').length;
-  const total = clients.length;
+    // Считаем всё за один проход вместо трех фильтров
+    const stats = clients.reduce((acc, c) => {
+        acc[c.status === 'online' ? 'online' : 'offline']++;
+        return acc;
+    }, { online: 0, offline: 0 });
 
-  // Обновление DOM
-  document.getElementById('online-count').textContent = online;
-  document.getElementById('offline-count').textContent = offline;
-  document.getElementById('total-count').textContent = total;
-}
+    // Массовое обновление DOM
+    const mapping = {
+        'online-count': stats.online,
+        'offline-count': stats.offline,
+        'total-count': clients.length
+    };
 
-// ----------------------------------------------------------------------
-// Подписка на события для автоматического обновления
-// ----------------------------------------------------------------------
+    Object.entries(mapping).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    });
+};
 
-document.addEventListener('clientsUpdated', updateStats);
-document.addEventListener('clientUpdated', updateStats);
-document.addEventListener('clientRemoved', updateStats);
+// Подписка на все события обновления данных разом
+['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev =>
+    document.addEventListener(ev, updateStats)
+);
 
-
-// Экспорт, если вы планируете вызывать её вручную из других модулей (но подписки достаточно)
 export { updateStats };

@@ -1,225 +1,108 @@
-// js/dashboard.js
-
-// 1. ИМПОРТЫ
 import { getAllClients } from './modules/data/clients.js';
 import { renderClients, toggleView } from './modules/render/main.js';
 import { applyStatusFilter } from './modules/ui/filters.js';
 import { applySearchFilter } from './modules/ui/search.js';
 import { connectWebSocket } from './modules/websocket/connection.js';
-//import { AlertsManager } from './modules/ui/alerts/AlertsManager.js'; // ⬅️ ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ #1: Импорт AlertsManager
 
+// 1. СОСТОЯНИЕ
+const state = { filter: 'all', search: '', tab: 'clients' };
 
-// 2. ЛОКАЛЬНОЕ СОСТОЯНИЕ
-let currentFilter = 'all';
-let currentSearchQuery = '';
-let activeTab = 'clients';
-
-
-// 3. УПРАВЛЕНИЕ UI И КАРКАСОМ
-// ---
+// 2. ЦЕНТРАЛЬНЫЙ КОНТРОЛЛЕР
+const updateView = () => {
+    const clients = applySearchFilter(applyStatusFilter(getAllClients(), state.filter), state.search);
+    renderClients(clients);
+};
 
 /**
- * Управляет видимостью основных контейнеров, searchBar и кнопки ToggleView.
- * @param {string} tabName - Имя вкладки для отображения.
+ * Управляет переключением разделов
  */
 function showTab(tabName) {
-    activeTab = tabName;
+    state.tab = tabName;
+    const isClients = tabName === 'clients';
 
-    const searchBar = document.querySelector('.search-bar');
-    const tableContainer = document.querySelector('.table-container');
-    const toggleViewBtn = document.getElementById('toggleView');
-
-    // Скрываем все основные контейнеры
-    document.querySelectorAll('.files-container, .alerts-container, .table-container, #stats-container, #settings-container').forEach(el => {
-        if (el) {
-            el.style.display = 'none';
-        }
+    // Скрываем всё, показываем нужное
+    const sections = ['.files-container', '.alerts-container', '.table-container', '#stats-container', '#settings-container'];
+    sections.forEach(s => {
+        const el = document.querySelector(s);
+        if (el) el.style.display = 'none';
     });
 
-    // Определяем контейнер для показа
-    let targetContainer;
-    switch (tabName) {
-        case 'files':
-            targetContainer = document.querySelector('.files-container');
-            break;
-        case 'alerts':
-            targetContainer = document.querySelector('.alerts-container');
-            break;
-        case 'stats':
-            targetContainer = document.getElementById('stats-container');
-            break;
-        case 'settings':
-            targetContainer = document.getElementById('settings-container');
-            break;
-        case 'clients':
-        default:
-            targetContainer = tableContainer;
-            break;
+    const target = document.querySelector(tabName === 'clients' ? '.table-container' :
+                   tabName === 'stats' || tabName === 'settings' ? `#${tabName}-container` : `.${tabName}-container`);
+
+    if (target) target.style.display = ['stats', 'settings'].includes(tabName) ? 'flex' : 'block';
+
+    // Управление UI-панелью (поиск и переключатель вида)
+    const searchBar = document.querySelector('.search-bar');
+    if (searchBar) searchBar.style.display = ['alerts', 'stats', 'settings'].includes(tabName) ? 'none' : 'flex';
+
+    const tvBtn = document.getElementById('toggleView');
+    if (tvBtn) {
+        tvBtn.disabled = !isClients;
+        tvBtn.classList.toggle('inactive', !isClients);
     }
 
-    // Показываем целевой контейнер
-    if (targetContainer) {
-        targetContainer.style.display = (tabName === 'alerts' || tabName === 'files' || tabName === 'clients') ? 'block' : 'flex';
-    }
-
-    // Управление видимостью searchBar
-    const showSearch = (tabName !== 'alerts' && tabName !== 'stats' && tabName !== 'settings');
-    if (searchBar) searchBar.style.display = showSearch ? 'flex' : 'none';
-
-    // Управление кнопкой ToggleView
-    const isActiveTab = (tabName === 'clients');
-
-    if (toggleViewBtn) {
-        toggleViewBtn.style.display = 'block';
-
-        if (isActiveTab) {
-            toggleViewBtn.classList.remove('inactive');
-            toggleViewBtn.disabled = false;
-        } else {
-            toggleViewBtn.classList.add('inactive');
-            toggleViewBtn.disabled = true;
-        }
-    }
-
-    if (tabName === 'clients' || tabName === 'files') {
-        updateView();
-    }
+    if (['clients', 'files'].includes(tabName)) updateView();
 }
 
 /**
- * Устанавливает активное состояние для кнопки в сайдбаре или фильтре.
- * @param {HTMLElement} button - Элемент, который нужно активировать.
+ * Управляет подсветкой активных кнопок
  */
 function setActiveButton(button) {
-    document.querySelectorAll('.icon, .filter-buttons button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    if (button) {
-        button.classList.add('active');
-    }
+    document.querySelectorAll('.icon, .filter-group button, .filter-buttons button').forEach(btn => btn.classList.remove('active'));
+    button?.classList.add('active');
 }
 
-
-// 4. ГЛАВНЫЙ КОНТРОЛЛЕР ДАННЫХ
-// ---
-
-/**
- * Применяет все активные фильтры (статус, поиск) и вызывает рендер.
- */
-function updateView() {
-    let clients = getAllClients();
-    clients = applyStatusFilter(clients, currentFilter);
-    clients = applySearchFilter(clients, currentSearchQuery);
-    renderClients(clients);
-}
-
-
-// 5. ИНИЦИАЛИЗАЦИЯ И ОБРАБОТЧИКИ СОБЫТИЙ
-// ---
-
+// 3. ИНИЦИАЛИЗАЦИЯ
 document.addEventListener('DOMContentLoaded', () => {
+    connectWebSocket();
 
-    const toggleViewBtn = document.getElementById('toggleView');
-
-    // ⬅️ ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ #2: Инициализация AlertsManager
-    // Теперь, когда модуль импортирован, его можно инициализировать.
-    //window.alertsManager = new AlertsManager('alerts-grid');
-
-
-    // --- Обработчики иконок в Sidebar ---
-
-    document.querySelector('.icon[title="Files"]')?.addEventListener('click', (e) => {
-        showTab('files');
-        setActiveButton(e.currentTarget);
+    // Делегирование для Сайдбара (иконки Files, Alerts, Stats, Settings)
+    document.querySelector('.sidebar')?.addEventListener('click', (e) => {
+        const icon = e.target.closest('.icon[title]');
+        if (icon) {
+            showTab(icon.getAttribute('title').toLowerCase());
+            setActiveButton(icon);
+        }
     });
 
-    document.querySelector('.icon[title="Alerts"]')?.addEventListener('click', (e) => {
-        showTab('alerts');
-        setActiveButton(e.currentTarget);
+    // Делегирование для Фильтров (All, Online, Offline)
+    document.querySelector('.filter-group, .filter-buttons')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[id^="filter-"]');
+        if (btn) {
+            state.filter = btn.id.replace('filter-', '');
+            setActiveButton(btn);
+            showTab('clients');
+        }
     });
 
-    document.querySelector('.icon[title="Stats"]')?.addEventListener('click', (e) => {
-        showTab('stats');
-        setActiveButton(e.currentTarget);
+    // Переключатель вида
+    document.getElementById('toggleView')?.addEventListener('click', () => toggleView());
+
+    // Глобальные события
+    window.addEventListener('searchUpdated', (e) => {
+        state.search = e.detail;
+        if (['clients', 'files'].includes(state.tab)) updateView();
     });
-
-    document.querySelector('.icon[title="Settings"]')?.addEventListener('click', (e) => {
-        showTab('settings');
-        setActiveButton(e.currentTarget);
-    });
-
-
-    // --- Обработчики кнопок фильтров ---
-
-    document.querySelectorAll('#filter-all, #filter-online, #filter-offline').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        currentFilter = e.currentTarget.id.replace('filter-', '');
-        setActiveButton(e.currentTarget);
-        showTab('clients');
-      });
-    });
-
-    // --- Обработчик Toggle View ---
-    toggleViewBtn?.addEventListener('click', () => {
-        toggleView();
-    });
-
-    // --- Обработчики внутренних событий (Синхронизация) ---
-
-    window.addEventListener('clientsUpdated', updateView);
-    window.addEventListener('clientUpdated', updateView);
-    window.addEventListener('clientRemoved', updateView);
 
     window.addEventListener('viewToggled', (e) => {
-        const isGridView = e.detail;
-
-        if (toggleViewBtn) {
-            if (isGridView) {
-                toggleViewBtn.innerHTML = '<i class="fas fa-list"></i> Table View';
-            } else {
-                toggleViewBtn.innerHTML = '<i class="fas fa-th"></i> Grid View';
-            }
-        }
+        const btn = document.getElementById('toggleView');
+        if (btn) btn.innerHTML = e.detail ? '<i class="fas fa-list"></i> Table View' : '<i class="fas fa-th"></i> Grid View';
         updateView();
     });
 
-    window.addEventListener('searchUpdated', (e) => {
-        currentSearchQuery = e.detail;
-        if (activeTab === 'clients' || activeTab === 'files') {
-             updateView();
-        }
-    });
+    ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => window.addEventListener(ev, updateView));
 
-    // --- Логика перехода на страницу управления клиентом ---
-
-    const openClientControl = (clientId) => {
-        if (clientId) {
-            window.location.href = `../client_control/client_control.html?id=${clientId}`;
-        }
-    };
-
+    // Переход в управление клиентом
     document.addEventListener('click', (e) => {
-        const row = e.target.closest('#table-view tbody tr');
-        const card = e.target.closest('.client-card');
-
-        if (row) {
-            const clientId = row.getAttribute('data-client-id');
-            openClientControl(clientId);
-        } else if (card) {
-            const clientId = card.getAttribute('data-client-id');
-            openClientControl(clientId);
+        const item = e.target.closest('[data-client-id]');
+        if (item && !e.target.closest('button')) {
+            window.location.href = `../client_control/client_control.html?id=${item.dataset.clientId}`;
         }
     });
 
-    // --- Инициализация при загрузке ---
-
-    connectWebSocket();
-
-    const initialFilterButton = document.getElementById('filter-all');
-    setActiveButton(initialFilterButton);
-
+    // Стартовое состояние
+    setActiveButton(document.getElementById('filter-all'));
     showTab('clients');
-
-    // ⬅️ ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ #3: Принудительный вызов рендера
-    updateView(); // <-- Это заставляет рендер произойти сразу
+    updateView();
 });
