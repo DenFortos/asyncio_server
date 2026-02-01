@@ -1,4 +1,4 @@
-// js/modules/websocket/connection.js (ФИНАЛЬНО ИСПРАВЛЕННАЯ ВЕРСИЯ)
+// js/modules/websocket/connection.js
 
 import { updateClient, updateClients } from '../data/clients.js';
 
@@ -9,11 +9,15 @@ let reconnectInterval = 5000;
 let pingIntervalId = null;
 const PING_INTERVAL = 25000;
 const textDecoder = new TextDecoder('utf-8');
-const textEncoder = new TextEncoder(); // Для кодирования PING
+const textEncoder = new TextEncoder();
 
+/**
+ * Декодирует бинарный пакет согласно протоколу:
+ * [ID_len(1)][ID][Mod_len(1)][Mod][Payload_len(4)][Payload]
+ */
 function decodeBinaryProtocol(buffer) {
     if (!buffer || buffer.byteLength < 6) {
-        console.warn('Received invalid binary message: buffer too small.');
+        console.warn('[WS Parser] Пакет слишком мал для заголовка');
         return null;
     }
 
@@ -21,57 +25,38 @@ function decodeBinaryProtocol(buffer) {
     let offset = 0;
 
     try {
-        // 1. Чтение ID клиента
-        const idLen = dataView.getUint8(offset); // 1 байт
+        // 1. Чтение ID
+        const idLen = dataView.getUint8(offset);
         offset += 1;
-
-        // ИСПРАВЛЕНО: Используем Uint8Array для надежного извлечения байтов
         const idBytes = new Uint8Array(buffer, offset, idLen);
         const client_id = textDecoder.decode(idBytes);
         offset += idLen;
 
-        // 2. Чтение имени модуля
-        const modLen = dataView.getUint8(offset); // 1 байт
+        // 2. Чтение Модуля
+        const modLen = dataView.getUint8(offset);
         offset += 1;
-
-        // ИСПРАВЛЕНО: Используем Uint8Array для надежного извлечения байтов
         const modBytes = new Uint8Array(buffer, offset, modLen);
         const module_name = textDecoder.decode(modBytes);
         offset += modLen;
 
         // 3. Чтение длины Payload (4 байта, Big Endian)
-        const payloadLen = dataView.getUint32(offset, false); // false = Big Endian
+        const payloadLen = dataView.getUint32(offset, false);
         offset += 4;
 
-        // 4. Извлечение Payload (ArrayBuffer)
+        // 4. Извлечение Payload
         const payload = buffer.slice(offset, offset + payloadLen);
 
-        // 5. Формирование внутреннего заголовка
-        const header = {
-            client_id: client_id,
-            module: module_name,
-            size: payloadLen
+        return {
+            header: { client_id, module: module_name, size: payloadLen },
+            payload: payload
         };
-
-        console.log(`[WS Parser] Decoded Header: ID=${client_id}, Module=${module_name}, PayloadSize=${payloadLen}`);
-
-        return { header, payload };
-
     } catch (e) {
-        console.error('Failed to decode binary ZMQ/WS frame:', e);
+        console.error('[WS Parser] Ошибка разбора бинарного фрейма:', e);
         return null;
     }
 }
 
-/** Отправляет PING-фрейм для поддержания активности соединения. */
-function sendPing() {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        const pingPacket = encodeToBinaryProtocol("0", "ping", new ArrayBuffer(0));
-        ws.send(pingPacket);
-    }
-}
-
-/** Функция кодирования (для PING) */
+/** Кодирование для PING */
 function encodeToBinaryProtocol(client_id, module_name, payload) {
     const id_bytes = textEncoder.encode(client_id);
     const module_bytes = textEncoder.encode(module_name);
@@ -82,35 +67,24 @@ function encodeToBinaryProtocol(client_id, module_name, payload) {
     const dataView = new DataView(buffer);
 
     let offset = 0;
-
-    // 1. ID_len и ID
-    dataView.setUint8(offset, id_bytes.byteLength);
-    offset += 1;
-    new Uint8Array(buffer, offset).set(id_bytes);
-    offset += id_bytes.byteLength;
-
-    // 2. Mod_len и Module_name
-    dataView.setUint8(offset, module_bytes.byteLength);
-    offset += 1;
-    new Uint8Array(buffer, offset).set(module_bytes);
-    offset += module_bytes.byteLength;
-
-    // 3. Payload_len
-    dataView.setUint32(offset, payload_bytes.byteLength, false);
-    offset += 4;
-
-    // 4. Payload
+    dataView.setUint8(offset, id_bytes.byteLength); offset += 1;
+    new Uint8Array(buffer, offset).set(id_bytes); offset += id_bytes.byteLength;
+    dataView.setUint8(offset, module_bytes.byteLength); offset += 1;
+    new Uint8Array(buffer, offset).set(module_bytes); offset += module_bytes.byteLength;
+    dataView.setUint32(offset, payload_bytes.byteLength, false); offset += 4;
     new Uint8Array(buffer, offset).set(payload_bytes);
 
     return buffer;
 }
 
-function connectWebSocket() { // 🚨 Здесь больше НЕТ ключевого слова 'export'
-    // Очищаем предыдущий интервал пинга, если он был
-    if (pingIntervalId) {
-        clearInterval(pingIntervalId);
-        pingIntervalId = null;
+function sendPing() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(encodeToBinaryProtocol("0", "ping", new ArrayBuffer(0)));
     }
+}
+
+export function connectWebSocket() {
+    if (pingIntervalId) clearInterval(pingIntervalId);
 
     ws = new WebSocket(WS_URL);
     ws.binaryType = 'arraybuffer';
@@ -118,106 +92,66 @@ function connectWebSocket() { // 🚨 Здесь больше НЕТ ключе�
     const alertsManager = window.alertsManager;
 
     ws.onopen = () => {
-        console.log("[WS] Connected to C2 API WebSocket.");
+        console.log("%c[WS] Соединение установлено", "color: #00ff00; font-weight: bold;");
         pingIntervalId = setInterval(sendPing, PING_INTERVAL);
     };
 
     ws.onmessage = (event) => {
+        if (!(event.data instanceof ArrayBuffer)) return;
 
-        if (!(event.data instanceof ArrayBuffer)) {
-             console.warn("[WS] Received non-binary message (expected ArrayBuffer). Skipping.", event.data);
-             return;
-        }
+        const decoded = decodeBinaryProtocol(event.data);
+        if (!decoded) return;
 
-        const decodedMessage = decodeBinaryProtocol(event.data);
-
-        if (!decodedMessage) return;
-
-        const header = decodedMessage.header;
-        const rawPayload = decodedMessage.payload;
+        const { header, payload: rawPayload } = decoded;
         const module = header.module;
 
-        // --- A. ОБРАБОТКА PONG ---
-        if (module === 'pong') {
-             return;
-        }
+        if (module === 'pong') return;
 
-        let payload;
+        // Список JSON-модулей, которые требуют парсинга
+        const jsonModules = ['ClientList', 'DataScribe', 'AuthUpdate'];
+        let payloadData = null;
         let isJson = false;
 
-        // Попытка декодировать Payload как JSON
-        try {
-            if (rawPayload.byteLength > 0) {
-                 const payloadString = textDecoder.decode(rawPayload);
-
-                 // ЛОГ: Показывает, что JS видит перед парсингом
-                 console.log(`[WS JSON Attempt] Module: ${module}, String Length: ${payloadString.length}, Data: ${payloadString.substring(0, 100)}...`);
-
-                 payload = JSON.parse(payloadString);
-                 isJson = true;
-            } else {
-                 payload = null;
+        if (jsonModules.includes(module) && rawPayload.byteLength > 0) {
+            try {
+                payloadData = JSON.parse(textDecoder.decode(rawPayload));
+                isJson = true;
+            } catch (e) {
+                console.error(`[WS] Ошибка JSON в модуле ${module}:`, e);
             }
-        } catch (e) {
-            console.error(`[WS JSON Error] Failed to parse JSON for module ${module}:`, e);
-            payload = rawPayload;
-            isJson = false;
         }
 
-        // === 1. ОБРАБОТКА СТАРТОВОГО СПИСКА КЛИЕНТОВ (ClientList) ===
+        // --- ДИСПЕТЧЕРИЗАЦИЯ ---
+
         if (module === 'ClientList' && isJson) {
-            if (Array.isArray(payload)) {
-                console.log(`✅ Received initial list of ${payload.length} clients.`);
-                if (alertsManager) {
-                   alertsManager.addLog(`[API] Received initial list of ${payload.length} clients.`);
-                }
-                updateClients(payload);
-            }
+            updateClients(payloadData);
         }
-        // === 2. ОБРАБОТКА СТАТУСА/ОБНОВЛЕНИЯ (AuthUpdate) ===
-        else if (module === 'AuthUpdate' && isJson) {
-            const clientData = payload;
-            console.log(`✅ Client Status: ${clientData.id} is ${clientData.status}`);
+        else if ((module === 'DataScribe' || module === 'AuthUpdate') && isJson) {
+            // ВАЖНО: Мы передаем данные в clients.js, который кинет событие для dashboard.js
+            updateClient(payloadData);
 
             if (alertsManager) {
-                alertsManager.addLog(`[Client] Status update: ${clientData.id} is now ${clientData.status}.`);
+                const win = payloadData.activeWindow || 'N/A';
+                alertsManager.addLog(`[${module}] ${header.client_id} -> ${win}`);
             }
-            updateClient(clientData);
         }
-        // === 3. ОБРАБОТКА JSON-РЕЗУЛЬТАТОВ ВОБКЕРОВ ===
-        else if (isJson) {
-            console.log(`[${module}] JSON Data for ${header.client_id}:`, payload);
-            if (alertsManager) {
-                alertsManager.addLog(`[WORKER] ${module} from ${header.client_id}: ${JSON.stringify(payload).substring(0, 100)}...`);
-            }
-            // TODO: Диспетчеризация JSON-данных воркеров
-        }
-        // === 4. ОБРАБОТКА ЧИСТЫХ БИНАРНЫХ ДАННЫХ ===
-        else {
-            // Здесь payload является ArrayBuffer
-            console.log(`[${module}] Received raw binary data for ${header.client_id}: ${rawPayload.byteLength} bytes.`);
-            if (alertsManager) {
-                alertsManager.addLog(`[WORKER] ${module} from ${header.client_id}: Received ${rawPayload.byteLength} bytes.`);
-            }
-            // TODO: Здесь должна быть логика обработки ArrayBuffer'а (например, скриншота/файла)
+        else if (!isJson) {
+            // Для бинарных данных (скриншоты и т.д.)
+            window.dispatchEvent(new CustomEvent('binaryDataReceived', {
+                detail: { header, payload: rawPayload }
+            }));
         }
     };
 
     ws.onclose = () => {
-        console.warn("[WS] Disconnected. Attempting to reconnect...");
-        if (pingIntervalId) {
-            clearInterval(pingIntervalId);
-            pingIntervalId = null;
-        }
+        console.warn("[WS] Соединение потеряно. Реконнект...");
+        if (pingIntervalId) clearInterval(pingIntervalId);
         setTimeout(connectWebSocket, reconnectInterval);
     };
 
-    ws.onerror = (error) => {
-        console.error("[WS] WebSocket Error:", error);
-        ws.close();
+    ws.onerror = (err) => {
+        console.error("[WS] Ошибка сокета:", err);
     };
 
     window.c2WebSocket = ws;
 }
-
-export { connectWebSocket, decodeBinaryProtocol };

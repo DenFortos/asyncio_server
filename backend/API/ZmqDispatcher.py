@@ -1,32 +1,9 @@
-# backend/API/ZmqDispatcher.py (ИСПРАВЛЕННЫЙ для БИНАРНОГО протокола и ДИАГНОСТИКИ)
-
 import asyncio
-import json
 import zmq
 import zmq.asyncio
-import struct
-from typing import Set, Optional, Dict, Any
+from typing import Set
 from fastapi import WebSocket
 from logs import Log as logger
-
-
-# ----------------------------------------------------------------------
-# Функция кодирования
-# ----------------------------------------------------------------------
-
-def encode_to_binary_protocol(client_id: str, module_name: str, payload_bytes: bytes) -> bytes:
-    """
-    Кодирует данные в требуемый бинарный формат для отправки на фронтенд.
-    Формат: ID_len (1) | ID (N) | Mod_len (1) | Module_name (N) | Payload_len (4) | Payload (N)
-    """
-    id_bytes = client_id.encode('utf-8', errors='replace')
-    module_bytes = module_name.encode('utf-8', errors='replace')
-
-    header = struct.pack('B', len(id_bytes)) + id_bytes
-    header += struct.pack('B', len(module_bytes)) + module_bytes
-    header += struct.pack('>I', len(payload_bytes))
-
-    return header + payload_bytes
 
 
 # ----------------------------------------------------------------------
@@ -34,54 +11,48 @@ def encode_to_binary_protocol(client_id: str, module_name: str, payload_bytes: b
 # ----------------------------------------------------------------------
 
 async def zmq_message_dispatcher(
-        header_bytes: bytes,
-        payload_bytes: Optional[bytes],
+        packet: bytes,
         websocket_connections: Set[WebSocket]
 ):
     """
-    Обрабатывает ZMQ-сообщение (Multipart) и рассылает его ВСЕГДА в унифицированном
-    бинарном формате (ID_len|...|Payload) всем активным WebSocket-соединениям.
+    Принимает готовый бинарный пакет от воркера и транслирует его в WebSocket.
     """
-
-    # 1. Парсинг заголовка
-    try:
-        header: Dict[str, Any] = json.loads(header_bytes.decode('utf-8'))
-        module_name = header.get("module", "Unknown")
-        client_id = header.get("client_id", "?")
-    except json.JSONDecodeError:
-        logger.error(f"[ZMQ Dispatch] Failed to decode ZMQ header. Raw bytes: {header_bytes[:50]}...")
+    if not packet:
         return
 
-    payload_len = len(payload_bytes) if payload_bytes is not None else 0
+    # 1. МИНИ-РАЗБОР ДЛЯ МАРШРУТИЗАЦИИ
+    try:
+        # Нам нужно только узнать client_id, чтобы понимать, чей это бот
+        id_len = packet[0]
+        client_id_bytes = packet[1: 1 + id_len]
+        client_id = client_id_bytes.decode('utf-8', errors='ignore')
 
-    # 🚨 КРИТИЧЕСКИЙ ДИАГНОСТИЧЕСКИЙ ЛОГ 🚨
+        # Для диагностики вытащим и имя модуля (оно идет сразу после ID)
+        mod_len_pos = 1 + id_len
+        mod_len = packet[mod_len_pos]
+        module_name = packet[mod_len_pos + 1: mod_len_pos + 1 + mod_len].decode('utf-8', errors='ignore')
+
+    except Exception as e:
+        logger.error(f"[ZMQ Dispatch] Ошибка разбора заголовка: {e}")
+        return
+
+    # 🚨 ДИАГНОСТИЧЕСКИЙ ЛОГ 🚨
     logger.info(
-        f"[ZMQ Dispatcher IN] ID: {client_id} | Module: {module_name} | Payload Size: {payload_len} bytes. WS connections: {len(websocket_connections)}"
+        f"[ZMQ -> WS] Client: {client_id} | Module: {module_name} | Total Size: {len(packet)} bytes"
     )
 
-    # 2. Определение итоговой полезной нагрузки
-    final_payload_bytes = payload_bytes if payload_bytes is not None else b''
-
-    # 3. Кодирование в новый бинарный протокол (УНИФИКАЦИЯ)
-    try:
-        encoded_message = encode_to_binary_protocol(client_id, module_name, final_payload_bytes)
-        logger.debug(f"[ZMQ Dispatcher] Successfully encoded message for frontend.")
-    except Exception as e:
-        logger.error(f"[ZMQ Dispatch] Failed to encode to binary protocol: {e}")
-        return
-
-    # 4. Рассылка бинарного фрейма
+    # 2. РАССЫЛКА ПАКЕТА
     if not websocket_connections:
-        logger.warning("[ZMQ Dispatcher] No active WebSocket connections to send message to.")
+        logger.warning("[ZMQ Dispatcher] Нет активных WS-соединений.")
         return
 
+    # Отправляем ВЕСЬ пакет без изменений (Zero-copy трансляция)
     for ws in list(websocket_connections):
         try:
-            await ws.send_bytes(encoded_message)
-            logger.debug(f"[ZMQ Dispatcher] Sent {len(encoded_message)} bytes to a WebSocket client.")
+            await ws.send_bytes(packet)
         except Exception as e:
-            logger.error(f"[ZMQ Dispatcher] Error sending to WebSocket: {type(e).__name__}. Removing connection.")
-            websocket_connections.discard(ws)  # Автоматически удаляем битое соединение
+            logger.error(f"[ZMQ Dispatcher] Ошибка отправки в WS: {e}")
+            websocket_connections.discard(ws)
 
 
 # ----------------------------------------------------------------------
@@ -94,47 +65,32 @@ async def zmq_pull_task_loop(websocket_connections: Set[WebSocket], ZMQ_WORKER_P
 
     try:
         pull_socket = zmq_ctx.socket(zmq.PULL)
+        # Убираем лимиты очереди, чтобы не терять пакеты
         pull_socket.set_hwm(0)
 
-        # Используем connect() вместо bind() если API запускается после Server.py
-        # pull_socket.connect(ZMQ_WORKER_PUSH_API)
-
-        # Используем bind() как было изначально (предполагаем, что Server.py стартует позже)
+        # Привязываемся к адресу
         pull_socket.bind(ZMQ_WORKER_PUSH_API)
 
-        logger.info(f"[ZMQ Dispatch] [+] ZeroMQ PULL socket bound to {ZMQ_WORKER_PUSH_API}")
+        logger.info(f"[ZMQ Dispatch] [+] PULL socket bound to {ZMQ_WORKER_PUSH_API}")
 
         while True:
             try:
-                # 🚨 КРИТИЧЕСКИЙ ЛОГ ПЕРЕД ОЖИДАНИЕМ 🚨
-                logger.debug("[ZMQ Dispatch] Waiting for next ZMQ message...")
+                # Воркер теперь присылает ОДИН фрейм вместо multipart
+                packet = await pull_socket.recv()
 
-                frames = await pull_socket.recv_multipart()
-
-                # 🚨 КРИТИЧЕСКИЙ ЛОГ ПОСЛЕ ПОЛУЧЕНИЯ 🚨
-                logger.debug(f"[ZMQ Dispatch] Received ZMQ message with {len(frames)} frames.")
-
-                if not frames:
-                    continue
-
-                header = frames[0]
-                payload = frames[1] if len(frames) > 1 else None
-
-                await zmq_message_dispatcher(header, payload, websocket_connections)
+                # Пробрасываем в диспетчер
+                await zmq_message_dispatcher(packet, websocket_connections)
 
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                logger.error(f"[ZMQ Dispatch] [!] ZMQ PULL task inner loop error: {e}")
-                await asyncio.sleep(0.1)
+                logger.error(f"[ZMQ Dispatch] Ошибка в цикле приема: {e}")
+                await asyncio.sleep(0.01)
 
-    except asyncio.CancelledError:
-        pass
     except Exception as e:
-        logger.critical(f"[ZMQ Dispatch] [!!!] ZMQ PULL task FATAL error: {e}")
+        logger.critical(f"[ZMQ Dispatch] Фатальная ошибка: {e}")
     finally:
         if pull_socket:
             pull_socket.close()
         zmq_ctx.term()
-        logger.info("[ZMQ Dispatch] [*] ZMQ PULL context terminated.")
-
+        logger.info("[ZMQ Dispatch] Контекст завершен.")
