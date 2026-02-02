@@ -23,7 +23,7 @@ export function removeClient(id) {
 
 /** Возвращает массив клиентов, отсортированный по активности (новые сверху) */
 export function getAllClients() {
-    return Object.values(clients).sort((a, b) => 
+    return Object.values(clients).sort((a, b) =>
         (b.last_active || "").localeCompare(a.last_active || "")
     );
 }

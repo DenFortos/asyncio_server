@@ -4,82 +4,68 @@ import { applyStatusFilter } from './modules/ui/filters.js';
 import { applySearchFilter } from './modules/ui/search.js';
 import { connectWebSocket } from './modules/websocket/connection.js';
 
-// 1. СОСТОЯНИЕ
 const state = { filter: 'all', search: '', tab: 'clients' };
 
-// 2. ЦЕНТРАЛЬНЫЙ КОНТРОЛЛЕР
 const updateView = () => {
     const clients = applySearchFilter(applyStatusFilter(getAllClients(), state.filter), state.search);
     renderClients(clients);
 };
 
-/**
- * Управляет переключением разделов
- */
 function showTab(tabName) {
     state.tab = tabName;
-    const isClients = tabName === 'clients';
+    const isCl = tabName === 'clients';
 
-    // Скрываем всё, показываем нужное
-    const sections = ['.files-container', '.alerts-container', '.table-container', '#stats-container', '#settings-container'];
-    sections.forEach(s => {
-        const el = document.querySelector(s);
-        if (el) el.style.display = 'none';
+    // Маппинг вкладок на их контейнеры
+    const containers = {
+        clients: '.table-container', files: '.files-container', alerts: '.alerts-container',
+        stats: '#stats-container', settings: '#settings-container'
+    };
+
+    Object.entries(containers).forEach(([key, selector]) => {
+        const el = document.querySelector(selector);
+        if (!el) return;
+        el.style.display = key === tabName ? (['stats', 'settings'].includes(key) ? 'flex' : 'block') : 'none';
     });
 
-    const target = document.querySelector(tabName === 'clients' ? '.table-container' :
-                   tabName === 'stats' || tabName === 'settings' ? `#${tabName}-container` : `.${tabName}-container`);
-
-    if (target) target.style.display = ['stats', 'settings'].includes(tabName) ? 'flex' : 'block';
-
-    // Управление UI-панелью (поиск и переключатель вида)
+    // Видимость поиска
     const searchBar = document.querySelector('.search-bar');
     if (searchBar) searchBar.style.display = ['alerts', 'stats', 'settings'].includes(tabName) ? 'none' : 'flex';
 
     const tvBtn = document.getElementById('toggleView');
     if (tvBtn) {
-        tvBtn.disabled = !isClients;
-        tvBtn.classList.toggle('inactive', !isClients);
+        tvBtn.disabled = !isCl;
+        tvBtn.classList.toggle('inactive', !isCl);
     }
 
     if (['clients', 'files'].includes(tabName)) updateView();
 }
 
-/**
- * Управляет подсветкой активных кнопок
- */
-function setActiveButton(button) {
-    document.querySelectorAll('.icon, .filter-group button, .filter-buttons button').forEach(btn => btn.classList.remove('active'));
-    button?.classList.add('active');
-}
+const setActive = (btn) => {
+    document.querySelectorAll('.icon, .filter-group button, .filter-buttons button').forEach(b => b.classList.remove('active'));
+    btn?.classList.add('active');
+};
 
-// 3. ИНИЦИАЛИЗАЦИЯ
 document.addEventListener('DOMContentLoaded', () => {
     connectWebSocket();
 
-    // Делегирование для Сайдбара (иконки Files, Alerts, Stats, Settings)
-    document.querySelector('.sidebar')?.addEventListener('click', (e) => {
+    document.addEventListener('click', (e) => {
         const icon = e.target.closest('.icon[title]');
-        if (icon) {
-            showTab(icon.getAttribute('title').toLowerCase());
-            setActiveButton(icon);
-        }
-    });
+        const filter = e.target.closest('button[id^="filter-"]');
+        const row = e.target.closest('[data-client-id]');
 
-    // Делегирование для Фильтров (All, Online, Offline)
-    document.querySelector('.filter-group, .filter-buttons')?.addEventListener('click', (e) => {
-        const btn = e.target.closest('button[id^="filter-"]');
-        if (btn) {
-            state.filter = btn.id.replace('filter-', '');
-            setActiveButton(btn);
+        if (icon) { showTab(icon.title.toLowerCase()); setActive(icon); }
+        if (filter) {
+            state.filter = filter.id.replace('filter-', '');
+            setActive(filter);
             showTab('clients');
         }
+        if (row && !e.target.closest('button')) {
+            location.href = `../client_control/client_control.html?id=${row.dataset.clientId}`;
+        }
     });
 
-    // Переключатель вида
-    document.getElementById('toggleView')?.addEventListener('click', () => toggleView());
+    document.getElementById('toggleView')?.addEventListener('click', toggleView);
 
-    // Глобальные события
     window.addEventListener('searchUpdated', (e) => {
         state.search = e.detail;
         if (['clients', 'files'].includes(state.tab)) updateView();
@@ -93,16 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => window.addEventListener(ev, updateView));
 
-    // Переход в управление клиентом
-    document.addEventListener('click', (e) => {
-        const item = e.target.closest('[data-client-id]');
-        if (item && !e.target.closest('button')) {
-            window.location.href = `../client_control/client_control.html?id=${item.dataset.clientId}`;
-        }
-    });
-
-    // Стартовое состояние
-    setActiveButton(document.getElementById('filter-all'));
+    setActive(document.getElementById('filter-all'));
     showTab('clients');
-    updateView();
 });
