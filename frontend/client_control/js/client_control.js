@@ -1,37 +1,29 @@
-// Файл: client_control.js
-// Описание: Основной файл инициализации и общей логики
-// Используется для запуска всех функций при загрузке страницы
+// js/client_control.js
+
+console.log("--> client_control.js инициализирован");
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Сбрасываем все состояния при загрузке страницы
-  resetAllStates();
+    initClientUI();
+    AppState.reset();
 
-  // Отправляем команды OFF для всех при загрузке страницы
-  sendCommandToClient('stop_desktop_stream');
-  sendCommandToClient('stop_control');
-  sendCommandToClient('stop_webcam');
-  sendCommandToClient('stop_audio_output');
-  sendCommandToClient('stop_audio_input');
+    // Сайдбар и переключение вкладок
+    const icons = document.querySelectorAll('.icon[data-function]');
+    icons.forEach(icon => {
+        icon.onclick = () => {
+            const fn = icon.dataset.function;
 
-  // Инициализируем данные клиента
-  initClientData();
+            icons.forEach(i => i.classList.remove('active'));
+            icon.classList.add('active');
 
-  // Показываем Remote Desktop по умолчанию
-  showDesktopView();
-  updateObserveButton();
-  updateControlButton();
-  updateWebcamButton();
-  updateAudioIcons();
+            if (['desktop', 'webcam'].includes(fn)) switchView(fn);
+            if (fn.startsWith('audio-')) toggleAudio(fn.split('-')[1]);
+        };
+    });
+
+    // Кнопки управления
+    document.getElementById('observeBtn').onclick = toggleObserve;
+    document.getElementById('controlBtn').onclick = toggleControl;
+    document.getElementById('webcamToggleBtn').onclick = toggleWebcam;
+
+    if (window.initControlConnection) initControlConnection();
 });
-
-// Функция обновления иконок аудио (независимо от других)
-function updateAudioIcons() {
-  const audioOutputIcon = document.querySelector('.icon[data-function="audio-output"]');
-  const audioInputIcon = document.querySelector('.icon[data-function="audio-input"]');
-
-  audioOutputIcon.classList.toggle('active', window.audioOutputState);
-  audioInputIcon.classList.toggle('active', window.audioInputState);
-}
-
-// Экспортируем функцию в глобальный объект
-window.updateAudioIcons = updateAudioIcons;

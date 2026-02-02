@@ -7,6 +7,7 @@ from backend.BenchUtils import add_bytes
 async def read_full_packet(reader: asyncio.StreamReader):
     """
     Читает данные по бинарному протоколу и возвращает ID и готовый пакет.
+    [ID_len][ID][Mod_len][Mod][Pay_len][Payload]
     """
     try:
         # 1. Читаем ID

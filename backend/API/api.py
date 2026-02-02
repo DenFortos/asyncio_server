@@ -73,22 +73,42 @@ async def get_server_logs(limit: int = 150):
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket, login: str = Query(None)):
     user = load_db().get(login) if login else None
-    if not user: return await ws.close(1008)
+    if not user:
+        logger.warning(f"[API] Незарегистрированный вход: {login}")
+        return await ws.close(1008)
 
     await manager.connect(ws, login, user)
-    prefix = user["prefix"]
+
+    # Извлекаем права один раз при подключении
+    prefix = user.get("prefix", "")
+    role = user.get("role", "")
 
     try:
         while True:
             msg = await ws.receive()
             if msg.get("type") == "websocket.disconnect": break
 
-            # Универсальный проброс команд [ID_len][ID]...
             if "bytes" in msg:
                 pkt = msg["bytes"]
-                target_id = pkt[1:1 + pkt[0]].decode(errors='ignore')
-                if prefix == "ALL" or target_id.startswith(prefix):
-                    await send_binary_to_bot(target_id, pkt)
+                # Безопасно извлекаем ID бота из бинарного пакета
+                try:
+                    id_len = pkt[0]
+                    target_id = pkt[1:1 + id_len].decode(errors='ignore')
+                except Exception:
+                    continue
+
+                # ЛОГИКА ПРОВЕРКИ ПРАВ
+                is_admin = (role == "admin")
+                is_prefix_match = (prefix == "ALL" or target_id.startswith(prefix))
+
+                if is_admin or is_prefix_match:
+                    # Шлем боту через твой Services.py
+                    sent = await send_binary_to_bot(target_id, pkt)
+                    if not sent:
+                        logger.warning(f"[API] Бот {target_id} не найден в сети (offline)")
+                else:
+                    logger.warning(f"[API] Отказ в доступе: {login} -> {target_id}")
+
     except (WebSocketDisconnect, RuntimeError):
         pass
     finally:
