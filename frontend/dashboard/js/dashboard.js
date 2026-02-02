@@ -1,3 +1,5 @@
+// js/dashboard.js
+
 import { getAllClients } from './modules/data/clients.js';
 import { renderClients, toggleView } from './modules/render/main.js';
 import { applyStatusFilter } from './modules/ui/filters.js';

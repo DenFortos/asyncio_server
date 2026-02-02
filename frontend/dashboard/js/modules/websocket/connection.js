@@ -1,3 +1,5 @@
+// js/modules/websocket/connection.js
+
 import { updateClient, updateClients } from '../data/clients.js';
 import { decodePacket, encodePacket, isJson } from './protocol.js';
 

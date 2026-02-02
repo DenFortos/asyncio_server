@@ -1,3 +1,5 @@
+// js/modules/ui/background.js
+
 /** Применяет фон и сохраняет выбор */
 export const setBackground = (path) => {
     document.body.style.backgroundImage = `url(${path})`;

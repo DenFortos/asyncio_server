@@ -1,3 +1,5 @@
+// js/modules/ui/filters.js
+
 /**
  * Фильтрует клиентов по статусу
  * @param {Array} clients - Список клиентов

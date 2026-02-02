@@ -1,3 +1,5 @@
+// js/modules/websocket/protocol.js
+
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 const JSON_MODS = ['AuthModule', 'DataScribe', 'ClientList', 'AuthUpdate'];

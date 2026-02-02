@@ -1,3 +1,5 @@
+// js/modules/data/clients.js
+
 let clients = {};
 
 // Генерирует событие обновления для UI

@@ -1,3 +1,5 @@
+// js/modules/render/main.js
+
 import { renderTable } from './table.js';
 import { renderGrid } from './grid.js';
 

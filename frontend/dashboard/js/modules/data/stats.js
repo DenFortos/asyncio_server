@@ -1,3 +1,5 @@
+// js/modules/data/stats.js
+
 import { getAllClients } from './clients.js';
 
 /**
