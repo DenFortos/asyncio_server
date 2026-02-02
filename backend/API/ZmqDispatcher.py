@@ -5,98 +5,78 @@ from logs import Log as logger
 
 
 async def zmq_message_dispatcher(packet: bytes, connections: Dict[str, dict]):
-    """
-    Разбирает бинарный пакет и рассылает его нужным WebSocket-клиентам.
-    Протокол: [ID_len(1)][ID][Mod_len(1)][Mod][Pay_len(4)][Payload]
-    """
-    if not packet:
-        return
-
-    if not connections:
-        # Это важный момент: если в таблице никого нет, пакеты просто дропаются
+    """Разбирает бинарный пакет и рассылает его активным сессиям."""
+    if not packet or not connections:
         return
 
     try:
-        cursor = 0
+        # 1. Парсинг заголовка (ID и Модуль)
+        id_len = packet[0]
+        bot_id = packet[1: 1 + id_len].decode('utf-8', errors='ignore')
 
-        # 1. Извлекаем ID бота
-        id_len = packet[cursor]
-        cursor += 1
-        bot_id = packet[cursor: cursor + id_len].decode('utf-8', errors='ignore')
-        cursor += id_len
+        mod_offset = 1 + id_len
+        mod_len = packet[mod_offset]
+        module_name = packet[mod_offset + 1: mod_offset + 1 + mod_len].decode('utf-8', errors='ignore')
 
-        # 2. Извлекаем префикс (всё до первого дефиса)
-        bot_prefix = bot_id.split('-')[0] if '-' in bot_id else bot_id
-
-        # 3. Извлекаем Модуль (для логов)
-        mod_len = packet[cursor]
-        cursor += 1
-        module_name = packet[cursor: cursor + mod_len].decode('utf-8', errors='ignore')
-
+        # Префикс для проверки прав (ua4e1-...)
+        bot_prefix = bot_id.split('-')[0]
     except Exception as e:
-        logger.error(f"[ZMQ Dispatcher] Ошибка разбора пакета: {e}")
+        logger.error(f"[ZMQ] Ошибка парсинга: {e}")
         return
 
-    # Рассылаем пакет авторизованным пользователям
+    # 2. Рассылка по активным сессиям
     found_target = False
     for login, session in list(connections.items()):
-        # Проверка прав:
-        # Админ с префиксом ALL видит всё.
-        # Обычный юзер видит только если префикс сессии совпадает с началом ID бота.
-        is_admin = (session.get("role") == "admin" or session.get("prefix") == "ALL")
-        is_owner = (session.get("prefix") == bot_prefix)
+        # Логика прав: Admin или совпадение префикса
+        is_allowed = (
+                session.get("role") == "admin" or
+                session.get("prefix") == "ALL" or
+                session.get("prefix") == bot_prefix
+        )
 
-        if is_admin or is_owner:
+        if is_allowed:
             sockets = session.get("sockets", [])
             if sockets:
                 found_target = True
+                # Создаем задачи на отправку, чтобы один медленный сокет не тормозил весь поток
                 for ws in sockets:
-                    # Запускаем отправку в фоне, чтобы не блокировать цикл диспетчера
-                    asyncio.create_task(safe_send(ws, packet, login))
+                    asyncio.create_task(safe_send(ws, packet))
 
     if not found_target:
-        # Если это сообщение часто спамит — значит либо никто не залогинен,
-        # либо префиксы не совпадают (например, бот u80a9, а у юзера ua4e1)
-        logger.debug(f"[ZMQ] Пакет от {bot_id} ({module_name}) не нашел получателя.")
+        logger.debug(f"[ZMQ] Нет получателя для {bot_id} [{module_name}]")
 
 
-async def safe_send(ws, packet: bytes, login: str):
-    """Безопасная отправка бинарных данных в WebSocket"""
+async def safe_send(ws, packet: bytes):
+    """Безопасная асинхронная отправка."""
     try:
         await ws.send_bytes(packet)
-    except Exception as e:
-        # Ошибка обычно значит, что клиент закрыл вкладку, API.py сам удалит сокет
-        pass
+    except:
+        pass  # Ошибки сокета обрабатываются в основном цикле api.py
 
 
 async def zmq_pull_task_loop(connections: Dict[str, dict], zmq_url: str):
-    """Основной цикл прослушивания шины ZMQ от воркеров"""
-    zmq_ctx = zmq.asyncio.Context()
-    pull_socket = zmq_ctx.socket(zmq.PULL)
-
-    # HWM 0 позволяет не терять пакеты при большой нагрузке
-    pull_socket.set_hwm(0)
+    """Основной цикл прослушивания шины ZMQ."""
+    ctx = zmq.asyncio.Context()
+    sock = ctx.socket(zmq.PULL)
+    sock.set_hwm(0)  # High Water Mark: не терять пакеты при пиковых нагрузках
 
     try:
-        # API BIND-ит сокет, воркеры к нему CONNECT-ятся
-        pull_socket.bind(zmq_url)
-        logger.info(f"[ZMQ Dispatcher] Приемник запущен на {zmq_url}")
+        sock.bind(zmq_url)
+        logger.info(f"[ZMQ] Приемник на {zmq_url} запущен")
     except Exception as e:
-        logger.error(f"[ZMQ Dispatcher] Critical Bind Error: {e}")
+        logger.error(f"[ZMQ] Bind Error: {e}")
         return
 
     while True:
         try:
-            # Ожидаем пакет от воркера
-            packet = await pull_socket.recv()
+            packet = await sock.recv()
             if packet:
                 await zmq_message_dispatcher(packet, connections)
         except asyncio.CancelledError:
             break
         except Exception as e:
-            logger.error(f"[ZMQ Dispatcher] Ошибка цикла: {e}")
+            logger.error(f"[ZMQ] Loop Error: {e}")
             await asyncio.sleep(0.01)
 
-    pull_socket.close()
-    zmq_ctx.term()
-    logger.info("[ZMQ Dispatcher] Цикл завершен.")
+    sock.close()
+    ctx.term()
