@@ -1,26 +1,37 @@
-// js/dashboard.js
-
+import { updateStats } from './modules/data/stats.js';
 import { getAllClients } from './modules/data/clients.js';
-import { renderClients, toggleView } from './modules/render/main.js';
+import { Renderer } from './modules/ui/Renderer.js';
+// Обновленные пути согласно твоему списку
 import { applyStatusFilter } from './modules/ui/filters.js';
 import { applySearchFilter } from './modules/ui/search.js';
 import { connectWebSocket } from './modules/websocket/connection.js';
+
+// Импорт инициализаций (background и sidebar теперь в ui)
+import './modules/ui/background.js';
+import './modules/ui/sidebar.js';
 
 const state = { filter: 'all', search: '', tab: 'clients' };
 
 const updateView = () => {
     const clients = applySearchFilter(applyStatusFilter(getAllClients(), state.filter), state.search);
-    renderClients(clients);
+
+    Renderer.render(clients);
+
+    if (state.tab === 'files') {
+        window.filesManager?.updateData(clients);
+    }
 };
 
 function showTab(tabName) {
     state.tab = tabName;
     const isCl = tabName === 'clients';
 
-    // Маппинг вкладок на их контейнеры
     const containers = {
-        clients: '.table-container', files: '.files-container', alerts: '.alerts-container',
-        stats: '#stats-container', settings: '#settings-container'
+        clients: '.table-container',
+        files: '.files-container',
+        alerts: '.alerts-container',
+        stats: '#stats-container',
+        settings: '#settings-container'
     };
 
     Object.entries(containers).forEach(([key, selector]) => {
@@ -29,7 +40,6 @@ function showTab(tabName) {
         el.style.display = key === tabName ? (['stats', 'settings'].includes(key) ? 'flex' : 'block') : 'none';
     });
 
-    // Видимость поиска
     const searchBar = document.querySelector('.search-bar');
     if (searchBar) searchBar.style.display = ['alerts', 'stats', 'settings'].includes(tabName) ? 'none' : 'flex';
 
@@ -49,6 +59,7 @@ const setActive = (btn) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     connectWebSocket();
+    updateStats();
 
     document.addEventListener('click', (e) => {
         const icon = e.target.closest('.icon[title]');
@@ -66,7 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('toggleView')?.addEventListener('click', toggleView);
+    document.getElementById('toggleView')?.addEventListener('click', () => {
+        Renderer.toggleView();
+    });
 
     window.addEventListener('searchUpdated', (e) => {
         state.search = e.detail;
@@ -79,7 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateView();
     });
 
-    ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => window.addEventListener(ev, updateView));
+    ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => {
+        window.addEventListener(ev, () => {
+            updateView();
+            updateStats();
+        });
+    });
 
     setActive(document.getElementById('filter-all'));
     showTab('clients');

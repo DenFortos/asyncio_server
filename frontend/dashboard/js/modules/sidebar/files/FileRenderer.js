@@ -1,4 +1,4 @@
-// js/modules/ui/files/FileRenderer.js
+// js/modules/sidebar/files/FileRenderer.js
 
 import { FileIcons } from './FileService.js';
 

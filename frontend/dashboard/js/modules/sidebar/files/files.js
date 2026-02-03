@@ -1,4 +1,4 @@
-// js/modules/ui/files/files.js
+// js/modules/sidebar/files/files.js
 
 import { FilesManager } from './FilesManager.js';
 

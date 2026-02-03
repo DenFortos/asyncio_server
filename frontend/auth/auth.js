@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     setTimeout(() => {
                         // Переход в Dashboard
-                        window.location.href = '/ui/dashboard/dashboard.html';
+                        window.location.href = '/sidebar/dashboard/dashboard.html';
                     }, 1000);
                 } else {
                     showMessage('Account created! You can login now.', 'success');

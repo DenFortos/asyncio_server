@@ -1,9 +1,14 @@
+// js/modules/sidebar/files/FileModal.js
+
 import { FileService } from './FileService.js';
 
 export class FileModal {
     constructor(modalId) {
         this.modal = document.getElementById(modalId);
-        if (!this.modal) return;
+        if (!this.modal) {
+            console.warn(`Modal with id ${modalId} not found`);
+            return;
+        }
 
         this.title = this.modal.querySelector('#fileModalTitle');
         this.body = this.modal.querySelector('#fileModalBody');
@@ -14,6 +19,7 @@ export class FileModal {
     }
 
     show(type, data) {
+        if (!this.modal) return;
         if (type === 'text') {
             this.title.textContent = `Текстовый файл: ${data.name}`;
             this.body.innerHTML = `<pre class="file-content-text">${data.content || 'Пусто'}</pre>`;
@@ -34,5 +40,5 @@ export class FileModal {
         this.modal.style.display = 'block';
     }
 
-    hide() { this.modal.style.display = 'none'; }
+    hide() { if (this.modal) this.modal.style.display = 'none'; }
 }

@@ -1,4 +1,4 @@
-// js/modules/ui/files/FileService.js
+// js/modules/sidebar/files/FileService.js
 
 export const FileIcons = {
     text: '📝',

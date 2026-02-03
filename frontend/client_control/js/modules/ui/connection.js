@@ -1,4 +1,4 @@
-// js/modules/ui/connection.js
+// js/modules/sidebar/connection.js
 window.initControlConnection = () => {
     const login = localStorage.getItem('user_login');
     if (!login) return;

@@ -45,11 +45,11 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
-app.mount("/ui", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
+app.mount("/sidebar", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
 
 
 @app.get("/")
-async def root(): return RedirectResponse("/ui/auth/auth.html")
+async def root(): return RedirectResponse("/sidebar/auth/auth.html")
 
 
 @app.post("/register")
