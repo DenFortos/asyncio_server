@@ -1,12 +1,12 @@
 import { updateStats } from './modules/data/stats.js';
 import { getAllClients, checkDeadClients } from './modules/data/clients.js'; // Добавили импорт проверки
-import { Renderer } from './modules/websocket/Renderer.js';
-import { applyStatusFilter } from './modules/websocket/filters.js';
-import { applySearchFilter } from './modules/websocket/search.js';
+import { Renderer } from './modules/ui/Renderer.js';
+import { applyStatusFilter } from './modules/ui/filters.js';
+import { applySearchFilter } from './modules/ui/search.js';
 import { connectWebSocket } from './modules/websocket/connection.js';
 
-import './modules/websocket/background.js';
-import './modules/websocket/sidebar.js';
+import './modules/ui/background.js';
+import './modules/ui/sidebar.js';
 
 const state = { filter: 'all', search: '', tab: 'clients' };
 

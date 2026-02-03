@@ -1,4 +1,4 @@
-// js/modules/websocket/Renderer.js
+// js/modules/ui/Renderer.js
 
 let isGridView = false;
 

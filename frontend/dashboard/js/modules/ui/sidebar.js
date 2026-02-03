@@ -1,4 +1,4 @@
-// js/modules/websocket/sidebar.js
+// js/modules/ui/sidebar.js
 
 /**
  * Управление состоянием боковой панели

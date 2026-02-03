@@ -2,8 +2,8 @@
 
 import { FileCore } from './FileCore.js';
 import { FileModal } from './FileModal.js';
-// Исправлено: выходим из files, выходим из sidebar, заходим в websocket
-import { applySearchFilter } from '../../websocket/search.js';
+// Исправлено: выходим из files, выходим из sidebar, заходим в ui
+import { applySearchFilter } from '../../ui/search.js';
 
 export class FilesManager {
     constructor(containerId, modalId) {

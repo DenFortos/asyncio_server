@@ -1,0 +1,9 @@
+03:31:44 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+03:31:44 | INFO     | [+] Server started on ('127.0.0.1', 50001)
+03:31:44 | INFO     | [+] 1 worker processes started
+03:31:44 | INFO     | [+] Dashboard should open shortly in your browser.
+03:31:44 | INFO     | [ZMQ] Receiver active on tcp://127.0.0.1:50002
+03:31:45 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+03:37:40 | INFO     | [API] [+] admin (Active: 1)
+03:37:40 | INFO     | [API] Initialized 2 bots for admin
+03:38:05 | WARNING  | [API] 0 offline

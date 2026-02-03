@@ -1,4 +1,4 @@
-// js/modules/websocket/filters.js
+// js/modules/ui/filters.js
 
 /**
  * Фильтрует клиентов по статусу

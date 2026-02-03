@@ -94,7 +94,7 @@ async def websocket_endpoint(ws: WebSocket, login: str = Query(None)):
     try:
         while True:
             msg = await ws.receive()
-            if msg.get("type") == "websocket.disconnect": break
+            if msg.get("type") == "ui.disconnect": break
 
             if "bytes" in msg:
                 pkt = msg["bytes"]
