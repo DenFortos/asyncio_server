@@ -27,13 +27,13 @@ export const Renderer = {
         const tbody = container.querySelector('#clients-list');
         if (!tbody) return;
         tbody.innerHTML = clients.map(c => `
-            <tr class="client-row state-${getS(c.status)}" data-client-id="${c.id}">
+            <tr class="client-row" data-client-id="${c.id}">
                 <td><span class="status-indicator status-${getS(c.status)}"></span> ${c.loc || '??'}</td>
                 <td>${c.user || 'Anon'}</td>
-                <td>${c.pc_name || 'N/A'}</td>
+                <td>${c.pc_name || c['pc-name'] || 'N/A'}</td>
                 <td>${c.last_active || 'N/A'}</td>
                 <td>${c.ip || '0.0.0.0'}</td>
-                <td class="text-truncate">${c.activeWindow || 'Idle'}</td>
+                <td class="text-truncate">${c.activeWindow || c.active_window || 'Idle'}</td>
                 <td class="client-id-cell">${c.id}</td>
             </tr>`).join('');
     },

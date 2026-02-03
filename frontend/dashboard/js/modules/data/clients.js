@@ -23,11 +23,17 @@ export function removeClient(id) {
     if (clients[id] && delete clients[id]) notify('clientRemoved', id);
 }
 
-/** Возвращает массив клиентов, отсортированный по активности (новые сверху) */
+/** * Возвращает массив клиентов, отсортированный по IP (от меньшего к большему).
+ * Если IP нет (N/A), такие клиенты уходят в конец списка.
+ */
 export function getAllClients() {
-    return Object.values(clients).sort((a, b) =>
-        (b.last_active || "").localeCompare(a.last_active || "")
-    );
-}
+    return Object.values(clients).sort((a, b) => {
+        const ipA = a.ip || "255.255.255.255";
+        const ipB = b.ip || "255.255.255.255";
 
-export const getClientById = (id) => clients[id];
+        const numA = ipA.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+        const numB = ipB.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+
+        return numA - numB;
+    });
+}

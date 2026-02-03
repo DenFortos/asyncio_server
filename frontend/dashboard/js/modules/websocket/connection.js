@@ -1,9 +1,9 @@
-// js/modules/websocket/connection.js
+// js/modules/websocket/connection.js:
 
 import { updateClient, updateClients } from '../data/clients.js';
 import { decodePacket, encodePacket, isJson } from './protocol.js';
 
-let ws, pingId;
+let ws;
 
 export function connectWebSocket() {
     const login = encodeURIComponent(localStorage.getItem('user_login') || 'admin');
@@ -13,8 +13,8 @@ export function connectWebSocket() {
     ws.binaryType = 'arraybuffer';
 
     ws.onopen = () => {
-        clearInterval(pingId);
-        pingId = setInterval(() => ws.readyState === 1 && ws.send(encodePacket("0", "ping")), 25000);
+        console.log("[WS] Connected");
+        setInterval(() => ws.readyState === 1 && ws.send(encodePacket("0", "ping")), 25000);
     };
 
     ws.onmessage = ({ data }) => {
@@ -22,12 +22,17 @@ export function connectWebSocket() {
         if (!pkg || pkg.module === 'pong') return;
 
         if (isJson(pkg.module)) {
-            const dataObj = JSON.parse(new TextDecoder().decode(pkg.payload));
-            if (pkg.module === 'ClientList') return updateClients(dataObj);
+            try {
+                const rawData = JSON.parse(new TextDecoder().decode(pkg.payload));
 
-            const update = { ...dataObj, id: dataObj.id || pkg.id };
-            updateClient(update);
-            window.alertsManager?.addLog(`[${pkg.module}] ${pkg.id}: ${update.status || 'active'}`);
+                // Если это список или объект — просто мержим
+                // pkg.id придет из бинарного заголовка [ID_L][ID]
+                const update = { ...rawData, id: rawData.id || pkg.id };
+
+                console.log("Mergining data for:", update.id, update);
+                updateClient(update);
+
+            } catch (e) { console.error("JSON Error:", e); }
         } else {
             window.dispatchEvent(new CustomEvent('binaryDataReceived', { detail: pkg }));
         }
