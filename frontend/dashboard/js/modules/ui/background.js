@@ -1,4 +1,4 @@
-// js/modules/ui/background.js
+// js/modules/websocket/background.js
 
 /** Применяет фон и сохраняет выбор */
 export const setBackground = (path) => {

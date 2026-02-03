@@ -1,12 +1,12 @@
 import { updateStats } from './modules/data/stats.js';
-import { getAllClients } from './modules/data/clients.js';
-import { Renderer } from './modules/ui/Renderer.js';
-import { applyStatusFilter } from './modules/ui/filters.js';
-import { applySearchFilter } from './modules/ui/search.js';
+import { getAllClients, checkDeadClients } from './modules/data/clients.js'; // Добавили импорт проверки
+import { Renderer } from './modules/websocket/Renderer.js';
+import { applyStatusFilter } from './modules/websocket/filters.js';
+import { applySearchFilter } from './modules/websocket/search.js';
 import { connectWebSocket } from './modules/websocket/connection.js';
 
-import './modules/ui/background.js';
-import './modules/ui/sidebar.js';
+import './modules/websocket/background.js';
+import './modules/websocket/sidebar.js';
 
 const state = { filter: 'all', search: '', tab: 'clients' };
 
@@ -46,38 +46,27 @@ function showTab(tabName) {
     if (['clients', 'files'].includes(target)) updateView();
 }
 
-/**
- * ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ ПОДСВЕТКИ
- */
 const setActive = (btn) => {
     if (!btn) return;
-
-    // Снимаем фокус с кнопки, чтобы убрать браузерное состояние :focus (то самое "вжатие")
     btn.blur();
 
-    // 1. Полная очистка ВСЕХ активных элементов в навигации
-    document.querySelectorAll('.icon, button[id^="filter-"]').forEach(el => {
-        el.classList.remove('active');
-    });
+    document.querySelectorAll('.icon, button[id^="filter-"]').forEach(el => el.classList.remove('active'));
 
-    // 2. Если нажата кнопка фильтра (Online/Offline/All)
     if (btn.id?.startsWith('filter-')) {
         btn.classList.add('active');
-        // Подсвечиваем иконку Clients, так как фильтры относятся к ней
         const clientsIcon = document.querySelector('.icon[title="Clients"]');
         if (clientsIcon) clientsIcon.classList.add('active');
-    }
-    // 3. Если нажата иконка в сайдбаре
-    else {
+    } else {
         btn.classList.add('active');
-        // Если нажали не на Clients, сбрасываем фильтры на "All" визуально (опционально)
-        // Но сейчас просто оставим активным то, что нажато
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     connectWebSocket();
     updateStats();
+
+    // ЗАПУСК МОНИТОРИНГА: Проверяем статус ботов каждую секунду
+    setInterval(checkDeadClients, 1000);
 
     document.addEventListener('click', (e) => {
         const icon = e.target.closest('.icon[title]');
@@ -95,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             state.filter = filter.id.replace('filter-', '');
             setActive(filter);
-
             if (state.tab !== 'clients') showTab('clients');
             else updateView();
             return;
@@ -116,18 +104,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('viewToggled', (e) => {
         const btn = document.getElementById('toggleView');
-        if (btn) {
-            btn.innerHTML = e.detail ? '<i class="fas fa-list"></i> Table View' : '<i class="fas fa-th"></i> Grid View';
-        }
+        if (btn) btn.innerHTML = e.detail ? '<i class="fas fa-list"></i> Table View' : '<i class="fas fa-th"></i> Grid View';
         updateView();
     });
 
     ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => {
-        window.addEventListener(ev, () => { updateView(); updateStats(); });
+        window.addEventListener(ev, () => {
+            updateView();
+            updateStats();
+        });
     });
 
-    // Инициализация
-    const defaultFilter = document.getElementById('filter-all');
-    setActive(defaultFilter);
+    // Инициализация дефолтного фильтра
+    setActive(document.getElementById('filter-all'));
     showTab('clients');
 });

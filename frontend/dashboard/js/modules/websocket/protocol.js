@@ -1,12 +1,11 @@
-// js/modules/websocket/protocol.js
-
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
-const JSON_MODS = ['AuthModule', 'DataScribe', 'ClientList', 'AuthUpdate'];
+const JSON_MODS = ['AuthModule', 'DataScribe', 'ClientList', 'AuthUpdate', 'Heartbeat'];
 
 const readStr = (view, off) => {
     const len = view.getUint8(off);
-    return { str: decoder.decode(new Uint8Array(view.buffer, off + 1, len)), next: off + 1 + len };
+    const str = decoder.decode(new Uint8Array(view.buffer, off + 1, len));
+    return { str, next: off + 1 + len };
 };
 
 export const isJson = (mod) => JSON_MODS.includes(mod) || mod.endsWith('Response');
@@ -27,9 +26,12 @@ export function encodePacket(id, mod, pay = []) {
     const bId = encoder.encode(id), bMod = encoder.encode(mod), bPay = new Uint8Array(pay);
     const buf = new Uint8Array(6 + bId.length + bMod.length + bPay.length);
     let off = 0;
+
     buf[off++] = bId.length; buf.set(bId, off); off += bId.length;
     buf[off++] = bMod.length; buf.set(bMod, off); off += bMod.length;
+
     new DataView(buf.buffer).setUint32(off, bPay.length, false);
     buf.set(bPay, off + 4);
+
     return buf.buffer;
 }

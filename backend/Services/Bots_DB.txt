@@ -1,24 +1,22 @@
 {
     "u80a9-Bot-First": {
         "id": "u80a9-Bot-First",
-        "status": "online",
         "loc": "RU",
         "user": "Tester",
         "pc_name": "DEBUG-PC",
         "activeWindow": "Visual Studio Code",
-        "last_active": "21:45:39",
+        "last_active": "02:30:14",
         "ip": "127.0.0.1",
         "auth_key": "super_secret"
     },
     "ua4e1-Bot-Worker": {
         "id": "ua4e1-Bot-Worker",
-        "status": "online",
         "loc": "US",
         "user": "Manager_John",
         "pc_name": "OFFICE-PC-01",
-        "activeWindow": "Excel: Report_2026",
-        "last_active": "21:45:46",
-        "ip": "192.168.1.15",
+        "activeWindow": "Spotify",
+        "last_active": "02:25:07",
+        "ip": "192.168.1.23",
         "auth_key": "super_secret"
     }
 }
