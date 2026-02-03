@@ -1,114 +1,64 @@
-// js/modules/ui/files/FilesManager.js
-
-import { FileGrouping } from './FileGrouping.js';
+import { FileService } from './FileService.js';
 import { FileRenderer } from './FileRenderer.js';
-import { FileActions } from './FileActions.js';
 import { FileModal } from './FileModal.js';
-import { FileDownload } from './FileDownload.js'; // Используется в FileModal
-import { FileDelete } from './FileDelete.js';
-// 🚨 ИСПРАВЛЕННЫЙ ПУТЬ: (если search.js находится в js/modules/ui/search.js)
 import { applySearchFilter } from '../search.js';
 
 export class FilesManager {
     constructor(containerId, modalId) {
         this.container = document.getElementById(containerId);
-        // Модальное окно инициализируется с передачей ID HTML-элемента
         this.modal = new FileModal(modalId);
-        this.filesData = [];
         this.groupedFiles = {};
+        this.setupGlobalListeners();
     }
 
     updateData(filesData) {
-        if (!this.container) return;
-        this.filesData = filesData;
-        this.groupedFiles = FileGrouping.groupByClient(filesData);
+        this.groupedFiles = FileService.groupByClient(filesData);
         this.render();
-        return this;
     }
 
-    render(filesToRender = null) {
-        const data = filesToRender || this.groupedFiles;
-
+    render(data = this.groupedFiles) {
         FileRenderer.renderGrid(this.container, data);
-        this.setupActions(data);
+    }
+
+    setupGlobalListeners() {
+        this.container.addEventListener('click', (e) => {
+            const fileItem = e.target.closest('.file-item');
+            const block = e.target.closest('.client-file-block');
+            if (!block) return;
+
+            const clientKey = `${block.dataset.clientId}_${block.dataset.ip}`;
+            const clientData = this.groupedFiles[clientKey];
+
+            // Кнопка удаления всего блока
+            if (e.target.classList.contains('delete-block-btn')) {
+                if (confirm(`Удалить все файлы клиента ${block.dataset.clientId}?`)) {
+                    block.remove();
+                    delete this.groupedFiles[clientKey];
+                }
+                return;
+            }
+
+            if (!fileItem) return;
+            const type = fileItem.dataset.fileType;
+            const data = type === 'text' ? clientData.textFile : clientData.imageFiles;
+
+            // Кнопка просмотра
+            if (e.target.classList.contains('view-btn')) {
+                this.modal.show(type, data);
+            }
+            // Кнопка удаления одного типа файлов
+            else if (e.target.classList.contains('delete-btn')) {
+                if (confirm('Удалить этот элемент?')) {
+                    fileItem.remove();
+                    if (block.querySelectorAll('.file-item').length === 0) block.remove();
+                }
+            }
+        });
     }
 
     filterBySearch(query) {
-        let clientsArray = Object.values(this.groupedFiles);
-
-        const filteredClients = applySearchFilter(clientsArray, query);
-
-        const filteredGrouped = filteredClients.reduce((acc, client) => {
-             const key = `${client.clientId}_${client.ip}`;
-             acc[key] = client;
-             return acc;
-        }, {});
-
-        this.render(filteredGrouped);
-    }
-
-    setupActions(groupedFiles) {
-        this.container.querySelectorAll('.client-file-block').forEach(block => {
-            const clientId = block.dataset.clientId;
-            const ip = block.dataset.ip;
-            const clientKey = `${clientId}_${ip}`;
-            const clientData = groupedFiles[clientKey];
-
-            if (!clientData) return;
-
-            // 1. Обработка текстового файла (JSON/Text)
-            const textFileElement = block.querySelector('[data-file-type="text"]');
-            if (textFileElement && clientData.textFile) {
-                FileActions.setupFileActions(textFileElement, clientData, {
-                    onViewText: (file) => this.modal.showText(file),
-
-                    // 🚨 ИЗМЕНЕНИЕ: Принимаем isLast и используем его
-                    onDeleteText: (file, element, isLast) => {
-                        FileDelete.showConfirmation(
-                            `Вы действительно хотите удалить файл ${file.name}?`,
-                            () => {
-                                element.remove(); // Удаляем элемент файла
-                                if (isLast) {
-                                    block.remove(); // ⬅️ УДАЛЯЕМ ВЕСЬ БЛОК
-                                }
-                                // Опционально: Обновление состояния в this.groupedFiles
-                            }
-                        );
-                    }
-                });
-            }
-
-            // 2. Обработка изображений
-            const imageFileElement = block.querySelector('[data-file-type="images"]');
-            if (imageFileElement && clientData.imageFiles.length > 0) {
-                FileActions.setupFileActions(imageFileElement, clientData, {
-                    onViewImages: (images) => this.modal.showImages(images),
-
-                    // 🚨 ИЗМЕНЕНИЕ: Принимаем isLast и используем его
-                    onDeleteImages: (images, element, isLast) => {
-                        FileDelete.showConfirmation(
-                            `Вы действительно хотите удалить все фото? (${images.length} шт.)`,
-                            () => {
-                                element.remove(); // Удаляем элемент фото
-                                if (isLast) {
-                                    block.remove(); // ⬅️ УДАЛЯЕМ ВЕСЬ БЛОК
-                                }
-                                // Опционально: Обновление состояния в this.groupedFiles
-                            }
-                        );
-                    }
-                });
-            }
-
-            // 3. Удаление всего блока
-            FileActions.setupBlockActions(block, clientData, {
-                onDeleteBlock: (block, clientData) => {
-                    FileDelete.showBlockConfirmation(clientData, () => {
-                        block.remove();
-                        delete this.groupedFiles[clientKey];
-                    });
-                }
-            });
-        });
+        const filtered = applySearchFilter(Object.values(this.groupedFiles), query);
+        const result = filtered.reduce((acc, c) => ({ ...acc, [`${c.clientId}_${c.ip}`]: c }), {});
+        this.render(result);
     }
 }

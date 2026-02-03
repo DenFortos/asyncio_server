@@ -7864,3 +7864,2204 @@
 01:27:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
 01:27:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
 01:27:21 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:57:12 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+01:57:12 | INFO     | [+] Server started on ('127.0.0.1', 50001)
+01:57:12 | INFO     | [+] 1 worker processes started
+01:57:12 | INFO     | [+] Dashboard should open shortly in your browser.
+01:57:12 | INFO     | [ZMQ] Приемник API запущен на tcp://127.0.0.1:50002
+01:57:13 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+01:57:15 | INFO     | [+] Клиент u80a9-Bot-First подключен: ('127.0.0.1', 52943)
+01:57:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:15 | INFO     | [API] [+] admin (Active: 1)
+01:57:15 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:57:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:18 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:57:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:21 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:57:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:24 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:57:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:27 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:57:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:30 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:57:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:33 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:57:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:36 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:57:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:39 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:57:40 | WARNING  | [API] Бот 0 не найден в сети (offline)
+01:57:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:42 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:57:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:45 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:57:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:48 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:57:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:51 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:57:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:55 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:57:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:57:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:57:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:57:58 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:58:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:01 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:58:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:04 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:58:05 | WARNING  | [API] Бот 0 не найден в сети (offline)
+01:58:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:07 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:58:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:10 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:58:10 | INFO     | [API] [-] admin
+01:58:10 | INFO     | [API] [+] admin (Active: 1)
+01:58:10 | INFO     | [DataScribe] Update from u80a9-Bot-First (Tester@DEBUG-PC): Window -> Visual Studio Code
+01:58:10 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:10 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:11 | INFO     | [BENCH] 242 bytes in 1.00s -> 0.00 Mbit/s
+01:58:11 | INFO     | [API] [-] admin
+01:58:11 | INFO     | [API] [+] admin (Active: 1)
+01:58:11 | INFO     | [API] [-] admin
+01:58:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:13 | INFO     | [BENCH] 78 bytes in 2.01s -> 0.00 Mbit/s
+01:58:14 | INFO     | [API] [+] admin (Active: 1)
+01:58:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:16 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:58:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:19 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:58:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:22 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:58:23 | INFO     | [API] [-] admin
+01:58:23 | INFO     | [API] [+] admin (Active: 1)
+01:58:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:25 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:58:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:28 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:58:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:31 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:58:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:34 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:58:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:37 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:58:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:40 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:58:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:43 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:58:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:46 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:58:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:48 | WARNING  | [API] Бот 0 не найден в сети (offline)
+01:58:49 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:58:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:51 | INFO     | [BENCH] 78 bytes in 2.00s -> 0.00 Mbit/s
+01:58:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:54 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:58:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:58:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:58:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:58:57 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:59:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:00 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:59:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:03 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:59:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:06 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:59:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:09 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:59:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:12 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+01:59:13 | WARNING  | [API] Бот 0 не найден в сети (offline)
+01:59:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:15 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:59:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:18 | INFO     | [BENCH] 78 bytes in 3.05s -> 0.00 Mbit/s
+01:59:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:21 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+01:59:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:24 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+01:59:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:27 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:59:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:30 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+01:59:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:33 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:59:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:36 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+01:59:38 | WARNING  | [API] Бот 0 не найден в сети (offline)
+01:59:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:39 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:59:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:42 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+01:59:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:45 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+01:59:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:48 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:59:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:51 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+01:59:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:54 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+01:59:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+01:59:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+01:59:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+01:59:57 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:00:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:00 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:00:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:03 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:00:04 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:00:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:07 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:00:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:10 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:00:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:13 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:00:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:16 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:00:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:19 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:00:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:22 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:00:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:25 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:00:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:28 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:00:28 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:00:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:31 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:00:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:34 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:00:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:37 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:00:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:40 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:00:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:43 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:00:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:46 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:00:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:49 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:00:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:52 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:00:53 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:00:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:55 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:00:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:00:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:00:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:00:58 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:01:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:01 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:01:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:03 | INFO     | [BENCH] 78 bytes in 2.01s -> 0.00 Mbit/s
+02:01:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:06 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:01:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:09 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:01:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:12 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:01:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:15 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:01:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:18 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:01:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:21 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:01:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:24 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:01:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:27 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:01:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:30 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:01:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:33 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:01:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:36 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:01:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:39 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:01:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:42 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:01:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:45 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:01:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:48 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:01:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:51 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:01:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:54 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:01:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:01:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:01:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:01:57 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:02:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:00 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:02:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:02:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:03 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:02:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:06 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:02:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:09 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:02:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:12 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:02:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:15 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:02:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:18 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:02:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:21 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:02:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:24 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:02:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:27 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:02:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:30 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:02:31 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:02:33 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:02:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:02:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:33 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:02:35 | INFO     | [API] [-] admin
+02:02:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:36 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:02:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:39 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:02:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:42 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:02:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:46 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:02:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:49 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:02:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:52 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:02:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:55 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:02:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:02:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:02:58 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:03:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:01 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:03:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:04 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:03:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:07 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:03:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:10 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:03:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:13 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:03:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:16 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:03:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:19 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:03:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:22 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:03:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:25 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:03:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:28 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:03:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:31 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:03:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:34 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:03:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:37 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:03:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:40 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:03:41 | INFO     | [API] [+] admin (Active: 1)
+02:03:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:03:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:43 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:03:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:03:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:46 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:03:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:03:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:49 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:03:50 | INFO     | [API] [-] admin
+02:03:50 | INFO     | [API] [+] admin (Active: 1)
+02:03:50 | INFO     | [DataScribe] Update from u80a9-Bot-First (Tester@DEBUG-PC): Window -> Visual Studio Code
+02:03:50 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:03:50 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:03:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:51 | INFO     | [BENCH] 320 bytes in 2.00s -> 0.00 Mbit/s
+02:03:51 | INFO     | [API] [-] admin
+02:03:51 | INFO     | [API] [+] admin (Active: 1)
+02:03:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:03:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:54 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:03:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:03:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:03:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:03:57 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:04:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:00 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:04:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:03 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:04:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:06 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:04:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:09 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:04:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:12 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:04:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:15 | INFO     | [BENCH] 78 bytes in 3.00s -> 0.00 Mbit/s
+02:04:17 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:04:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:18 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:04:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:21 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:04:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:24 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:04:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:27 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:04:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:30 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:04:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:33 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:04:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:36 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:04:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:39 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:04:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:42 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:04:42 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:04:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:45 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:04:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:48 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:04:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:51 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:04:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:54 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:04:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:04:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:04:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:04:57 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:05:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:00 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:05:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:03 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:05:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:06 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:05:07 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:05:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:09 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:05:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:12 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:05:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:16 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:05:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:19 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:05:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:22 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:05:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:25 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:05:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:28 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:05:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:31 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:05:32 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:05:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:34 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:05:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:37 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:05:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:40 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:05:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:43 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:05:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:46 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:05:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:49 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:05:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:52 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:05:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:55 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:05:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:05:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:05:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:05:57 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:05:58 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:06:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:01 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:06:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:04 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:06:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:07 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:06:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:10 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:06:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:13 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:06:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:15 | INFO     | [BENCH] 78 bytes in 2.01s -> 0.00 Mbit/s
+02:06:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:18 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:06:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:21 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:06:22 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:06:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:24 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:06:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:27 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:06:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:30 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:06:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:33 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:06:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:36 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:06:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:39 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:06:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:42 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:06:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:45 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:06:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:48 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:06:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:51 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:06:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:54 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:06:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:06:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:06:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:06:57 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:07:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:00 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:07:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:07:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:03 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:07:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:06 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:07:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:09 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:07:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:12 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:07:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:15 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:07:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:18 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:07:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:21 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:07:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:24 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:07:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:27 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:07:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:31 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:07:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:34 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:07:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:37 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:07:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:40 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:07:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:43 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:07:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:46 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:07:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:49 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:07:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:52 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:07:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:55 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:07:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:07:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:07:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:07:58 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:08:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:01 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:08:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:08:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:04 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:08:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:07 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:08:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:10 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:08:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:13 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:08:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:16 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:08:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:19 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:08:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:22 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:08:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:25 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:08:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:27 | INFO     | [BENCH] 78 bytes in 2.02s -> 0.00 Mbit/s
+02:08:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:30 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:08:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:33 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:08:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:36 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:08:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:39 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:08:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:42 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:08:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:45 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:08:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:48 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:08:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:51 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:08:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:54 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:08:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:08:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:08:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:08:57 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:09:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:00 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:09:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:09:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:03 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:09:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:06 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:09:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:09 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:09:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:12 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:09:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:15 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:09:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:18 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:09:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:21 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:09:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:24 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:09:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:27 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:09:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:30 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:09:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:33 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:09:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:37 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:09:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:40 | INFO     | [BENCH] 78 bytes in 3.00s -> 0.00 Mbit/s
+02:09:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:43 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:09:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:46 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:09:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:49 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:09:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:52 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:09:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:55 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:09:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:09:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:09:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:09:58 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:10:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:01 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:10:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:10:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:04 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:10:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:07 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:10:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:10 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:10:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:13 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:10:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:16 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:10:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:19 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:10:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:22 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:10:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:25 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:10:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:28 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:10:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:31 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:10:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:34 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:10:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:37 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:10:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:39 | INFO     | [BENCH] 78 bytes in 2.01s -> 0.00 Mbit/s
+02:10:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:42 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:10:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:45 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:10:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:48 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:10:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:51 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:10:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:54 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:10:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:10:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:10:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:10:57 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:11:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:00 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:11:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:11:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:03 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:11:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:06 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:11:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:09 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:11:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:12 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:11:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:15 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:11:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:18 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:11:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:21 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:11:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:24 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:11:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:27 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:11:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:30 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:11:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:33 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:11:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:36 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:11:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:39 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:11:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:43 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:11:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:46 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:11:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:49 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:11:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:52 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:11:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:55 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:11:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:11:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:11:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:11:58 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:12:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:01 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:12:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:12:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:04 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:12:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:07 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:12:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:10 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:12:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:13 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:12:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:16 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:12:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:19 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:12:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:22 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:12:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:25 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:12:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:28 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:12:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:31 | INFO     | [BENCH] 78 bytes in 3.05s -> 0.00 Mbit/s
+02:12:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:34 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:12:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:37 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:12:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:40 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:12:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:42 | INFO     | [BENCH] 78 bytes in 2.02s -> 0.00 Mbit/s
+02:12:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:45 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:12:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:48 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:12:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:51 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:12:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:54 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:12:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:12:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:12:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:12:57 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:13:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:00 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:13:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:13:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:03 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:13:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:06 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:13:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:09 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:13:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:12 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:13:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:15 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:13:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:18 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:13:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:21 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:13:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:24 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:13:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:27 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:13:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:30 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:13:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:33 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:13:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:36 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:13:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:40 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:13:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:43 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:13:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:46 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:13:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:49 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:13:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:52 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:13:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:55 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:13:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:13:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:13:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:13:58 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:14:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:01 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:14:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:14:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:04 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:14:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:07 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:14:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:10 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:14:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:13 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:14:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:16 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:14:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:19 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:14:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:22 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:14:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:25 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:14:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:28 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:14:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:31 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:14:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:34 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:14:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:37 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:14:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:40 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:14:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:43 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:14:45 | INFO     | [BENCH] 78 bytes in 2.02s -> 0.00 Mbit/s
+02:14:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:48 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:14:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:51 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:14:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:54 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:14:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:14:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:14:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:14:57 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:15:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:00 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:15:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:15:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:03 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:15:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:06 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:15:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:09 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:15:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:12 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:15:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:15 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:15:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:18 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:15:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:21 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:15:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:24 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:15:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:27 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:15:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:30 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:15:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:33 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:15:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:36 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:15:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:39 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:15:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:42 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:15:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:46 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:15:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:49 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:15:49 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:15:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:52 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:15:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:55 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:15:56 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:15:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:15:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:15:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:15:58 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:01 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:04 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:07 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:10 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:16:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:13 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:16 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:19 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:21 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:16:22 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:25 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:28 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:31 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:16:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:34 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:16:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:37 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:40 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:16:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:43 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:16:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:46 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:16:46 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:16:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:49 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:16:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:52 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:16:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:55 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:16:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:16:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:16:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:16:58 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:17:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:01 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:17:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:04 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:17:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:07 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:17:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:09 | INFO     | [BENCH] 78 bytes in 2.01s -> 0.00 Mbit/s
+02:17:11 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:17:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:12 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:17:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:15 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:17:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:18 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:17:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:21 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:17:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:24 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:17:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:27 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:17:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:30 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:17:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:33 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:17:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:36 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:17:36 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:17:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:39 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:17:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:42 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:17:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:45 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:17:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:48 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:17:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:51 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:17:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:54 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:17:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:17:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:17:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:17:57 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:18:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:00 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:18:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:18:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:03 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:18:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:07 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:18:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:10 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:18:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:13 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:18:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:16 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:18:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:19 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:18:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:22 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:18:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:25 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:18:26 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:18:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:28 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:18:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:31 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:18:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:34 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:18:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:37 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:18:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:40 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:18:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:43 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:18:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:46 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:18:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:49 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:18:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:51 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:18:52 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:18:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:55 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:18:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:18:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:18:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:18:58 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:19:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:01 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:19:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:04 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:19:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:07 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:19:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:10 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:19:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:13 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:19:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:16 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:19:16 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:19:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:19 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:19:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:22 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:19:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:25 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:19:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:28 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:19:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:31 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:19:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:33 | INFO     | [BENCH] 78 bytes in 2.02s -> 0.00 Mbit/s
+02:19:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:36 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:19:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:39 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:19:41 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:19:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:42 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:19:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:45 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:19:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:48 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:19:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:51 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:19:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:54 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:19:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:19:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:19:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:19:57 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:20:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:00 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:20:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:03 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:20:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:06 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:20:06 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:20:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:09 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:20:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:12 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:20:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:15 | INFO     | [API] [-] admin
+02:20:15 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:20:16 | INFO     | [API] [+] admin (Active: 1)
+02:20:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:18 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:20:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:21 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:20:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:24 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:20:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:27 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:20:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:30 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:20:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:34 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:20:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:37 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:20:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:40 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:20:41 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:20:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:43 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:20:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:46 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:20:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:49 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:20:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:52 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:20:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:55 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:20:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:20:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:20:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:20:58 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:21:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:01 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:04 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:06 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:21:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:07 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:10 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:13 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:21:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:16 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:19 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:21:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:22 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:25 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:21:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:28 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:31 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:21:31 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:21:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:34 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:37 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:40 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:43 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:21:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:46 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:49 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:52 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:21:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:55 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:21:56 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:21:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:21:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:21:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:21:58 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:22:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:01 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:22:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:03 | INFO     | [BENCH] 78 bytes in 2.01s -> 0.00 Mbit/s
+02:22:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:06 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:22:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:09 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:22:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:12 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:22:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:15 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:22:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:18 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:22:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:21 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:22:21 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:22:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:24 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:22:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:27 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:22:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:30 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:22:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:33 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:22:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:36 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:22:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:39 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:22:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:42 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:22:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:45 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:22:46 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:22:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:48 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:22:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:51 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:22:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:54 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:22:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:22:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:22:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:22:57 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:23:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:01 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:23:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:04 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:23:06 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:06 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:06 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:07 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:23:09 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:09 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:09 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:10 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:23:12 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:12 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:12 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:13 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:23:15 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:15 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:15 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:16 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:23:18 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:18 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:18 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:19 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:23:21 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:21 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:21 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:22 | INFO     | [BENCH] 78 bytes in 3.04s -> 0.00 Mbit/s
+02:23:24 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:24 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:24 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:25 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:23:27 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:27 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:27 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:28 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:23:30 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:30 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:30 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:31 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:23:33 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:33 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:33 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:34 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:23:36 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:36 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:36 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:37 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:23:39 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:39 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:39 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:40 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:23:42 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:42 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:42 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:43 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:23:45 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:45 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:45 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:46 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:23:48 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:48 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:48 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:49 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:23:51 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:51 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:51 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:52 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:23:54 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:54 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:54 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:55 | INFO     | [BENCH] 78 bytes in 3.03s -> 0.00 Mbit/s
+02:23:57 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:23:57 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:23:57 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:23:58 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:24:00 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:24:00 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:24:00 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:24:01 | INFO     | [BENCH] 78 bytes in 3.02s -> 0.00 Mbit/s
+02:24:01 | WARNING  | [API] Бот 0 не найден в сети (offline)
+02:24:03 | WARNING  | [DataScribe] Получены данные без ID клиента.
+02:24:03 | INFO     | [ZMQ] Получен DataScribe от u80a9-Bot-First. Рассылка активным сессиям: 1
+02:24:03 | DEBUG    | [Worker Process-1] Обработан DataScribe для u80a9-Bot-First
+02:24:04 | INFO     | [BENCH] 78 bytes in 3.01s -> 0.00 Mbit/s
+02:24:05 | INFO     | [-] Клиент u80a9-Bot-First отключен.
