@@ -1,3 +1,5 @@
+// frontend/auth/auth.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginBtn');
     const regBtn = document.getElementById('regBtn');
@@ -28,13 +30,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (type === 'login') {
                     showMessage('Access Granted. Redirecting...', 'success');
 
-                    // Сохраняем все данные, полученные от API
+                    // ГЛАВНОЕ: Сохраняем токен, который выдал сервер
+                    localStorage.setItem('auth_token', result.token); // <--- ТОКЕН
                     localStorage.setItem('user_login', login);
                     localStorage.setItem('user_role', result.role);
                     localStorage.setItem('user_prefix', result.prefix);
 
                     setTimeout(() => {
-                        // Переход в Dashboard
                         window.location.href = '/sidebar/dashboard/dashboard.html';
                     }, 1000);
                 } else {

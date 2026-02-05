@@ -13,5 +13,10 @@
         "password": "123",
         "role": "user",
         "prefix": "ua4e1"
+    },
+    "test3": {
+        "password": "123",
+        "role": "user",
+        "prefix": "uc1a6"
     }
 }

@@ -1,4 +1,4 @@
-// js/modules/data/stats.js
+// frontend/dashboard/js/modules/data/stats.js
 
 import { getAllClients } from './clients.js';
 

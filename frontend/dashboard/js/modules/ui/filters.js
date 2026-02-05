@@ -1,4 +1,4 @@
-// js/modules/ui/filters.js
+// frontend/dashboard/js/modules/ui/filters.js
 
 /**
  * Фильтрует клиентов по статусу

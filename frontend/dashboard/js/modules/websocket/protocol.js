@@ -1,5 +1,5 @@
-const decoder = new TextDecoder();
-const encoder = new TextEncoder();
+// frontend/dashboard/js/modules/websocket/protocol.js
+const decoder = new TextDecoder(), encoder = new TextEncoder();
 const JSON_MODS = ['AuthModule', 'DataScribe', 'ClientList', 'AuthUpdate', 'Heartbeat'];
 
 const readStr = (view, off) => {
@@ -17,8 +17,11 @@ export function decodePacket(buf) {
         const id = readStr(view, 0);
         const mod = readStr(view, id.next);
         const pLen = view.getUint32(mod.next, false);
-        const payload = buf.slice(mod.next + 4, mod.next + 4 + pLen);
-        return { id: id.str, module: mod.str, payload };
+        return {
+            id: id.str,
+            module: mod.str,
+            payload: buf.slice(mod.next + 4, mod.next + 4 + pLen)
+        };
     } catch (e) { return null; }
 }
 
@@ -32,6 +35,5 @@ export function encodePacket(id, mod, pay = []) {
 
     new DataView(buf.buffer).setUint32(off, bPay.length, false);
     buf.set(bPay, off + 4);
-
     return buf.buffer;
 }

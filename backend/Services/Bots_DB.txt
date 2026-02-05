@@ -5,7 +5,7 @@
         "user": "Tester",
         "pc_name": "DEBUG-PC",
         "activeWindow": "Visual Studio Code",
-        "last_active": "02:30:14",
+        "last_active": "03:02:13",
         "ip": "127.0.0.1",
         "auth_key": "super_secret"
     },
@@ -14,9 +14,9 @@
         "loc": "US",
         "user": "Manager_John",
         "pc_name": "OFFICE-PC-01",
-        "activeWindow": "Spotify",
-        "last_active": "02:25:07",
-        "ip": "192.168.1.23",
+        "activeWindow": "Chrome: Dashboard",
+        "last_active": "02:47:38",
+        "ip": "192.168.1.44",
         "auth_key": "super_secret"
     }
 }

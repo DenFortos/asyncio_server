@@ -1,3 +1,5 @@
+// frontend/dashboard/js/modules/ui/searh.js
+
 /**
  * Фильтрация клиентов по ID, IP и Локации
  * @param {Array} items - Массив объектов клиентов

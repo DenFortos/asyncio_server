@@ -1,4 +1,4 @@
-// js/modules/ui/sidebar.js
+// frontend/dashboard/js/modules/ui/sidebar.js
 
 /**
  * Управление состоянием боковой панели

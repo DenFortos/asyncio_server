@@ -1,4 +1,4 @@
-// js/modules/data/clients.js
+// frontend/dashboard/js/modules/data/clients.js
 
 let clients = {};
 const emit = (name, detail = null) => window.dispatchEvent(new CustomEvent(name, { detail }));

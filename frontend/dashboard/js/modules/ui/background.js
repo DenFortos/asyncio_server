@@ -1,4 +1,4 @@
-// js/modules/ui/background.js
+// frontend/dashboard/js/modules/ui/background.js
 
 /** Применяет фон и сохраняет выбор */
 export const setBackground = (path) => {

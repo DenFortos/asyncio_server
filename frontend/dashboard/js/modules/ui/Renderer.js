@@ -1,4 +1,4 @@
-// js/modules/ui/Renderer.js
+// frontend/dashboard/js/modules/ui/Renderer.js
 
 let isGridView = false;
 

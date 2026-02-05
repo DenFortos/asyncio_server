@@ -1,3 +1,5 @@
+// frontend/dashboard/js/dashboard.js
+
 import { updateStats } from './modules/data/stats.js';
 import { getAllClients, checkDeadClients } from './modules/data/clients.js'; // Добавили импорт проверки
 import { Renderer } from './modules/ui/Renderer.js';
