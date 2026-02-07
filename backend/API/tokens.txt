@@ -1,6 +1,3 @@
 {
-    "7be20d5bc1980e7677c23f1898d77338695f411bf4d1594a": "test3",
-    "7891168b42a6eabd9342b568008f7e1de4cca90539531f48": "test2",
-    "851cf4da73eaac9859a00a35ddb5da6ff49e1e7aba32ae3a": "test1",
-    "54f5eb193b7bd3919df53cf418b4da7d4627dd9e7716fd61": "admin"
+    "1b50c9bf9a5fcf458918f9917d3d011a81cb6141a8dab8b9": "admin"
 }

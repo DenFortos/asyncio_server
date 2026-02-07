@@ -1,4 +1,4 @@
-// js/modules/core/states.js
+// frontend/client_control/js/modules/core/states.js
 window.AppState = {
     clientId: new URLSearchParams(window.location.search).get('id'),
     info: { ip: '...', status: 'offline' },

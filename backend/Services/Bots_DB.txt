@@ -5,7 +5,7 @@
         "user": "Tester",
         "pc_name": "DEBUG-PC",
         "activeWindow": "Visual Studio Code",
-        "last_active": "03:02:13",
+        "last_active": "09:02:27",
         "ip": "127.0.0.1",
         "auth_key": "super_secret"
     },

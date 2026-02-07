@@ -1,4 +1,4 @@
-// js/modules/features/desktop.js
+// frontend/client_control/js/modules/features/desktop.js
 window.updateDesktopFeed = (pay) =>
     window.renderStream('remoteScreen', pay, '.desktop-display', 'desktopPlaceholder');
 

@@ -1,4 +1,4 @@
-// js/modules/features/webcam.js
+// frontend/client_control/js/modules/features/webcam.js
 window.updateWebcamFeed = (pay) =>
     window.renderStream('webcamImg', pay, '.webcam-display', 'webcamPlaceholder');
 

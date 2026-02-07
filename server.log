@@ -1,0 +1,119 @@
+03:22:37 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+03:22:37 | INFO     | [+] Server started on ('188.190.156.120', 50001)
+03:22:37 | INFO     | [+] 1 worker processes started
+03:22:38 | INFO     | [+] Dashboard should open shortly in your browser.
+03:22:38 | INFO     | [ZMQ] Receiver active on tcp://127.0.0.1:50002
+03:22:39 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+03:22:43 | INFO     | [API] [+] admin (1 active)
+03:24:13 | INFO     | [API] [+] test1 (1 active)
+03:24:17 | INFO     | [API] [-] test1
+03:24:20 | INFO     | [API] [+] test1 (1 active)
+03:25:24 | INFO     | [API] [-] test1
+03:26:24 | INFO     | [API] [+] test1 (1 active)
+03:26:40 | INFO     | [API] [-] test1
+03:26:42 | INFO     | [API] [+] test1 (1 active)
+03:30:37 | INFO     | [API] [-] test1
+03:36:37 | INFO     | [API] [-] admin
+04:03:49 | ERROR    | [!] Critical Error during startup: Address in use (addr='tcp://127.0.0.1:50000')
+04:03:58 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+04:03:58 | INFO     | [+] Server started on ('188.190.156.120', 50001)
+04:03:58 | INFO     | [+] 1 worker processes started
+04:03:58 | INFO     | [+] Dashboard should open shortly in your browser.
+04:03:58 | INFO     | [ZMQ] Receiver active on tcp://127.0.0.1:50002
+04:03:59 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+04:04:03 | INFO     | [API] [+] admin (1 active)
+04:04:30 | INFO     | [API] [-] admin
+04:04:33 | INFO     | [API] [+] admin (1 active)
+04:04:40 | INFO     | [API] [-] admin
+04:04:48 | INFO     | [API] [+] admin (1 active)
+04:05:23 | INFO     | [API] [-] admin
+04:05:26 | INFO     | [API] [+] admin (1 active)
+04:05:30 | INFO     | [API] [-] admin
+04:06:22 | INFO     | [API] [+] admin (1 active)
+04:08:23 | INFO     | [API] [-] admin
+04:09:07 | INFO     | [API] [+] admin (1 active)
+04:11:37 | INFO     | [API] [-] admin
+04:17:28 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+04:17:28 | INFO     | [+] Server started on ('188.190.156.120', 50001)
+04:17:28 | INFO     | [+] 1 worker processes started
+04:17:28 | INFO     | [+] Dashboard should open shortly in your browser.
+04:17:28 | INFO     | [ZMQ] Receiver active on tcp://127.0.0.1:50002
+04:17:29 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+04:17:41 | INFO     | [API] [+] admin (1 active)
+04:29:22 | INFO     | [API] [-] admin
+04:29:30 | INFO     | [API] [+] admin (1 active)
+04:42:26 | INFO     | [!] Auth - недопустимый размер данных: 369296129 байт от IP 195.184.76.215
+04:42:26 | INFO     | [-] Клиент ? отключен.
+04:42:29 | INFO     | [!] Auth - недопустимый размер данных: 1195725856 байт от IP 195.184.76.140
+04:42:29 | INFO     | [-] Клиент ? отключен.
+04:50:40 | INFO     | [API] [+] efamir (1 active)
+04:52:33 | INFO     | [API] [-] efamir
+04:52:33 | INFO     | [API] [+] efamir (1 active)
+04:53:40 | INFO     | [API] [-] efamir
+04:54:07 | INFO     | [API] [+] efamir (1 active)
+04:54:14 | INFO     | [API] [-] efamir
+04:54:16 | INFO     | [API] [+] efamir (1 active)
+04:54:23 | INFO     | [API] [-] efamir
+04:54:25 | INFO     | [API] [+] efamir (1 active)
+05:37:58 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+05:37:58 | INFO     | [+] Server started on ('188.190.156.120', 50001)
+05:37:58 | INFO     | [+] 1 worker processes started
+05:37:58 | INFO     | [+] Dashboard should open shortly in your browser.
+05:37:59 | INFO     | [ZMQ] Receiver active on tcp://127.0.0.1:50002
+05:37:59 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+05:38:03 | INFO     | [API] [+] admin (1 active)
+05:38:04 | INFO     | [API] [+] admin (2 active)
+05:43:07 | INFO     | [API] [-] admin
+05:43:09 | INFO     | [API] [+] admin (2 active)
+06:10:43 | INFO     | [API] [-] admin
+06:11:01 | INFO     | [API] [+] admin (2 active)
+06:11:18 | INFO     | [API] [-] admin
+09:02:12 | INFO     | [API] [-] admin
+09:04:52 | ERROR    | [!] Critical Error during startup: Address in use (addr='tcp://127.0.0.1:50000')
+09:05:00 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+09:05:00 | INFO     | [+] Server started on ('188.190.156.120', 50001)
+09:05:00 | INFO     | [+] 1 worker processes started
+09:05:00 | INFO     | [+] Dashboard should open shortly in your browser.
+09:05:00 | INFO     | [ZMQ] Receiver active on tcp://127.0.0.1:50002
+09:05:01 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+09:05:07 | INFO     | [API] [+] admin (1 active)
+09:06:04 | INFO     | [API] [-] admin
+09:06:14 | INFO     | [API] [+] admin (1 active)
+09:06:22 | INFO     | [API] [-] admin
+09:06:29 | INFO     | [API] [+] admin (1 active)
+09:06:30 | INFO     | [API] [-] admin
+09:26:34 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+09:26:34 | INFO     | [+] Server started on ('0.0.0.0', 50001)
+09:26:34 | INFO     | [+] 1 worker processes started
+09:26:34 | INFO     | [+] Dashboard should open shortly in your browser.
+09:26:34 | INFO     | [ZMQ] Receiver active on tcp://127.0.0.1:50002
+09:26:35 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+09:27:54 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+09:27:54 | INFO     | [+] Server started on ('0.0.0.0', 50001)
+09:27:54 | INFO     | [+] 1 worker processes started
+09:27:54 | INFO     | [+] Dashboard should open shortly in your browser.
+09:27:54 | INFO     | [ZMQ] Receiver active on tcp://127.0.0.1:50002
+09:27:54 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+09:28:22 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+09:28:22 | ERROR    | [!] Critical Error during startup: could not bind on any address out of [('192.168.0.1', 50001)]
+09:29:28 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+09:29:28 | ERROR    | [!] Critical Error during startup: could not bind on any address out of [('192.168.1.1', 50001)]
+09:32:39 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+09:32:39 | INFO     | [+] Server started on ('127.0.0.1', 50001)
+09:32:39 | INFO     | [+] 1 worker processes started
+09:32:40 | INFO     | [+] Dashboard should open shortly in your browser.
+09:32:40 | INFO     | [ZMQ] Receiver active on tcp://127.0.0.1:50002
+09:32:41 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+09:32:42 | INFO     | [API] [+] admin (1 active)
+06:26:12 | INFO     | [+] ZeroMQ PUSH socket bound to tcp://127.0.0.1:50000
+06:26:12 | INFO     | [+] Server started on ('127.0.0.1', 50001)
+06:26:13 | INFO     | [+] 1 worker processes started
+06:26:13 | INFO     | [+] Dashboard should open shortly in your browser.
+06:26:13 | INFO     | [ZMQ] Receiver active on tcp://127.0.0.1:50002
+06:26:14 | INFO     | [+] Worker Process-1 запущен (Binary Pipeline Mode)
+06:26:37 | INFO     | [API] [+] admin (1 active)
+06:27:05 | INFO     | [API] [-] admin
+06:27:14 | INFO     | [API] [+] admin (1 active)
+07:36:41 | INFO     | [API] [-] admin
+07:45:54 | INFO     | [API] [+] admin (1 active)
+07:45:55 | INFO     | [API] [-] admin
