@@ -1,123 +1,111 @@
-// frontend/dashboard/js/dashboard.js
-
 import { updateStats } from './modules/data/stats.js';
-import { getAllClients, checkDeadClients } from './modules/data/clients.js'; // Добавили импорт проверки
+import { getAllClients, checkDeadClients } from './modules/data/clients.js';
 import { Renderer } from './modules/ui/Renderer.js';
 import { applyStatusFilter } from './modules/ui/filters.js';
 import { applySearchFilter } from './modules/ui/search.js';
 import { connectWebSocket } from './modules/websocket/connection.js';
+import { initializeSidebar } from './modules/ui/sidebar.js';
+import { initializeBackgroundUI } from './modules/ui/background.js';
 
-import './modules/ui/background.js';
-import './modules/ui/sidebar.js';
-
-const state = { filter: 'all', search: '', tab: 'clients' };
+const state = { filter: 'all', search: '', tab: 'bots' };
 
 const updateView = () => {
-    const clients = applySearchFilter(applyStatusFilter(getAllClients(), state.filter), state.search);
-    Renderer.render(clients);
-    if (state.tab === 'files' && window.filesManager) window.filesManager.updateData(clients);
+    const data = applySearchFilter(applyStatusFilter(getAllClients(), state.filter), state.search);
+    Renderer.render(data);
 };
 
-function showTab(tabName) {
-    const target = tabName.toLowerCase().trim();
-    state.tab = target;
+function showTab(name) {
+    state.tab = name.toLowerCase().trim();
 
-    const containers = {
-        clients: '.table-container',
-        files: '.files-container',
-        alerts: '.alerts-container',
-        stats: '#stats-container',
-        settings: '#settings-container'
-    };
-
-    Object.entries(containers).forEach(([key, selector]) => {
-        const el = document.querySelector(selector);
-        if (!el) return;
-        el.style.display = key === target ? (['stats', 'settings'].includes(key) ? 'flex' : 'block') : 'none';
+    document.querySelectorAll('.content-section').forEach(s => {
+        s.classList.toggle('active', s.id === `section-${state.tab}`);
+        s.classList.toggle('hidden', s.id !== `section-${state.tab}`);
     });
 
-    const searchBar = document.querySelector('.search-bar');
-    if (searchBar) searchBar.style.display = ['alerts', 'stats', 'settings'].includes(target) ? 'none' : 'flex';
+    const isData = ['bots', 'files'].includes(state.tab);
+    const search = document.querySelector('.global-search-container');
+    const btn = document.getElementById('toggleView');
 
-    const tvBtn = document.getElementById('toggleView');
-    if (tvBtn) {
-        tvBtn.disabled = target !== 'clients';
-        tvBtn.style.opacity = target === 'clients' ? "1" : "0.5";
+    if (search) search.style.display = isData ? 'flex' : 'none';
+    if (btn) btn.style.display = (state.tab === 'bots') ? 'flex' : 'none';
+
+    // ВИЗУАЛЬНЫЙ ФИКС: Принудительно подсвечиваем фильтр из памяти state
+    const currentFilterEl = document.getElementById(`filter-${state.filter}`);
+    if (currentFilterEl) {
+        document.querySelectorAll('.stat-box').forEach(b => b.classList.remove('active'));
+        currentFilterEl.classList.add('active');
     }
 
-    if (['clients', 'files'].includes(target)) updateView();
+    if (isData) updateView();
 }
 
-const setActive = (btn) => {
-    if (!btn) return;
-    btn.blur();
+const setActiveUI = (el) => {
+    if (!el) return;
 
-    document.querySelectorAll('.icon, button[id^="filter-"]').forEach(el => el.classList.remove('active'));
+    // Если нажата иконка сайдбара — чистим только сайдбар
+    if (el.classList.contains('icon')) {
+        document.querySelectorAll('.sidebar .icon').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+    }
 
-    if (btn.id?.startsWith('filter-')) {
-        btn.classList.add('active');
-        const clientsIcon = document.querySelector('.icon[title="Clients"]');
-        if (clientsIcon) clientsIcon.classList.add('active');
-    } else {
-        btn.classList.add('active');
+    // Если нажат фильтр — чистим только фильтры и активируем иконку Bots
+    if (el.classList.contains('stat-box')) {
+        document.querySelectorAll('.stat-box').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+
+        document.querySelectorAll('.sidebar .icon').forEach(i => i.classList.remove('active'));
+        document.querySelector('.icon[title="Bots"]')?.classList.add('active');
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     connectWebSocket();
     updateStats();
+    if (typeof initializeSidebar === 'function') initializeSidebar();
+    if (typeof initializeBackgroundUI === 'function') initializeBackgroundUI();
 
-    // ЗАПУСК МОНИТОРИНГА: Проверяем статус ботов каждую секунду
     setInterval(checkDeadClients, 1000);
 
-    document.addEventListener('click', (e) => {
-        const icon = e.target.closest('.icon[title]');
-        const filter = e.target.closest('button[id^="filter-"]');
+    document.addEventListener('click', e => {
+        const icon = e.target.closest('.icon');
+        const filter = e.target.closest('.stat-box.clickable');
         const row = e.target.closest('.client-row, .client-card');
 
         if (icon) {
-            e.preventDefault();
-            setActive(icon);
-            showTab(icon.getAttribute('title'));
-            return;
-        }
-
-        if (filter) {
-            e.preventDefault();
+            setActiveUI(icon);
+            showTab(icon.getAttribute('title') || 'bots');
+        } else if (filter) {
             state.filter = filter.id.replace('filter-', '');
-            setActive(filter);
-            if (state.tab !== 'clients') showTab('clients');
-            else updateView();
-            return;
-        }
-
-        if (row && !e.target.closest('button')) {
+            setActiveUI(filter);
+            state.tab !== 'bots' ? showTab('bots') : updateView();
+        } else if (row && !e.target.closest('button')) {
             const id = row.dataset.clientId;
-            if (id) location.href = `../client_control/client_control.html?id=${id}`;
+            if (id) window.location.href = `../client_control/client_control.html?id=${id}`;
         }
     });
 
-    document.getElementById('toggleView')?.addEventListener('click', () => Renderer.toggleView());
-
-    window.addEventListener('searchUpdated', (e) => {
-        state.search = e.detail;
+    const tvBtn = document.getElementById('toggleView');
+    tvBtn?.addEventListener('click', () => {
+        const isGrid = Renderer.toggleView();
+        if (isGrid) {
+            state.filter = 'online';
+            setActiveUI(document.getElementById('filter-online'));
+        }
         updateView();
     });
 
-    window.addEventListener('viewToggled', (e) => {
-        const btn = document.getElementById('toggleView');
-        if (btn) btn.innerHTML = e.detail ? '<i class="fas fa-list"></i> Table View' : '<i class="fas fa-th"></i> Grid View';
-        updateView();
+    window.addEventListener('searchUpdated', e => { state.search = e.detail; updateView(); });
+
+    window.addEventListener('viewToggled', e => {
+        if (tvBtn) tvBtn.innerHTML = e.detail ?
+            '<i class="fas fa-list"></i> <span>Table View</span>' :
+            '<i class="fas fa-th"></i> <span>Grid View</span>';
     });
 
     ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => {
-        window.addEventListener(ev, () => {
-            updateView();
-            updateStats();
-        });
+        window.addEventListener(ev, () => { updateView(); updateStats(); });
     });
 
-    // Инициализация дефолтного фильтра
-    setActive(document.getElementById('filter-all'));
-    showTab('clients');
+    // Инициализация стартового состояния
+    showTab('bots');
 });

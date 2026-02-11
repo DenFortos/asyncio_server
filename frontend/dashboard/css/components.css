@@ -1,0 +1,509 @@
+/* frontend/dashboard/css/components.css
+
+/* ==========================================================================
+   1. САЙДБАР И ВНЕШНИЙ БУРГЕР
+   ========================================================================== */
+
+.sidebar {
+    width: 80px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--glass-border);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    padding: 20px 0;
+
+    /* ПРАВКА ТУТ: Убрали прыгучий коэффициент 1.275 на плавный 1.0 */
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Кнопка БУРГЕР — прикреплена к ПРАВОМУ краю сайдбара снаружи */
+.menu-toggle {
+    position: absolute;
+    right: -55px;
+    top: 20px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.menu-toggle:hover {
+    background: rgba(0, 212, 255, 0.2);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    transform: scale(1.1);
+}
+
+/* Иконки навигации (внутри сайдбара) */
+.sidebar-icons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-icons .icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-icons .icon.active,
+.sidebar-icons .icon:hover {
+    color: #fff;
+    background: rgba(0, 212, 255, 0.2);
+    border: 1px solid var(--accent-blue);
+}
+
+/* ==========================================================================
+   2. ШАПКА И УПРАВЛЕНИЕ (Buttons & Stats)
+   ========================================================================== */
+
+/* Логотип/Заголовок */
+.brand-title {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    white-space: nowrap;
+
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(0, 212, 255, 0.5) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+    text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.3),
+        0 2px 0 rgba(255, 255, 255, 0.1),
+        0 3px 0 rgba(0, 212, 255, 0.2),
+        0 4px 0 rgba(0, 212, 255, 0.3),
+        0 5px 10px rgba(0, 0, 0, 0.4),
+        0 0 15px rgba(0, 212, 255, 0.2);
+
+    transition: all 0.4s ease;
+    cursor: pointer;
+}
+
+.brand-title:hover {
+    transform: translateY(-3px) scale(1.02);
+    filter: drop-shadow(0 5px 15px rgba(0, 212, 255, 0.4));
+    background: linear-gradient(180deg, #ffffff 0%, rgba(0, 212, 255, 0.8) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Глобальные кнопки управления */
+.bg-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-btn i { font-size: 1.2rem; color: var(--accent-blue); }
+
+.bg-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--accent-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 212, 255, 0.2);
+}
+
+/* Контейнер для фильтров статистики */
+.stats-filters {
+    display: flex;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 6px;
+    border-radius: 14px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+}
+
+.stat-box {
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 95px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.stat-box:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+
+/* Состояния активности фильтров */
+.stat-box#filter-all.active {
+    background: rgba(0, 212, 255, 0.25);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+.stat-box#filter-online.active {
+    background: rgba(0, 255, 136, 0.2);
+    border-color: #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+.stat-box#filter-offline.active {
+    background: rgba(255, 75, 43, 0.2);
+    border-color: #ff4b2b;
+    box-shadow: 0 0 20px rgba(255, 75, 43, 0.3);
+}
+
+.stat-value { font-size: 1.5rem; font-weight: 800; display: block; }
+.stat-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; opacity: 0.8; }
+
+#online-count { color: #00ff88; }
+#offline-count { color: #ff4b2b; }
+
+/* ==========================================================================
+   3. ПОИСК (Улучшенная видимость и компактность)
+   ========================================================================== */
+.search-bar {
+    position: relative;
+    width: 100%;
+    /* Ограничиваем длину поиска по твоему запросу */
+    max-width: 500px;
+    margin: 0 auto; /* Центрируем */
+}
+
+.search-bar i {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent-blue);
+    font-size: 1.2rem;
+    pointer-events: none;
+    z-index: 5;
+    /* Свечение иконки для заметности */
+    filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.4));
+}
+
+.search-input {
+    width: 100%;
+    /* Делаем фон темнее, чтобы белый текст "горел" */
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    padding: 14px 25px 14px 55px;
+    border-radius: 12px; /* Прямоугольный стиль под стать кнопкам */
+
+    /* Текст внутри поиска */
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.search-input::placeholder {
+    /* Делаем подсказку более читаемой */
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    background: rgba(0, 0, 0, 0.5);
+    /* Эффект свечения при печати */
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   4. ТАБЛИЦА БОТОВ (Улучшенная читаемость)
+   ========================================================================== */
+.table-container {
+    width: 100%;
+    border-radius: 15px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2); /* Слегка притемняем подложку самой таблицы */
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+}
+
+.clients-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Шапка таблицы */
+.clients-table thead th {
+    padding: 20px 15px;
+    text-align: left;
+    font-size: 0.9rem; /* Увеличили размер заголовков */
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent-blue);
+    border-bottom: 2px solid rgba(0, 212, 255, 0.4);
+    letter-spacing: 1px;
+}
+
+/* Строки с данными */
+.clients-table td {
+    padding: 18px 15px; /* Увеличили отступы для высоты строки */
+    font-size: 1.05rem;  /* Увеличен размер текста (был 0.9) */
+    font-weight: 500;    /* Сделали текст чуть толще */
+    color: #ffffff;      /* Чистый белый */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    /* Легкое свечение текста для четкости на темном фоне */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Подсветка IP и ID для быстрого поиска глазами */
+.clients-table td:nth-child(5) { /* Столбец IP */
+    color: var(--accent-blue);
+    font-family: 'JetBrains Mono', 'Consolas', monospace; /* Моноширинный шрифт для цифр */
+}
+
+.client-id-cell {
+    opacity: 0.8;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+/* Эффект при наведении */
+.clients-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+
+/* ==========================================================================
+   4.1. СЕТКА БОТОВ (Grid View для раздела Bots)
+   ========================================================================== */
+
+/* Контейнер сетки */
+#grid-view {
+    display: grid;
+    /* Колонки по 300px, чтобы карточки не растягивались */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+/* Сама карточка бота */
+.client-card {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 15px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.client-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-blue);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Превью/Скриншот внутри карточки */
+.bot-preview {
+    width: 100%;
+    height: 160px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #000;
+}
+
+.bot-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    transition: 0.5s;
+}
+
+.client-card:hover .bot-preview img {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+/* Инфо-блок карточки */
+.bot-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bot-primary-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    color: #fff;
+}
+
+.bot-secondary-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Точка статуса на карточке */
+.card-status-dot {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    z-index: 10;
+    border: 2px solid rgba(0,0,0,0.5);
+}
+
+/* Класс скрытия (ВАЖНО для работы переключателя) */
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   5. КАРТОЧКИ ФАЙЛОВ (File Grid)
+   ========================================================================== */
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.file-card {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    transition: 0.3s;
+}
+
+.file-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-blue);
+}
+
+.file-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    color: var(--accent-blue);
+}
+
+.file-name {
+    font-weight: 500;
+    display: block;
+    word-break: break-all;
+}
+
+.file-size {
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+.file-source {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--glass-border);
+    width: 100%;
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    opacity: 0.8;
+}
+
+/* ==========================================================================
+   6. МОДАЛКИ (Modal Content)
+   ========================================================================== */
+.modal-content {
+    padding: 30px;
+    color: white;
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+.close-modal:hover { opacity: 1; }
+
+.bg-option-item {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 8px;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid transparent;
+    transition: 0.3s;
+}
+
+.bg-option-item:hover {
+    border-color: var(--accent-blue);
+    transform: scale(1.05);
+}
+
+.global-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 25px; /* Отодвигаем статы от кнопок */
+}

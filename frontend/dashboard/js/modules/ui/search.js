@@ -1,43 +1,42 @@
-// frontend/dashboard/js/modules/ui/searh.js
+// frontend/dashboard/js/modules/ui/search.js
 
 /**
- * Фильтрация клиентов по ID, IP и Локации
- * @param {Array} items - Массив объектов клиентов
- * @param {string} query - Запрос из инпута
+ * Фильтрация клиентов строго по ID, IP и Локации
+ * @param {Array} items - Список объектов клиентов
+ * @param {string} query - Строка поиска
  */
 export const applySearchFilter = (items, query) => {
     const q = query?.toLowerCase().trim();
+
+    // Если поисковый запрос пуст, возвращаем всех клиентов
     if (!q) return items;
 
     return items.filter(item => {
-        // Извлекаем только нужные поля
-        const fieldsToSearch = [
-            item.id,
-            item.ip,
-            item.loc // Добавили локацию (RU, US и т.д.)
-        ];
+        // Извлекаем только нужные поля для поиска
+        const id = item.id?.toString().toLowerCase() || "";
+        const ip = item.ip?.toString().toLowerCase() || "";
+        const loc = item.loc?.toString().toLowerCase() || "";
 
-        return fieldsToSearch.some(field =>
-            field?.toLowerCase().includes(q)
-        );
+        // Проверяем, содержится ли запрос хотя бы в одном из этих полей
+        return id.includes(q) || ip.includes(q) || loc.includes(q);
     });
 };
 
 /**
- * Инициализация слушателя.
- * Мы используем Debounce (задержку), чтобы не перерисовывать таблицу
- * слишком часто при быстром наборе текста.
+ * Инициализация слушателя инпута поиска
  */
 document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('search-input');
-    let timeout;
+    const input = document.getElementById('universal-search');
+    if (!input) return;
 
-    input?.addEventListener('input', () => {
+    let timeout;
+    input.addEventListener('input', (e) => {
+        // Используем небольшую задержку (debounce), чтобы не спамить рендером при каждом символе
         clearTimeout(timeout);
         timeout = setTimeout(() => {
             window.dispatchEvent(new CustomEvent('searchUpdated', {
-                detail: input.value
+                detail: e.target.value
             }));
-        }, 150); // Задержка 150мс для плавности
+        }, 150);
     });
 });

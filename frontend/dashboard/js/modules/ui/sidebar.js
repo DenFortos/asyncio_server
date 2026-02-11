@@ -1,16 +1,15 @@
 // frontend/dashboard/js/modules/ui/sidebar.js
-
-/**
- * Управление состоянием боковой панели
- */
-export function initializeSidebarToggle() {
-    const sidebar = document.querySelector('.sidebar');
+export function initializeSidebar() {
     const toggleBtn = document.getElementById('menuToggle');
+    console.log("[Sidebar] Init. Toggle button found:", !!toggleBtn);
 
-    toggleBtn?.addEventListener('click', () => {
-        sidebar?.classList.toggle('expanded');
-    });
+    if (!toggleBtn) {
+        console.warn("[Sidebar] CRITICAL: #menuToggle not found in DOM!");
+        return;
+    }
+
+    toggleBtn.onclick = (e) => {
+        console.log("[Sidebar] Hamburger clicked");
+        document.body.classList.toggle('sidebar-hidden');
+    };
 }
-
-// Инициализация при загрузке
-document.addEventListener('DOMContentLoaded', initializeSidebarToggle);
