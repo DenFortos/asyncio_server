@@ -256,15 +256,17 @@
 }
 
 /* ==========================================================================
-   4. ТАБЛИЦА БОТОВ (Улучшенная читаемость)
+   4. ТАБЛИЦА БОТОВ (Финальная интерактивная версия)
    ========================================================================== */
+
 .table-container {
     width: 100%;
     border-radius: 15px;
     overflow: hidden;
-    background: rgba(0, 0, 0, 0.2); /* Слегка притемняем подложку самой таблицы */
+    background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
+    margin-top: 10px;
 }
 
 .clients-table {
@@ -272,46 +274,88 @@
     border-collapse: collapse;
 }
 
-/* Шапка таблицы */
+/* ШАПКА ТАБЛИЦЫ */
 .clients-table thead th {
     padding: 20px 15px;
     text-align: left;
-    font-size: 0.9rem; /* Увеличили размер заголовков */
-    font-weight: 700;
+    font-size: 0.8rem;
+    font-weight: 800;
     text-transform: uppercase;
     color: var(--accent-blue);
-    border-bottom: 2px solid rgba(0, 212, 255, 0.4);
+    border-bottom: 2px solid rgba(0, 212, 255, 0.2);
     letter-spacing: 1px;
 }
 
-/* Строки с данными */
+/* ЯЧЕЙКИ (СТРОКИ) */
 .clients-table td {
-    padding: 18px 15px; /* Увеличили отступы для высоты строки */
-    font-size: 1.05rem;  /* Увеличен размер текста (был 0.9) */
-    font-weight: 500;    /* Сделали текст чуть толще */
-    color: #ffffff;      /* Чистый белый */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    /* Легкое свечение текста для четкости на темном фоне */
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    padding: 12px 15px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+    transition: all 0.2s ease; /* Плавность для всех изменений */
 }
 
-/* Подсветка IP и ID для быстрого поиска глазами */
-.clients-table td:nth-child(5) { /* Столбец IP */
-    color: var(--accent-blue);
-    font-family: 'JetBrains Mono', 'Consolas', monospace; /* Моноширинный шрифт для цифр */
+/* --- ИНТЕРАКТИВ ПРИ НАВЕДЕНИИ --- */
+.clients-table tbody tr {
+    cursor: pointer; /* Мышка превращается в палец */
+    transition: all 0.3s ease;
+}
+
+.clients-table tbody tr:hover {
+    /* Легкая подсветка фона, как у кнопок */
+    background: rgba(0, 212, 255, 0.1);
+    /* Эффект свечения границ */
+    box-shadow: inset 0 0 15px rgba(0, 212, 255, 0.05);
+}
+
+.clients-table tbody tr:hover td {
+    /* Текст становится чуть ярче при наведении */
+    color: #fff !important;
+    border-bottom-color: rgba(0, 212, 255, 0.3);
+}
+
+/* --- СТАТУСЫ --- */
+.status-online {
+    color: #00ff88 !important;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
+}
+
+.status-offline {
+    color: #888888 !important;
+}
+
+/* IP и ID */
+.clients-table td:nth-child(5),
+.client-id-cell {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.9rem;
 }
 
 .client-id-cell {
-    opacity: 0.8;
-    font-size: 0.9rem;
-    color: #aaa;
+    color: #555555 !important;
 }
 
-/* Эффект при наведении */
-.clients-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.08);
+/* ТОЧКИ И ФЛАГИ */
+.status-dot-mini {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: middle;
 }
+.status-dot-mini.online { background: #00ff88; box-shadow: 0 0 8px #00ff88; }
+.status-dot-mini.offline { background: #ff4b2b; }
 
+.flag-icon {
+    width: 16px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
 
 /* ==========================================================================
    4.1. СЕТКА БОТОВ (Grid View для раздела Bots)
@@ -402,6 +446,7 @@
     border-radius: 50%;
     z-index: 10;
     border: 2px solid rgba(0,0,0,0.5);
+    pointer-events: none;
 }
 
 /* Класс скрытия (ВАЖНО для работы переключателя) */

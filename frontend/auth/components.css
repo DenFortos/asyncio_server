@@ -1,0 +1,61 @@
+/* --- Логотип и иконка --- */
+.main-icon {
+    width: 50px; height: 50px;
+    background: var(--accent);
+    color: #000;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 20px;
+}
+
+.brand-title { font-size: 2.4rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
+.brand-subtitle { opacity: 0.5; font-size: 0.8rem; margin-top: 4px; text-transform: uppercase; }
+
+/* --- Статус-бары --- */
+.system-status { display: flex; flex-direction: column; gap: 10px; }
+.status-item { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; opacity: 0.6; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: #00ff88; box-shadow: 0 0 8px #00ff88; }
+
+/* --- Форма и Инпуты --- */
+.form-header h2 { font-size: 1.6rem; margin: 0 0 5px 0; }
+.form-header p { opacity: 0.4; margin-bottom: 30px; font-size: 0.9rem; }
+
+.input-group { margin-bottom: 20px; }
+.input-group label { display: block; font-size: 0.75rem; margin-bottom: 8px; opacity: 0.5; }
+
+.input-wrapper { position: relative; }
+.input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent); font-size: 14px; }
+
+input {
+    width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+    padding: 14px 14px 14px 45px; color: #fff; border-radius: 12px;
+    outline: none; transition: 0.2s; box-sizing: border-box;
+}
+input:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.05); }
+
+/* --- Кнопки действий --- */
+.auth-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-main {
+    width: 100%; padding: 15px; background: #ffffff; color: #000;
+    border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+.btn-main:hover { background: var(--accent); transform: translateY(-1px); }
+
+.btn-sub {
+    width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border);
+    color: #fff; border-radius: 12px; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
+}
+.btn-sub:hover { background: rgba(255, 255, 255, 0.05); border-color: #fff; }
+
+.divider { text-align: center; font-size: 0.7rem; opacity: 0.2; margin: 5px 0; }
+
+/* --- Сообщения --- */
+#message { margin-top: 15px; text-align: center; min-height: 20px; font-size: 0.85rem; font-weight: 600; }
+.error { color: #ff4b2b; }
+.success { color: #00ff88; }

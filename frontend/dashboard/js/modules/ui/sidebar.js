@@ -1,15 +1,11 @@
 // frontend/dashboard/js/modules/ui/sidebar.js
+
 export function initializeSidebar() {
     const toggleBtn = document.getElementById('menuToggle');
-    console.log("[Sidebar] Init. Toggle button found:", !!toggleBtn);
 
-    if (!toggleBtn) {
-        console.warn("[Sidebar] CRITICAL: #menuToggle not found in DOM!");
-        return;
-    }
+    if (!toggleBtn) return;
 
-    toggleBtn.onclick = (e) => {
-        console.log("[Sidebar] Hamburger clicked");
+    toggleBtn.addEventListener('click', () => {
         document.body.classList.toggle('sidebar-hidden');
-    };
+    });
 }

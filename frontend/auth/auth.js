@@ -1,61 +1,46 @@
 // frontend/auth/auth.js
-
 document.addEventListener('DOMContentLoaded', () => {
-    const loginBtn = document.getElementById('loginBtn');
-    const regBtn = document.getElementById('regBtn');
-    const msgDiv = document.getElementById('message');
+    const [loginBtn, regBtn, msgDiv] = ['loginBtn', 'regBtn', 'message'].map(id => document.getElementById(id));
 
-    async function performAuth(type) {
-        const login = document.getElementById('username').value.trim();
-        const pass = document.getElementById('password').value.trim();
+    const showMsg = (text, cls = '') => {
+        msgDiv.textContent = text;
+        msgDiv.className = cls;
+    };
 
-        if (!login || !pass) {
-            showMessage('Fill all fields', 'error');
-            return;
-        }
+    async function auth(type) {
+        const [login, password] = ['username', 'password'].map(id => document.getElementById(id).value.trim());
+        if (!login || !password) return showMsg('ERR: EMPTY_FIELDS', 'error');
 
-        showMessage('Processing...', '');
+        showMsg('PROCESSING...', '');
+        loginBtn.disabled = regBtn.disabled = true;
 
         try {
-            // Запросы на /login или /register к твоему API
-            const response = await fetch(`/${type}`, {
+            const res = await fetch(`/${type}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login: login, password: pass })
+                body: JSON.stringify({ login, password })
             });
+            const data = await res.json();
 
-            const result = await response.json();
-
-            if (result.status === 'ok') {
+            if (data.status === 'ok') {
                 if (type === 'login') {
-                    showMessage('Access Granted. Redirecting...', 'success');
-
-                    // ГЛАВНОЕ: Сохраняем токен, который выдал сервер
-                    localStorage.setItem('auth_token', result.token); // <--- ТОКЕН
-                    localStorage.setItem('user_login', login);
-                    localStorage.setItem('user_role', result.role);
-                    localStorage.setItem('user_prefix', result.prefix);
-
-                    setTimeout(() => {
-                        window.location.href = '/sidebar/dashboard/dashboard.html';
-                    }, 1000);
+                    showMsg('ACCESS GRANTED', 'success');
+                    ['auth_token', 'user_login', 'user_role', 'user_prefix'].forEach(key =>
+                        localStorage.setItem(key, data[key.replace('auth_', '')] || data[key] || login));
+                    setTimeout(() => location.href = '/sidebar/dashboard/dashboard.html', 800);
                 } else {
-                    showMessage('Account created! You can login now.', 'success');
+                    showMsg('ACCOUNT CREATED', 'success');
+                    loginBtn.disabled = regBtn.disabled = false;
                 }
             } else {
-                showMessage(result.message || 'Authentication failed', 'error');
+                throw new Error(data.message || 'AUTH_FAILED');
             }
         } catch (err) {
-            console.error('Auth Error:', err);
-            showMessage('Connection to C2 lost', 'error');
+            showMsg(`ERR: ${err.message}`, 'error');
+            loginBtn.disabled = regBtn.disabled = false;
         }
     }
 
-    function showMessage(text, className) {
-        msgDiv.innerText = text;
-        msgDiv.className = className;
-    }
-
-    loginBtn.addEventListener('click', () => performAuth('login'));
-    regBtn.addEventListener('click', () => performAuth('register'));
+    loginBtn.onclick = () => auth('login');
+    regBtn.onclick = () => auth('register');
 });

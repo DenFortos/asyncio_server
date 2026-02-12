@@ -1,9 +1,41 @@
-// frontend/client_control/js/modules/features/desktop.js
-window.updateDesktopFeed = (pay) =>
-    window.renderStream('remoteScreen', pay, '.desktop-display', 'desktopPlaceholder');
+/* frontend/client_control/js/modules/ui/render.js */
 
-window.clearDesktopUI = () => {
-    const img = document.getElementById('remoteScreen');
-    if (img) img.style.display = 'none';
-    document.getElementById('desktopPlaceholder').style.display = 'block';
+/**
+ * Универсальный рендеринг потока (изображений)
+ */
+window.renderStream = (imgId, payload, containerSelector, placeholderId) => {
+    const img = document.getElementById(imgId);
+    const placeholder = document.getElementById(placeholderId);
+
+    if (!img || !payload) return;
+
+    // Конвертируем бинарные данные в URL
+    const blob = new Blob([payload], { type: 'image/jpeg' });
+    const url = URL.createObjectURL(blob);
+
+    const oldUrl = img.src;
+    img.src = url;
+
+    // Скрываем заглушку и показываем поток при первом кадре
+    if (img.style.display === 'none') {
+        img.style.display = 'block';
+        if (placeholder) placeholder.style.display = 'none';
+    }
+
+    // Освобождаем память от старого кадра
+    if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
+};
+
+/**
+ * Очистка UI для любого типа потока
+ */
+window.clearStreamUI = (imgId, placeholderId) => {
+    const img = document.getElementById(imgId);
+    const placeholder = document.getElementById(placeholderId);
+
+    if (img) {
+        img.style.display = 'none';
+        img.src = '';
+    }
+    if (placeholder) placeholder.style.display = 'block';
 };

@@ -1,0 +1,91 @@
+/* frontend/client_control/css/base.css
+   ==========================================================================
+   1. ПЕРЕМЕННЫЕ (Terminal High-Contrast Theme)
+   ========================================================================== */
+
+:root {
+    /* Цветовая палитра */
+    --bg-black: #000000;         /* Основной фон */
+    --panel-dark: #0a0a0a;       /* Фон панелей (чуть светлее для объема) */
+    --border-dim: #222222;       /* Тусклые рамки */
+    --border-bright: #444444;    /* Яркие рамки при наведении */
+
+    /* Акценты и состояния */
+    --accent-green: #00ff41;     /* Matrix Green (активен/online) */
+    --accent-green-dim: rgba(0, 255, 65, 0.1);
+    --accent-red: #ff3333;       /* Offline/Критические действия */
+
+    /* Типографика */
+    --text-main: #ffffff;        /* Основной текст */
+    --text-muted: #666666;       /* Вспомогательный текст (метки) */
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+    /* Геометрия и тайминги */
+    --sidebar-width: 80px;
+    --header-height: 60px;
+    --radius: 8px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* ==========================================================================
+   2. ГЛОБАЛЬНЫЙ СБРОС (Reset & Normalize)
+   ========================================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+}
+
+body {
+    background-color: var(--bg-black);
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden; /* Весь интерфейс зафиксирован без прокрутки окна */
+    line-height: 1.5;
+}
+
+
+/* ==========================================================================
+   3. БАЗОВЫЕ ЭЛЕМЕНТЫ (Buttons & Icons)
+   ========================================================================== */
+
+/* Отключаем стандартный стиль кнопок для кастомных компонентов */
+button {
+    background: none;
+    border: none;
+    color: inherit;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* Проброс клика сквозь иконки для точности JS-событий */
+i {
+    pointer-events: none;
+}
+
+
+/* ==========================================================================
+   4. СКРОЛЛБАР (Custom Terminal Scrollbar)
+   ========================================================================== */
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-black);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-bright);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-green);
+}

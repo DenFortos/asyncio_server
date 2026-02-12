@@ -1,42 +1,31 @@
 // frontend/dashboard/js/modules/ui/search.js
 
 /**
- * Фильтрация клиентов строго по ID, IP и Локации
- * @param {Array} items - Список объектов клиентов
- * @param {string} query - Строка поиска
+ * Фильтрация клиентов (ID, IP, Location)
  */
 export const applySearchFilter = (items, query) => {
     const q = query?.toLowerCase().trim();
-
-    // Если поисковый запрос пуст, возвращаем всех клиентов
     if (!q) return items;
 
-    return items.filter(item => {
-        // Извлекаем только нужные поля для поиска
-        const id = item.id?.toString().toLowerCase() || "";
-        const ip = item.ip?.toString().toLowerCase() || "";
-        const loc = item.loc?.toString().toLowerCase() || "";
-
-        // Проверяем, содержится ли запрос хотя бы в одном из этих полей
-        return id.includes(q) || ip.includes(q) || loc.includes(q);
-    });
+    return items.filter(({ id = '', ip = '', loc = '' }) =>
+        [id, ip, loc].some(val => val.toString().toLowerCase().includes(q))
+    );
 };
 
 /**
- * Инициализация слушателя инпута поиска
+ * Инициализация поиска с Debounce
  */
-document.addEventListener('DOMContentLoaded', () => {
+export function initializeSearch() {
     const input = document.getElementById('universal-search');
     if (!input) return;
 
     let timeout;
-    input.addEventListener('input', (e) => {
-        // Используем небольшую задержку (debounce), чтобы не спамить рендером при каждом символе
+    input.addEventListener('input', ({ target }) => {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
             window.dispatchEvent(new CustomEvent('searchUpdated', {
-                detail: e.target.value
+                detail: target.value
             }));
         }, 150);
     });
-});
+}

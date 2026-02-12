@@ -1,0 +1,44 @@
+/* --- Контейнер-обертка --- */
+.auth-wrapper {
+    width: 100%;
+    max-width: 900px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- Основная карточка --- */
+.auth-container {
+    background: var(--panel);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr; /* Разделение на две колонки */
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Левая информационная панель --- */
+.auth-info {
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
+    border-right: 1px solid var(--border);
+}
+
+/* --- Правая панель с формой --- */
+.auth-form-section {
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Адаптив для мобильных устройств */
+@media (max-width: 768px) {
+    .auth-container { grid-template-columns: 1fr; }
+    .auth-info { display: none; }
+}

@@ -1,6 +1,6 @@
 import { updateStats } from './modules/data/stats.js';
 import { getAllClients, checkDeadClients } from './modules/data/clients.js';
-import { Renderer } from './modules/ui/Renderer.js';
+import { Renderer } from './modules/ui/renderer.js';
 import { applyStatusFilter } from './modules/ui/filters.js';
 import { applySearchFilter } from './modules/ui/search.js';
 import { connectWebSocket } from './modules/websocket/connection.js';

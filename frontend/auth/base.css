@@ -1,0 +1,23 @@
+/* --- Глобальные переменные --- */
+:root {
+    --accent: #00d4ff;         /* Яркий голубой */
+    --accent-dark: #00a2ff;    /* Темно-голубой */
+    --bg-main: #000000;        /* Чистый черный фон */
+    --panel: rgba(20, 22, 28, 0.8); /* Фон карточки */
+    --border: rgba(255, 255, 255, 0.1); /* Тонкие границы */
+    --input-bg: rgba(255, 255, 255, 0.03); /* Фон инпутов */
+}
+
+/* --- Базовый сброс --- */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Чтобы не было полос прокрутки */
+}

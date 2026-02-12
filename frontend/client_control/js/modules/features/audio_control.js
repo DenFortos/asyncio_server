@@ -1,32 +1,23 @@
+/* frontend/client_control/js/modules/features/audio.js */
+
 window.toggleAudio = (type) => {
-    // type приходит как 'input' или 'output'
-    const stateKey = type === 'input' ? 'input' : 'output';
+    // type: 'input' (микрофон) или 'output' (динамики)
+    const state = AppState.audio;
+    state[type] = !state[type];
 
-    // 1. Инвертируем состояние именно для этого типа
-    AppState.audio[stateKey] = !AppState.audio[stateKey];
-    const isActive = AppState.audio[stateKey];
-
-    // 2. Находим именно ту иконку, на которую нажали
+    const isActive = state[type];
     const icon = document.querySelector(`.icon[data-function="audio-${type}"]`);
 
     if (icon) {
-        // Если включено — добавляем класс active, если выключено — убираем
         icon.classList.toggle('active', isActive);
-
-        // Если ты хочешь визуально выделить, что поток пошел (например, красным),
-        // можно добавить/убрать спец. класс. Если нет — active достаточно.
+        // Цветовая индикация: микрофон — красный, звук — зеленый Matrix
         if (isActive) {
-            icon.style.color = (type === 'input') ? '#ff4444' : '#44ff44'; // Например: микрофон красный, звук зеленый
+            icon.style.color = (type === 'input') ? 'var(--accent-red)' : 'var(--accent-green)';
         } else {
-            icon.style.color = ''; // Возвращаем стандартный цвет из CSS
+            icon.style.color = '';
         }
     }
 
-    // 3. Отправляем команду боту
-    const action = isActive ? 'start' : 'stop';
-    if (window.sendToBot) {
-        window.sendToBot('Audio', `${action}_${type}`);
-    }
-
-    console.log(`[Audio] ${type} is now ${isActive ? 'ON' : 'OFF'}`);
+    const cmd = isActive ? 'start' : 'stop';
+    window.sendToBot?.('Audio', `${cmd}_${type}`);
 };

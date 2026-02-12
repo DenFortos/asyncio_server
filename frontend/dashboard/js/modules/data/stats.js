@@ -3,33 +3,33 @@
 import { getAllClients } from './clients.js';
 
 /**
- * Обновляет счетчики в хедере или на дашборде
+ * Обновляет счетчики в шапке (Online, Offline, Total)
  */
-const updateStats = () => {
+export const updateStats = () => {
     const clients = getAllClients();
 
-    // Считаем всё за один проход вместо трех фильтров
-    const stats = clients.reduce((acc, c) => {
-        acc[c.status === 'online' ? 'online' : 'offline']++;
+    // Считаем статусы за один проход
+    const stats = clients.reduce((acc, { status }) => {
+        acc[status === 'online' ? 'online' : 'offline']++;
         return acc;
     }, { online: 0, offline: 0 });
 
-    // Массовое обновление DOM
-    const mapping = {
+    const data = {
         'online-count': stats.online,
         'offline-count': stats.offline,
         'total-count': clients.length
     };
 
-    Object.entries(mapping).forEach(([id, val]) => {
+    // Обновляем только если значения изменились (мини-оптимизация)
+    Object.entries(data).forEach(([id, val]) => {
         const el = document.getElementById(id);
-        if (el) el.textContent = val;
+        if (el && el.textContent !== String(val)) {
+            el.textContent = val;
+        }
     });
 };
 
-// Подписка на все события обновления данных разом
-['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev =>
-    document.addEventListener(ev, updateStats)
+// Подписка на события обновления данных
+['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(event =>
+    document.addEventListener(event, updateStats)
 );
-
-export { updateStats };

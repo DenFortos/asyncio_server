@@ -1,33 +1,52 @@
-// frontend/client_control/js/modules/websocket/controller.js
-import { initControlConnection } from './connection.js';
-import { toggleFeature } from '../ui/controller.js'; // Поднимаемся на уровень выше к папке ui
+import { toggleFeature } from '../ui/controller.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof AppState !== 'undefined' && AppState.reset) AppState.reset();
+    // 1. Инициализация интерфейса
+    if (window.initClientUI) window.initClientUI();
 
-    initControlConnection();
+    // 2. Групповая привязка кнопок управления
+    const actions = [
+        {
+            id: 'btn-desktop-stream',
+            ref: AppState.desktop,
+            key: 'observe',
+            mod: 'ScreenWatch',
+            cmds: ['start_stream', 'stop_stream']
+        },
+        {
+            id: 'btn-desktop-control',
+            ref: AppState.desktop,
+            key: 'control',
+            mod: 'InputForge',
+            cmds: ['start_control', 'stop_control']
+        },
+        {
+            id: 'btn-webcam-stream',
+            ref: AppState.webcam,
+            key: 'active',
+            mod: 'CamGaze',
+            cmds: ['start', 'stop']
+        }
+    ];
 
-    // Экспортируем функции в window, чтобы они были видны кнопкам
-    window.toggleObserve = () =>
-        toggleFeature('observeBtn', AppState.desktop, 'observe', 'Desktop', ['start_stream', 'stop_stream'], window.clearDesktopUI);
-
-    window.toggleControl = () =>
-        toggleFeature('controlBtn', AppState.desktop, 'control', 'Desktop', ['start_control', 'stop_control']);
-
-    window.toggleWebcam = () =>
-        toggleFeature('webcamToggleBtn', AppState.webcam, 'active', 'Webcam', ['start', 'stop'], window.stopWebcamUI);
-
-    // Сайдбар и кнопки
-    document.querySelectorAll('.icon[data-function]').forEach(icon => {
-        icon.onclick = () => {
-            const fn = icon.dataset.function;
-            document.querySelectorAll('.icon').forEach(i => i.classList.remove('active'));
-            icon.classList.add('active');
-            if (['desktop', 'webcam'].includes(fn)) window.switchView(fn);
-        };
+    // Инициализируем слушатели в цикле для чистоты кода
+    actions.forEach(({ id, ref, key, mod, cmds }) => {
+        document.getElementById(id)?.addEventListener('click', () =>
+            toggleFeature(id, ref, key, mod, cmds)
+        );
     });
 
-    document.getElementById('observeBtn')?.addEventListener('click', window.toggleObserve);
-    document.getElementById('controlBtn')?.addEventListener('click', window.toggleControl);
-    document.getElementById('webcamToggleBtn')?.addEventListener('click', window.toggleWebcam);
+    // 3. Логика переключения режимов сайдбара
+    document.querySelectorAll('.nav-item[data-function]').forEach(item => {
+        item.addEventListener('click', () => {
+            const mode = item.dataset.function;
+
+            // Визуальное переключение активной иконки
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            // Вызов глобальной функции переключения вида (если есть)
+            if (window.switchView) window.switchView(mode);
+        });
+    });
 });

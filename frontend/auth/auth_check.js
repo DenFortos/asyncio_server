@@ -1,16 +1,17 @@
 // frontend/auth/auth_check.js
-(async function() {
+(async () => {
     const token = localStorage.getItem('auth_token');
-    if (!token) {
-        window.location.href = '/sidebar/auth/auth.html';
-        return;
-    }
+    const redirect = () => {
+        localStorage.clear();
+        location.href = '/sidebar/auth/auth.html';
+    };
+
+    if (!token) return redirect();
 
     try {
-        const response = await fetch(`/verify_token?token=${token}`);
-        if (!response.ok) throw new Error();
-    } catch (err) {
-        localStorage.clear();
-        window.location.href = '/sidebar/auth/auth.html';
+        const res = await fetch(`/verify_token?token=${token}`);
+        if (!res.ok) redirect();
+    } catch {
+        redirect();
     }
 })();
