@@ -1,9 +1,17 @@
-// frontend/dashboard/js/modules/data/clients.js
-
+/* frontend/dashboard/js/modules/data/clients.js
+   ==========================================================================
+   1. ХРАНИЛИЩЕ И СОБЫТИЯ (Storage & Events)
+   ========================================================================== */
 let clients = {};
+
+// Утилита для отправки событий (чтобы UI знал об изменениях)
 const emit = (name, detail = null) => window.dispatchEvent(new CustomEvent(name, { detail }));
 
-/** Инициализация из БД — по умолчанию все offline */
+/* ==========================================================================
+   2. МЕТОДЫ ОБНОВЛЕНИЯ ДАННЫХ (Data Actions)
+   ========================================================================== */
+
+/** Инициализация списка (например, при загрузке страницы) */
 export const updateClients = (list) => {
     clients = Object.fromEntries(list.map(c => [c.id, {
         ...c,
@@ -13,7 +21,7 @@ export const updateClients = (list) => {
     emit('clientsUpdated');
 };
 
-/** Обновление клиента. isLive=true для heartbeat (пульса) */
+/** Обновление конкретного клиента (Heartbeat или изменение данных) */
 export const updateClient = (data, isLive = false) => {
     if (!data?.id) return;
 
@@ -28,7 +36,19 @@ export const updateClient = (data, isLive = false) => {
     emit(old ? 'clientUpdated' : 'clientsUpdated', clients[data.id]);
 };
 
-/** Проверка таймаута (5 сек) */
+/** Удаление клиента из системы */
+export const removeClient = (id) => {
+    if (clients[id]) {
+        delete clients[id];
+        emit('clientsUpdated');
+    }
+};
+
+/* ==========================================================================
+   3. МОНИТОРИНГ И ВЫБОРКА (Monitoring & Getters)
+   ========================================================================== */
+
+/** Проверка таймаута (если бот не слал сигнал > 5 сек — он offline) */
 export const checkDeadClients = () => {
     const now = Date.now();
     let changed = false;
@@ -41,14 +61,6 @@ export const checkDeadClients = () => {
     });
 
     if (changed) emit('clientsUpdated');
-};
-
-/** Удаление клиента */
-export const removeClient = (id) => {
-    if (clients[id]) {
-        delete clients[id];
-        emit('clientsUpdated');
-    }
 };
 
 /** Получение всех клиентов с сортировкой по IP */

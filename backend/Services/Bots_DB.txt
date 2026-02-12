@@ -14,9 +14,9 @@
         "loc": "US",
         "user": "Manager_John",
         "pc_name": "OFFICE-PC-01",
-        "activeWindow": "Zoom Meeting",
-        "last_active": "23:34:46",
-        "ip": "192.168.1.49",
+        "activeWindow": "Chrome: Dashboard",
+        "last_active": "02:25:45",
+        "ip": "192.168.1.39",
         "auth_key": "super_secret"
     }
 }

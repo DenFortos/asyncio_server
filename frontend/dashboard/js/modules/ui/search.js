@@ -1,31 +1,58 @@
 // frontend/dashboard/js/modules/ui/search.js
 
+/* ==========================================================================
+   1. ЛОГИКА ФИЛЬТРАЦИИ (Filter Core)
+   ========================================================================== */
+
 /**
- * Фильтрация клиентов (ID, IP, Location)
+ * Проверяет соответствие элементов поисковому запросу.
+ * Ищет совпадения по ID, IP и Локации.
  */
 export const applySearchFilter = (items, query) => {
     const q = query?.toLowerCase().trim();
     if (!q) return items;
 
     return items.filter(({ id = '', ip = '', loc = '' }) =>
-        [id, ip, loc].some(val => val.toString().toLowerCase().includes(q))
+        [id, ip, loc].some(val =>
+            val.toString().toLowerCase().includes(q)
+        )
     );
 };
 
-/**
- * Инициализация поиска с Debounce
- */
-export function initializeSearch() {
-    const input = document.getElementById('universal-search');
-    if (!input) return;
+/* ==========================================================================
+   2. ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА (UI Setup)
+   ========================================================================== */
 
-    let timeout;
-    input.addEventListener('input', ({ target }) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            window.dispatchEvent(new CustomEvent('searchUpdated', {
-                detail: target.value
-            }));
+export function initializeSearch() {
+    const searchInput = document.getElementById('universal-search');
+    if (!searchInput) {
+        console.warn('Search: Input field "#universal-search" not found');
+        return;
+    }
+
+    let searchTimeout;
+
+    // Слушатель ввода с оптимизацией (Debounce)
+    searchInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+
+        // Сбрасываем таймер при каждом нажатии клавиши
+        clearTimeout(searchTimeout);
+
+        // Запускаем поиск только если пользователь сделал паузу в 150мс
+        searchTimeout = setTimeout(() => {
+            dispatchSearchEvent(value);
         }, 150);
     });
+}
+
+/* ==========================================================================
+   3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (Events)
+   ========================================================================== */
+
+/** Отправляет кастомное событие с данными поиска */
+function dispatchSearchEvent(query) {
+    window.dispatchEvent(new CustomEvent('searchUpdated', {
+        detail: query
+    }));
 }

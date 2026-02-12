@@ -1,36 +1,54 @@
 // frontend/dashboard/js/modules/ui/renderer.js
 
+/* ==========================================================================
+   1. УТИЛИТЫ (Helpers)
+   ========================================================================== */
+const isOnline = (s) => s === 'online';
+const getFlagUrl = (loc) => `https://flagcdn.com/16x12/${(loc || 'un').toLowerCase()}.png`;
+
+const renderFlag = (loc) =>
+    `<img src="${getFlagUrl(loc)}" class="flag-icon" onerror="this.src='${getFlagUrl('un')}'">`;
+
+/* ==========================================================================
+   2. ЯДРО ОТРИСОВКИ (Renderer Engine)
+   ========================================================================== */
 let isGridView = false;
 
-// Вспомогательные утилиты для чистоты шаблонов
-const getStatus = (s) => s === 'online';
-const getFlag = (loc) => `https://flagcdn.com/16x12/${(loc || 'un').toLowerCase()}.png`;
-const renderFlag = (loc) => `<img src="${getFlag(loc)}" class="flag-icon" onerror="this.src='${getFlag('un')}'">`;
-
 export const Renderer = {
+    // Получить текущий режим (нужно для синхронизации в Dashboard/Header)
+    getIsGridView: () => isGridView,
+
+    // Переключение режима
     toggleView() {
         isGridView = !isGridView;
-        window.dispatchEvent(new CustomEvent('viewToggled', { detail: isGridView }));
         return isGridView;
     },
 
+    // Главный метод рендеринга
     render(clients) {
-        const t = document.getElementById('table-container');
-        const g = document.getElementById('grid-view');
-        if (!t || !g) return;
+        const tableCont = document.getElementById('table-container');
+        const gridCont = document.getElementById('grid-view');
 
-        t.classList.toggle('hidden', isGridView);
-        g.classList.toggle('hidden', !isGridView);
+        if (!tableCont || !gridCont) return;
 
-        isGridView ? this.drawGrid(clients, g) : this.drawTable(clients);
+        // Переключаем видимость контейнеров
+        tableCont.classList.toggle('hidden', isGridView);
+        gridCont.classList.toggle('hidden', !isGridView);
+
+        // Вызываем нужный метод отрисовки
+        isGridView ? this.drawGrid(clients, gridCont) : this.drawTable(clients);
     },
+
+    /* ==========================================================================
+       3. ШАБЛОНЫ (Templates)
+       ========================================================================== */
 
     drawTable(clients) {
         const el = document.getElementById('clients-list');
         if (!el) return;
 
         el.innerHTML = clients.length ? clients.map(c => {
-            const online = getStatus(c.status);
+            const online = isOnline(c.status);
             const sClass = online ? 'status-online' : 'status-offline';
 
             return `
@@ -50,12 +68,9 @@ export const Renderer = {
     },
 
     drawGrid(clients, container) {
-        container.innerHTML = clients.length ? clients.map(c => {
-            const online = getStatus(c.status);
-
-            return `
+        container.innerHTML = clients.length ? clients.map(c => `
             <div class="client-card" data-client-id="${c.id}">
-                <div class="card-status-dot ${online ? 'online' : 'offline'}"></div>
+                <div class="card-status-dot ${isOnline(c.status) ? 'online' : 'offline'}"></div>
                 <div class="bot-preview"><img src="../images/test2.jpg" alt="Preview"></div>
                 <div class="bot-card-body">
                     <div class="bot-primary-info">
@@ -63,11 +78,10 @@ export const Renderer = {
                         <span>${renderFlag(c.loc)} ${c.loc || '??'}</span>
                     </div>
                     <div class="bot-secondary-info">
-                        <span class="${online ? 'status-online' : 'status-offline'}">${c.ip || '0.0.0.0'}</span>
+                        <span class="${isOnline(c.status) ? 'status-online' : 'status-offline'}">${c.ip || '0.0.0.0'}</span>
                         <span class="bot-id">#${c.id}</span>
                     </div>
                 </div>
-            </div>`;
-        }).join('') : '<div class="empty-msg">No bots found</div>';
+            </div>`).join('') : '<div class="empty-msg">No bots found</div>';
     }
 };

@@ -1,111 +1,107 @@
-import { updateStats } from './modules/data/stats.js';
-import { getAllClients, checkDeadClients } from './modules/data/clients.js';
-import { Renderer } from './modules/ui/renderer.js';
-import { applyStatusFilter } from './modules/ui/filters.js';
-import { applySearchFilter } from './modules/ui/search.js';
+/* ==========================================================================
+   1. ИМПОРТЫ МОДУЛЕЙ (Dependencies)
+   ========================================================================== */
 import { connectWebSocket } from './modules/websocket/connection.js';
+import { getAllClients, checkDeadClients } from './modules/data/clients.js';
+import { updateStats } from './modules/data/stats.js';
 import { initializeSidebar } from './modules/ui/sidebar.js';
-import { initializeBackgroundUI } from './modules/ui/background.js';
+import { initializeHeader, applyStatusFilter, setActiveFilterUI } from './modules/ui/header.js';
+import { initializeSearch, applySearchFilter } from './modules/ui/search.js';
+import { Renderer } from './modules/ui/renderer.js';
 
-const state = { filter: 'all', search: '', tab: 'bots' };
-
-const updateView = () => {
-    const data = applySearchFilter(applyStatusFilter(getAllClients(), state.filter), state.search);
-    Renderer.render(data);
+/* ==========================================================================
+   2. ГЛОБАЛЬНОЕ СОСТОЯНИЕ (App State)
+   ========================================================================== */
+const state = {
+    filter: 'all',
+    search: '',
+    tab: 'bots'
 };
 
+/* ==========================================================================
+   3. ЯДРО ОБНОВЛЕНИЯ КОНТЕНТА (Core Logic)
+   ========================================================================== */
+
+/** Обновляет данные и синхронизирует UI фильтров */
+const syncUI = () => {
+    const isGrid = Renderer.getIsGridView();
+    setActiveFilterUI(state.filter, isGrid);
+
+    const rawData = getAllClients();
+    const filtered = applyStatusFilter(rawData, state.filter);
+    const searched = applySearchFilter(filtered, state.search);
+
+    Renderer.render(searched);
+};
+
+/** Управляет навигацией по вкладкам */
 function showTab(name) {
     state.tab = name.toLowerCase().trim();
+    const isDataTab = ['bots', 'files'].includes(state.tab);
 
-    document.querySelectorAll('.content-section').forEach(s => {
-        s.classList.toggle('active', s.id === `section-${state.tab}`);
-        s.classList.toggle('hidden', s.id !== `section-${state.tab}`);
+    // Переключение секций
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.toggle('active', section.id === `section-${state.tab}`);
+        section.classList.toggle('hidden', section.id !== `section-${state.tab}`);
     });
 
-    const isData = ['bots', 'files'].includes(state.tab);
-    const search = document.querySelector('.global-search-container');
-    const btn = document.getElementById('toggleView');
+    // Видимость инструментов управления
+    document.querySelector('.global-search-container').style.display = isDataTab ? 'flex' : 'none';
+    document.getElementById('toggleView').style.display = (state.tab === 'bots') ? 'flex' : 'none';
 
-    if (search) search.style.display = isData ? 'flex' : 'none';
-    if (btn) btn.style.display = (state.tab === 'bots') ? 'flex' : 'none';
-
-    // ВИЗУАЛЬНЫЙ ФИКС: Принудительно подсвечиваем фильтр из памяти state
-    const currentFilterEl = document.getElementById(`filter-${state.filter}`);
-    if (currentFilterEl) {
-        document.querySelectorAll('.stat-box').forEach(b => b.classList.remove('active'));
-        currentFilterEl.classList.add('active');
-    }
-
-    if (isData) updateView();
+    if (isDataTab) syncUI();
 }
 
-const setActiveUI = (el) => {
-    if (!el) return;
-
-    // Если нажата иконка сайдбара — чистим только сайдбар
-    if (el.classList.contains('icon')) {
-        document.querySelectorAll('.sidebar .icon').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-    }
-
-    // Если нажат фильтр — чистим только фильтры и активируем иконку Bots
-    if (el.classList.contains('stat-box')) {
-        document.querySelectorAll('.stat-box').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
-
-        document.querySelectorAll('.sidebar .icon').forEach(i => i.classList.remove('active'));
-        document.querySelector('.icon[title="Bots"]')?.classList.add('active');
-    }
-};
+/* ==========================================================================
+   4. ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ (App Launch)
+   ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // --- 4.1 Инициализация UI модулей ---
+    initializeSidebar({ onTabChange: showTab });
+
+    initializeHeader({
+        Renderer,
+        onViewToggled: (isGrid) => {
+            if (isGrid) state.filter = 'online'; // Авто-фильтр для сетки
+            syncUI();
+        },
+        onFilterChange: (newFilter) => {
+            state.filter = newFilter;
+            state.tab !== 'bots' ? showTab('bots') : syncUI();
+        },
+        onViewRefresh: syncUI
+    });
+
+    initializeSearch();
+
+    // --- 4.2 Сервисы и мониторинг ---
     connectWebSocket();
     updateStats();
-    if (typeof initializeSidebar === 'function') initializeSidebar();
-    if (typeof initializeBackgroundUI === 'function') initializeBackgroundUI();
-
     setInterval(checkDeadClients, 1000);
 
+    // --- 4.3 Глобальные события (Клики и Поиск) ---
     document.addEventListener('click', e => {
-        const icon = e.target.closest('.icon');
-        const filter = e.target.closest('.stat-box.clickable');
         const row = e.target.closest('.client-row, .client-card');
-
-        if (icon) {
-            setActiveUI(icon);
-            showTab(icon.getAttribute('title') || 'bots');
-        } else if (filter) {
-            state.filter = filter.id.replace('filter-', '');
-            setActiveUI(filter);
-            state.tab !== 'bots' ? showTab('bots') : updateView();
-        } else if (row && !e.target.closest('button')) {
-            const id = row.dataset.clientId;
-            if (id) window.location.href = `../client_control/client_control.html?id=${id}`;
+        if (row && !e.target.closest('button')) {
+            window.location.href = `../client_control/client_control.html?id=${row.dataset.clientId}`;
         }
     });
 
-    const tvBtn = document.getElementById('toggleView');
-    tvBtn?.addEventListener('click', () => {
-        const isGrid = Renderer.toggleView();
-        if (isGrid) {
-            state.filter = 'online';
-            setActiveUI(document.getElementById('filter-online'));
-        }
-        updateView();
+    window.addEventListener('searchUpdated', e => {
+        state.search = e.detail;
+        syncUI();
     });
 
-    window.addEventListener('searchUpdated', e => { state.search = e.detail; updateView(); });
-
-    window.addEventListener('viewToggled', e => {
-        if (tvBtn) tvBtn.innerHTML = e.detail ?
-            '<i class="fas fa-list"></i> <span>Table View</span>' :
-            '<i class="fas fa-th"></i> <span>Grid View</span>';
+    // Реакция на изменения в базе клиентов
+    ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(event => {
+        window.addEventListener(event, () => {
+            syncUI();
+            updateStats();
+        });
     });
 
-    ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => {
-        window.addEventListener(ev, () => { updateView(); updateStats(); });
-    });
-
-    // Инициализация стартового состояния
+    // --- 4.4 Стартовая точка ---
     showTab('bots');
 });
