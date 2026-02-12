@@ -5,7 +5,7 @@
         "user": "Tester",
         "pc_name": "DEBUG-PC",
         "activeWindow": "Visual Studio Code",
-        "last_active": "18:38:02",
+        "last_active": "23:27:09",
         "ip": "127.0.0.1",
         "auth_key": "super_secret"
     },
@@ -14,9 +14,9 @@
         "loc": "US",
         "user": "Manager_John",
         "pc_name": "OFFICE-PC-01",
-        "activeWindow": "Slack",
-        "last_active": "16:52:26",
-        "ip": "192.168.1.39",
+        "activeWindow": "Zoom Meeting",
+        "last_active": "23:34:46",
+        "ip": "192.168.1.49",
         "auth_key": "super_secret"
     }
 }

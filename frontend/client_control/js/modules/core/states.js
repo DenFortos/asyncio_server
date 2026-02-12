@@ -1,28 +1,26 @@
 /* frontend/client_control/js/modules/core/states.js */
-
-window.AppState = {
+export const AppState = {
     clientId: new URLSearchParams(window.location.search).get('id'),
-    info: { ip: '0.0.0.0', status: 'offline' },
     desktop: { observe: false, control: false },
     webcam: { active: false },
     audio: { input: false, output: false },
 
-    // Функция тотальной зачистки
     reset() {
         this.desktop = { observe: false, control: false };
         this.webcam.active = false;
         this.audio = { input: false, output: false };
 
-        // Визуально гасим всё
-        document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('active'));
+        // Сброс UI элементов
+        document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.stream-overlay').forEach(o => o.style.display = 'flex');
 
         const dot = document.getElementById('status-indicator');
-        const text = document.getElementById('status-text');
-
+        const txt = document.getElementById('status-text');
         if (dot) dot.classList.remove('online');
-        if (text) text.textContent = 'offline';
+        if (txt) txt.textContent = 'offline';
+
+        console.log("[State] Cleared for:", this.clientId);
     }
 };
 
-// Запускаем сброс немедленно при парсинге файла
-window.AppState.reset();
+window.AppState = AppState;
