@@ -92,10 +92,12 @@
                                     <th>id</th>
                                 </tr>
                             </thead>
-                            <tbody id="clients-list"></tbody>
+                            <tbody id="clients-list">
+                                </tbody>
                         </table>
                     </div>
-                    <div class="clients-grid hidden" id="grid-view"></div>
+                    <div id="grid-view" class="clients-grid hidden">
+                        </div>
                 </div>
             </section>
 
@@ -106,34 +108,26 @@
                 </div>
             </section>
 
-            <section id="section-alerts" class="content-section hidden"><h2>Alerts</h2></section>
-            <section id="section-stats" class="content-section hidden"><h2>Statistics</h2></section>
-            <section id="section-settings" class="content-section hidden"><h2>Settings</h2></section>
+            <section id="section-alerts" class="content-section hidden">
+                <div class="data-wrapper"><h2>Alerts Monitoring</h2></div>
+            </section>
+
+            <section id="section-stats" class="content-section hidden">
+                <div class="data-wrapper"><h2>System Statistics</h2></div>
+            </section>
+
+            <section id="section-settings" class="content-section hidden">
+                <div class="data-wrapper"><h2>Panel Settings</h2></div>
+            </section>
 
         </main>
     </div>
 
     <div class="modal hidden" id="bgModal">
-        <div class="modal-content">
+        <div class="modal-content glass-effect">
             <span class="close-modal">&times;</span>
             <h2>Select Theme</h2>
             <div class="bg-options-grid"></div>
-        </div>
-    </div>
-
-    <div class="file-card glass-effect">
-        <div class="file-icon">
-            <i class="fas fa-file-image"></i>
-        </div>
-
-        <div class="file-info">
-            <span class="file-name">screenshot.png</span>
-            <span class="file-size">1.2 MB</span>
-        </div>
-
-        <div class="file-source">
-            <span class="bot-id"><i class="fas fa-robot"></i> ID: 8821</span>
-            <span class="bot-loc"><i class="fas fa-map-marker-alt"></i> USA</span>
         </div>
     </div>
 

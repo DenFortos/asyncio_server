@@ -1,58 +1,22 @@
-// frontend/dashboard/js/modules/ui/sidebar.js
-
-/* ==========================================================================
-   1. КОНФИГУРАЦИЯ И НАСТРОЙКИ (Config)
-   ========================================================================== */
-const SELECTORS = {
-    toggle: '#menuToggle',
-    icons: '.sidebar .icon',
-    bodyHideClass: 'sidebar-hidden'
-};
-
-/* ==========================================================================
-   2. ЛОГИКА УПРАВЛЕНИЯ САЙДБАРОМ (Sidebar Core)
-   ========================================================================== */
-
+/* frontend/dashboard/js/modules/ui/sidebar.js */
 export function initializeSidebar(callbacks) {
-    const toggleBtn = document.querySelector(SELECTORS.toggle);
-    const sidebarIcons = document.querySelectorAll(SELECTORS.icons);
+    const toggleBtn = document.getElementById('menuToggle');
+    const sidebarIcons = document.querySelectorAll('.sidebar .icon');
 
-    if (!toggleBtn) {
-        console.warn('Sidebar: Toggle button not found');
-        return;
-    }
+    toggleBtn?.addEventListener('click', () => document.body.classList.toggle('sidebar-hidden'));
 
-    // --- 2.1 Сворачивание / Разворачивание ---
-    toggleBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.body.classList.toggle(SELECTORS.bodyHideClass);
-    });
-
-    // --- 2.2 Навигация по вкладкам ---
     sidebarIcons.forEach(icon => {
         icon.addEventListener('click', () => {
-            // Берем название вкладки из title или data-section
-            const tabName = icon.getAttribute('title')?.toLowerCase() ||
-                           icon.dataset.section?.replace('section-', '') ||
-                           'bots';
+            // Берем title (например, "Bots", "Files") или данные из атрибута
+            const tabName = (icon.getAttribute('title') || icon.dataset.section || 'bots').toLowerCase();
 
-            // Визуальное переключение (UI Update)
-            updateActiveIcon(sidebarIcons, icon);
+            sidebarIcons.forEach(i => i.classList.remove('active'));
+            icon.classList.add('active');
 
-            // Уведомляем Dashboard о смене вкладки (Callback)
+            // Передаем чистое имя: "bots", "files", "settings"
             if (callbacks?.onTabChange) {
                 callbacks.onTabChange(tabName);
             }
         });
     });
-}
-
-/* ==========================================================================
-   3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (UI Helpers)
-   ========================================================================== */
-
-/** Обновляет активное состояние иконок */
-function updateActiveIcon(allIcons, activeIcon) {
-    allIcons.forEach(i => i.classList.remove('active'));
-    activeIcon.classList.add('active');
 }

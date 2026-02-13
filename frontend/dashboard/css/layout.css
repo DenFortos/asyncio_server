@@ -94,11 +94,16 @@
 .header-left {
     display: flex;
     align-items: center;
-    /* Фиксированный отступ: 80px сайдбар + 20px зазор. Больше не прыгает! */
-    padding-left: 100px;
+    /* Увеличиваем до 120px, чтобы текст SpectralWeb не прижимался
+       вплотную к кнопке-бургеру в открытом состоянии */
+    padding-left: 120px;
+    transition: padding-left 0.4s ease;
 }
 
-/* Удален блок .sidebar-hidden .header-left, чтобы исключить движение */
+/* Когда сайдбар скрыт, заголовок может чуть "подтянуться" влево для баланса */
+.sidebar-hidden .header-left {
+    padding-left: 60px;
+}
 
 .header-right {
     display: flex;
@@ -138,9 +143,19 @@
 -------------------------------------------------------------------------- */
 .content-viewport {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: overlay; /* Позволяет скроллу плавать над контентом, не сдвигая сетку */
     padding: 20px 40px;
-    position: relative;
+    height: calc(100vh - 150px); /* Фиксируем высоту, чтобы скроллилась только зона */
+}
+
+/* Кастомный тонкий скроллбар */
+.content-viewport::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content-viewport::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 255, 0.2);
+    border-radius: 10px;
 }
 
 /* Управление вкладками */

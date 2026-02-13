@@ -1,88 +1,81 @@
-/* frontend/dashboard/js/modules/ui/header.js
-/* ==========================================================================
-   1. ТЕМЫ И ФОН (Theme Management)
-   ========================================================================== */
+/* frontend/dashboard/js/modules/ui/header.js */
 const BG_LIST = ['bg1', 'bg2', 'bg3', 'bg4'];
 
-export const setBackground = (path) => {
-    document.body.style.backgroundImage = `url(${path})`;
-    localStorage.setItem('selectedBackground', path);
+export const setBackground = (p) => {
+    document.body.style.backgroundImage = `url(${p})`;
+    localStorage.setItem('selectedBackground', p);
 };
 
-// Самоисполняющаяся установка фона при импорте
 const savedBg = localStorage.getItem('selectedBackground');
 if (savedBg) setBackground(savedBg);
 
-const initBackgroundOptions = (modal) => {
-    const grid = modal?.querySelector('.bg-options-grid');
-    if (grid) grid.innerHTML = BG_LIST.map(name => `
-        <div class="bg-option" data-bg="../images/${name}.jpg">
-            <img src="../images/${name}.jpg" alt="${name}" loading="lazy">
-            <span>Theme ${name.slice(2)}</span>
-        </div>
-    `).join('');
-};
+/** * Управляет состоянием кнопок при смене вкладок.
+ * Эта функция теперь только ставит маркер (класс disabled).
+ */
+export const updateHeaderContext = (tabName) => {
+    const isBots = tabName === 'bots';
+    const controls = document.querySelectorAll('#toggleView, .stat-box.clickable');
 
-/* ==========================================================================
-   2. ФИЛЬТРАЦИЯ И СТАТИСТИКА (UI State)
-   ========================================================================== */
-
-export const applyStatusFilter = (clients, filter) =>
-    (!filter || filter === 'all') ? clients : clients.filter(c => c.status === filter);
-
-/** Синхронизирует визуальное состояние кнопок фильтров */
-export const setActiveFilterUI = (filterType, isGrid = false) => {
-    document.querySelectorAll('.stat-box.clickable').forEach(box => {
-        const type = box.id.replace('filter-', '');
-        const isLocked = isGrid && (type === 'all' || type === 'offline');
-
-        box.classList.toggle('active', type === filterType);
-        box.classList.toggle('disabled', isLocked);
-
-        // Блокировка взаимодействия, если активен Grid (кроме Online)
-        box.style.opacity = isLocked ? '0.5' : '1';
-        box.style.pointerEvents = isLocked ? 'none' : 'auto';
+    controls.forEach(el => {
+        el.classList.toggle('disabled', !isBots);
     });
 };
 
-/** Обновляет цифры статистики в шапке */
+export const applyStatusFilter = (c, f) => (!f || f === 'all') ? c : c.filter(i => i.status === f);
+
+/** * Синхронизирует фильтры и принудительно гасит ВСЁ,
+ * если кнопка имеет класс .disabled (значит мы не в Bots)
+ */
+export const setActiveFilterUI = (f, isGrid) => {
+    document.querySelectorAll('.stat-box.clickable, #toggleView').forEach(el => {
+        const isStatBox = el.classList.contains('stat-box');
+        const type = isStatBox ? el.id.replace('filter-', '') : null;
+
+        // Кнопка заблокирована либо вкладкой (disabled), либо режимом Grid
+        const isTabLocked = el.classList.contains('disabled');
+        const isGridLocked = isGrid && (type === 'all' || type === 'offline');
+        const shouldBeDisabled = isTabLocked || isGridLocked;
+
+        if (isStatBox) el.classList.toggle('active', type === f);
+
+        // Применяем финальные стили "заморозки"
+        Object.assign(el.style, {
+            opacity: shouldBeDisabled ? '0.4' : '1',
+            pointerEvents: shouldBeDisabled ? 'none' : 'auto',
+            filter: shouldBeDisabled ? 'grayscale(1)' : 'none'
+        });
+    });
+};
+
 export const updateHeaderStats = (stats) => {
     const ids = { online: 'online-count', total: 'total-count', offline: 'offline-count' };
-    Object.entries(ids).forEach(([key, id]) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = stats[key] || 0;
+    Object.entries(ids).forEach(([k, v]) => {
+        const el = document.getElementById(v);
+        if (el) el.textContent = stats[k] || 0;
     });
 };
-
-/* ==========================================================================
-   3. ИНИЦИАЛИЗАЦИЯ (Event Delegation)
-   ========================================================================== */
 
 export function initializeHeader(callbacks) {
     const modal = document.getElementById('bgModal');
-    initBackgroundOptions(modal);
+    const grid = modal?.querySelector('.bg-options-grid');
+    if (grid) grid.innerHTML = BG_LIST.map(n => `
+        <div class="bg-option" data-bg="../images/${n}.jpg">
+            <img src="../images/${n}.jpg" alt="${n}">
+            <span>Theme ${n.slice(2)}</span>
+        </div>`).join('');
 
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', e => {
         const t = e.target;
+        const btn = t.closest('#bgButton, .close-modal, .bg-option, #toggleView, .stat-box.clickable');
+        if (!btn || (btn.classList.contains('disabled') && btn.id !== 'bgButton')) return;
 
-        // 1. Модальное окно тем
-        if (t.closest('#bgButton')) return modal?.classList.remove('hidden');
-        if (t.closest('.close-modal') || t === modal) return modal?.classList.add('hidden');
-        if (t.closest('.bg-option')) {
-            setBackground(t.closest('.bg-option').dataset.bg);
+        if (btn.id === 'bgButton') return modal?.classList.remove('hidden');
+        if (btn.classList.contains('close-modal') || t === modal) return modal?.classList.add('hidden');
+        if (btn.classList.contains('bg-option')) {
+            setBackground(btn.dataset.bg);
             return modal?.classList.add('hidden');
         }
-
-        // 2. Вид (Grid/Table) - берем состояние напрямую из Renderer
-        if (t.closest('#toggleView')) {
-            const isGrid = callbacks.Renderer.toggleView();
-            return callbacks.onViewToggled(isGrid);
-        }
-
-        // 3. Фильтры (Статистика)
-        const statBox = t.closest('.stat-box.clickable');
-        if (statBox && !statBox.classList.contains('disabled')) {
-            callbacks.onFilterChange(statBox.id.replace('filter-', ''));
-        }
+        if (btn.id === 'toggleView') return callbacks.onViewToggled(callbacks.Renderer.toggleView());
+        if (btn.classList.contains('stat-box')) callbacks.onFilterChange(btn.id.replace('filter-', ''));
     });
 }

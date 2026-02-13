@@ -1,13 +1,18 @@
-// frontend/dashboard/js/modules/ui/renderer.js
-
 /* ==========================================================================
    1. УТИЛИТЫ (Helpers)
    ========================================================================== */
 const isOnline = (s) => s === 'online';
-const getFlagUrl = (loc) => `https://flagcdn.com/16x12/${(loc || 'un').toLowerCase()}.png`;
+
+/** Превращает код страны (RU, US) в эмодзи-флаг. Не требует сети. */
+const getFlagEmoji = (loc) => {
+    if (!loc || loc.length !== 2) return '🏳️';
+    return loc.toUpperCase().replace(/./g, char =>
+        String.fromCodePoint(char.charCodeAt(0) + 127397)
+    );
+};
 
 const renderFlag = (loc) =>
-    `<img src="${getFlagUrl(loc)}" class="flag-icon" onerror="this.src='${getFlagUrl('un')}'">`;
+    `<span class="flag-emoji" style="font-size:1.2rem; margin-right:8px; vertical-align:middle;">${getFlagEmoji(loc)}</span>`;
 
 /* ==========================================================================
    2. ЯДРО ОТРИСОВКИ (Renderer Engine)
@@ -15,27 +20,21 @@ const renderFlag = (loc) =>
 let isGridView = false;
 
 export const Renderer = {
-    // Получить текущий режим (нужно для синхронизации в Dashboard/Header)
     getIsGridView: () => isGridView,
 
-    // Переключение режима
     toggleView() {
         isGridView = !isGridView;
         return isGridView;
     },
 
-    // Главный метод рендеринга
     render(clients) {
         const tableCont = document.getElementById('table-container');
         const gridCont = document.getElementById('grid-view');
-
         if (!tableCont || !gridCont) return;
 
-        // Переключаем видимость контейнеров
         tableCont.classList.toggle('hidden', isGridView);
         gridCont.classList.toggle('hidden', !isGridView);
 
-        // Вызываем нужный метод отрисовки
         isGridView ? this.drawGrid(clients, gridCont) : this.drawTable(clients);
     },
 
@@ -55,7 +54,7 @@ export const Renderer = {
             <tr class="client-row" data-client-id="${c.id}">
                 <td>
                     <span class="status-dot-mini ${online ? 'online' : 'offline'}"></span>
-                    ${renderFlag(c.loc)} ${c.loc || '??'}
+                    ${renderFlag(c.loc)}
                 </td>
                 <td>${c.user || 'Anon'}</td>
                 <td>${c.pc_name || 'PC'}</td>
@@ -68,20 +67,23 @@ export const Renderer = {
     },
 
     drawGrid(clients, container) {
-        container.innerHTML = clients.length ? clients.map(c => `
+        container.innerHTML = clients.length ? clients.map(c => {
+            const online = isOnline(c.status);
+            return `
             <div class="client-card" data-client-id="${c.id}">
-                <div class="card-status-dot ${isOnline(c.status) ? 'online' : 'offline'}"></div>
+                <div class="card-status-dot ${online ? 'online' : 'offline'}"></div>
                 <div class="bot-preview"><img src="../images/test2.jpg" alt="Preview"></div>
                 <div class="bot-card-body">
                     <div class="bot-primary-info">
                         <span><i class="fas fa-user"></i> ${c.user || 'Anon'}</span>
-                        <span>${renderFlag(c.loc)} ${c.loc || '??'}</span>
+                        <span>${renderFlag(c.loc)}</span>
                     </div>
                     <div class="bot-secondary-info">
-                        <span class="${isOnline(c.status) ? 'status-online' : 'status-offline'}">${c.ip || '0.0.0.0'}</span>
+                        <span class="${online ? 'status-online' : 'status-offline'}">${c.ip || '0.0.0.0'}</span>
                         <span class="bot-id">#${c.id}</span>
                     </div>
                 </div>
-            </div>`).join('') : '<div class="empty-msg">No bots found</div>';
+            </div>`;
+        }).join('') : '<div class="empty-msg">No bots found</div>';
     }
 };
