@@ -14,9 +14,9 @@
         "loc": "US",
         "user": "Manager_John",
         "pc_name": "OFFICE-PC-01",
-        "activeWindow": "Slack",
-        "last_active": "02:45:26",
-        "ip": "192.168.1.28",
+        "activeWindow": "Excel: Report_2026",
+        "last_active": "05:53:42",
+        "ip": "192.168.1.34",
         "auth_key": "super_secret"
     }
 }
