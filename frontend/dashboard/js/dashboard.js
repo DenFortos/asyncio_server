@@ -7,21 +7,18 @@ import { initializeHeader, applyStatusFilter, setActiveFilterUI, updateHeaderCon
 import { initializeSearch, applySearchFilter } from './modules/ui/search.js';
 import { Renderer } from './modules/ui/renderer.js';
 
-// ГЛОБАЛЬНОЕ СОСТОЯНИЕ (Только одно объявление!)
 const state = {
     filter: 'all',
     search: '',
     tab: 'bots'
 };
 
-/** Синхронизация данных и интерфейса */
 const syncUI = () => {
-    const isGrid = Renderer.getIsGridView();
+    if (state.tab !== 'bots' && state.tab !== 'files') return;
 
-    // 1. Обновляем визуальное состояние кнопок (заморозка/активность)
+    const isGrid = Renderer.getIsGridView();
     setActiveFilterUI(state.filter, isGrid);
 
-    // 2. Фильтруем и рендерим данные
     const rawData = getAllClients();
     const filtered = applyStatusFilter(rawData, state.filter);
     const searched = applySearchFilter(filtered, state.search);
@@ -29,33 +26,22 @@ const syncUI = () => {
     Renderer.render(searched);
 };
 
-/** Переключение вкладок */
 function showTab(name) {
-    // Очищаем имя от лишних приставок
     state.tab = name.toLowerCase().trim().replace('section-', '');
 
-    const targetSectionId = `section-${state.tab}`;
-    const sections = document.querySelectorAll('.content-section');
-
-    sections.forEach(s => {
-        const isTarget = s.id === targetSectionId;
+    // Переключение видимости секций
+    document.querySelectorAll('.content-section').forEach(s => {
+        const isTarget = s.id === `section-${state.tab}`;
         s.classList.toggle('hidden', !isTarget);
         s.classList.toggle('active', isTarget);
     });
 
-    // ОБЯЗАТЕЛЬНО: Обновляем статус кнопок в шапке (ставим класс .disabled)
     updateHeaderContext(state.tab);
-
-    // Вызываем отрисовку, если нужно
-    if (state.tab === 'bots' || state.tab === 'files') {
-        syncUI();
-    }
+    syncUI();
 }
 
-/* ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ */
 document.addEventListener('DOMContentLoaded', () => {
     initializeSidebar({ onTabChange: showTab });
-
     initializeHeader({
         Renderer,
         onViewToggled: (isGrid) => {
@@ -70,10 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initializeSearch();
     connectWebSocket();
-    updateStats();
+    // updateStats() вызовется сам через событие при загрузке данных
     setInterval(checkDeadClients, 1000);
 
-    // Глобальные события (переход в клиент и поиск)
     document.addEventListener('click', e => {
         const row = e.target.closest('.client-row, .client-card');
         if (row && !e.target.closest('button')) {
@@ -86,11 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
         syncUI();
     });
 
+    // Слушаем изменения данных для перерисовки
     ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => {
-        window.addEventListener(ev, () => {
-            syncUI();
-            updateStats();
-        });
+        window.addEventListener(ev, syncUI);
     });
 
     showTab('bots');

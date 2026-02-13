@@ -23,27 +23,21 @@ export const updateHeaderContext = (tabName) => {
 
 export const applyStatusFilter = (c, f) => (!f || f === 'all') ? c : c.filter(i => i.status === f);
 
-/** * Синхронизирует фильтры и принудительно гасит ВСЁ,
- * если кнопка имеет класс .disabled (значит мы не в Bots)
- */
 export const setActiveFilterUI = (f, isGrid) => {
     document.querySelectorAll('.stat-box.clickable, #toggleView').forEach(el => {
-        const isStatBox = el.classList.contains('stat-box');
-        const type = isStatBox ? el.id.replace('filter-', '') : null;
-
-        // Кнопка заблокирована либо вкладкой (disabled), либо режимом Grid
+        const type = el.id.replace('filter-', '');
         const isTabLocked = el.classList.contains('disabled');
         const isGridLocked = isGrid && (type === 'all' || type === 'offline');
-        const shouldBeDisabled = isTabLocked || isGridLocked;
+        const locked = isTabLocked || isGridLocked;
 
-        if (isStatBox) el.classList.toggle('active', type === f);
+        if (el.classList.contains('stat-box')) {
+            el.classList.toggle('active', type === f);
+        }
 
-        // Применяем финальные стили "заморозки"
-        Object.assign(el.style, {
-            opacity: shouldBeDisabled ? '0.4' : '1',
-            pointerEvents: shouldBeDisabled ? 'none' : 'auto',
-            filter: shouldBeDisabled ? 'grayscale(1)' : 'none'
-        });
+        // Применяем состояние через стили (лучше перенести в .locked класс в CSS)
+        el.style.opacity = locked ? '0.4' : '1';
+        el.style.pointerEvents = locked ? 'none' : 'auto';
+        el.style.filter = locked ? 'grayscale(1)' : 'none';
     });
 };
 
@@ -65,17 +59,23 @@ export function initializeHeader(callbacks) {
         </div>`).join('');
 
     document.addEventListener('click', e => {
-        const t = e.target;
-        const btn = t.closest('#bgButton, .close-modal, .bg-option, #toggleView, .stat-box.clickable');
+        const btn = e.target.closest('#bgButton, .close-modal, .bg-option, #toggleView, .stat-box.clickable');
         if (!btn || (btn.classList.contains('disabled') && btn.id !== 'bgButton')) return;
 
         if (btn.id === 'bgButton') return modal?.classList.remove('hidden');
-        if (btn.classList.contains('close-modal') || t === modal) return modal?.classList.add('hidden');
+        if (btn.classList.contains('close-modal') || e.target === modal) return modal?.classList.add('hidden');
+
         if (btn.classList.contains('bg-option')) {
             setBackground(btn.dataset.bg);
             return modal?.classList.add('hidden');
         }
-        if (btn.id === 'toggleView') return callbacks.onViewToggled(callbacks.Renderer.toggleView());
-        if (btn.classList.contains('stat-box')) callbacks.onFilterChange(btn.id.replace('filter-', ''));
+
+        if (btn.id === 'toggleView') {
+            return callbacks.onViewToggled(callbacks.Renderer.toggleView());
+        }
+
+        if (btn.classList.contains('stat-box')) {
+            callbacks.onFilterChange(btn.id.replace('filter-', ''));
+        }
     });
 }
