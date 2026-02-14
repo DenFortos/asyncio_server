@@ -37,7 +37,9 @@ def pack_bot(bot_id, payload):
     b_id, b_mod, b_pay = bot_id.encode(), b"DataScribe", json.dumps(payload).encode()
     return len(b_id).to_bytes(1, 'big') + b_id + len(b_mod).to_bytes(1, 'big') + b_mod + len(b_pay).to_bytes(4,
                                                                                                              'big') + b_pay
-
+def pack_bot_command(bot_id, mod, payload):
+    b_id, b_mod, b_pay = bot_id.encode(), mod.encode(), payload.encode()
+    return len(b_id).to_bytes(1, 'big') + b_id + len(b_mod).to_bytes(1, 'big') + b_mod + len(b_pay).to_bytes(4, 'big') + b_pay
 
 def has_access(user, target_id):
     return user["role"] == "admin" or user["prefix"] == "ALL" or target_id.startswith(user["prefix"])
@@ -78,22 +80,30 @@ async def auth(action: str, data=Body(...)):
 
 
 @app.websocket("/ws")
-async def websocket_endpoint(ws: WebSocket, token: str = Query(None), login: str = Query(None)):
+async def websocket_endpoint(ws: WebSocket, token: str = Query(None), login: str = Query(None),
+                             mode: str = Query(None)):
     user_login = get_login_by_token(token)
     if not user_login or user_login != login:
-        await ws.accept();
-        await ws.close(1008);
+        await ws.accept()
+        await ws.close(1008)
         return
 
     user = load_db().get(user_login)
     await manager.connect(ws, user_login, user)
 
     try:
-        # Initial bots load
-        bots = load_bots_from_file()
-        for bid, pay in bots.items():
-            if has_access(user, bid) and isinstance(pay, dict):
-                await ws.send_bytes(pack_bot(bid, pay))
+        if mode != "control":
+            bots = load_bots_from_file()
+            for bid, pay in bots.items():
+                if has_access(user, bid) and isinstance(pay, dict):
+                    # 1. Шлем кэш из БД для мгновенной отрисовки
+                    await ws.send_bytes(pack_bot(bid, pay))
+
+                    # 2. Пингуем бота для получения свежих метаданных
+                    # Используем твой pack_bot, но с полезной нагрузкой "get_metadata"
+                    # так как pack_bot ожидает dict, передаем строку напрямую через упаковку
+                    ping_pkt = pack_bot_command(bid, "DataScribe", "get_metadata")
+                    asyncio.create_task(send_binary_to_bot(bid, ping_pkt))
 
         while True:
             msg = await ws.receive()
