@@ -4,9 +4,9 @@
         "loc": "US",
         "user": "Manager_John",
         "pc_name": "OFFICE-PC-01",
-        "activeWindow": "Zoom Meeting",
-        "last_active": "02:23:22",
-        "ip": "192.168.1.49",
+        "activeWindow": "Dashboard",
+        "last_active": "03:14:38",
+        "ip": "127.0.0.1",
         "auth_key": "super_secret"
     },
     "u80a9-Bot-First": {
