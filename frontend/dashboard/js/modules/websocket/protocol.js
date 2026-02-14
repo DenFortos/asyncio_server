@@ -1,5 +1,6 @@
-// frontend/dashboard/js/modules/websocket/protocol.js
+/* frontend/dashboard/js/modules/websocket/protocol.js */
 const decoder = new TextDecoder(), encoder = new TextEncoder();
+// Модули, которые всегда содержат JSON в payload
 const JSON_MODS = ['AuthModule', 'DataScribe', 'ClientList', 'AuthUpdate', 'Heartbeat'];
 
 const readStr = (view, off) => {
@@ -26,7 +27,10 @@ export function decodePacket(buf) {
 }
 
 export function encodePacket(id, mod, pay = []) {
-    const bId = encoder.encode(id), bMod = encoder.encode(mod), bPay = new Uint8Array(pay);
+    // Если pay это строка (например "ping"), конвертируем в байты
+    const payloadData = typeof pay === 'string' ? encoder.encode(pay) : pay;
+    const bId = encoder.encode(id), bMod = encoder.encode(mod), bPay = new Uint8Array(payloadData);
+
     const buf = new Uint8Array(6 + bId.length + bMod.length + bPay.length);
     let off = 0;
 

