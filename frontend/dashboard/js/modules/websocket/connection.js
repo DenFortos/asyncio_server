@@ -29,24 +29,25 @@ export function connectWebSocket() {
             return window.location.reload();
         }
 
-        // Если модуль в списке JSON или это ответ от сервера
         if (isJson(pkg.module)) {
             try {
                 const decodedText = new TextDecoder().decode(pkg.payload);
                 const rawData = JSON.parse(decodedText);
 
-                // Если пришел список или данные бота
                 if (pkg.module === 'ClientList' || Array.isArray(rawData)) {
                     updateClients(Array.isArray(rawData) ? rawData : [rawData]);
                 } else {
-                    // Обработка данных бота (DataScribe или другие)
+                    /** * Передаем данные в обработчик.
+                     * rawData.net === 'heartbeat' вернет true только для коротких пульсов.
+                     * Для метаданных (DataScribe) вторым аргументом уйдет false,
+                     * и сработает проверка на отсутствие auth_key внутри updateClient.
+                     */
                     updateClient({ ...rawData, id: rawData.id || pkg.id }, rawData.net === 'heartbeat');
                 }
             } catch (e) {
-                console.error("[WS] JSON Parse Error in module:", pkg.module, e);
+                console.error("[WS] JSON Parse Error:", e);
             }
         } else {
-            // Для сырых бинарных данных (скриншоты и т.д.)
             window.dispatchEvent(new CustomEvent('binaryDataReceived', { detail: pkg }));
         }
     };

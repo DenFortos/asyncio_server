@@ -26,22 +26,29 @@ export const updateClient = (data, isLive = false) => {
     if (!data?.id) return;
 
     const old = clients[data.id];
+
+    /**
+     * ЛОГИКА ОПРЕДЕЛЕНИЯ ОНЛАЙНА:
+     * 1. Если пришел явный heartbeat (isLive === true).
+     * 2. ИЛИ если это пакет с метаданными (есть pc_name), но в нем ОТСУТСТВУЕТ auth_key.
+     * (Это значит, что пакет пришел напрямую от живого бота, а не из пуша БД).
+     */
+    const actuallyOnline = isLive || (data.pc_name && !data.auth_key);
+
+    // Логируем для отладки, чтобы видеть кто "проснулся", а кто из базы
+    if (data.pc_name) {
+        console.log(`[DataUpdate] Bot: ${data.id} | Source: ${data.auth_key ? 'DATABASE' : 'LIVE BOT'} | Status: ${actuallyOnline ? 'ONLINE' : 'OFFLINE'}`);
+    }
+
     clients[data.id] = {
         ...old,
         ...data,
-        status: isLive ? 'online' : (old?.status || 'offline'),
-        lastHB: isLive ? Date.now() : (old?.lastHB || 0)
+        status: actuallyOnline ? 'online' : (old?.status || 'offline'),
+        lastHB: actuallyOnline ? Date.now() : (old?.lastHB || 0)
     };
 
+    // Если бота не было в списке (новый), шлем событие обновления всего списка, иначе только строки
     emit(old ? 'clientUpdated' : 'clientsUpdated', clients[data.id]);
-};
-
-/** Удаление клиента из системы */
-export const removeClient = (id) => {
-    if (clients[id]) {
-        delete clients[id];
-        emit('clientsUpdated');
-    }
 };
 
 /* ==========================================================================
