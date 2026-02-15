@@ -19,7 +19,7 @@ async def start_server():
     # 1. ZeroMQ PUSH/PULL (ClientHandler -> Workers)
     push_socket = zmq_ctx.socket(zmq.PUSH)
     push_socket.bind(ZMQ_CLIENT_PUSH_WORKER)  # BIND-им сокет для воркеров
-    push_socket.set_hwm(0)
+    push_socket.set_hwm(2)
     logger.info(f"[+] ZeroMQ PUSH socket bound to {ZMQ_CLIENT_PUSH_WORKER}")
 
     # Запуск основного сервера

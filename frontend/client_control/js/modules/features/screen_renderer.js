@@ -2,43 +2,53 @@
 
 export function renderScreenRGBA(payload) {
     const canvas = document.getElementById('desktopCanvas');
-    const wrapper = document.getElementById('wrapper-desktop');
-
-    // 1. Проверка наличия канваса и минимальной длины заголовка
     if (!canvas || payload.byteLength < 4) return;
 
     const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
     const view = new DataView(payload);
 
-    // 2. Читаем заголовок (W:2b, H:2b)
+    // 1. Парсинг заголовка
     const width = view.getUint16(0);
     const height = view.getUint16(2);
+    const dataSize = width * height * 4;
 
-    // 3. Проверка целостности данных (RGBA = 4 байта на пиксель)
-    const expectedLength = width * height * 4;
-    if (payload.byteLength < (expectedLength + 4)) {
-        console.warn("[Renderer] Пакет неполон или поврежден");
-        return;
-    }
+    if (payload.byteLength < (dataSize + 4)) return;
 
-    // 4. Создаем массив пикселей (пропускаем 4 байта заголовка)
-    const pixels = new Uint8ClampedArray(payload, 4, expectedLength);
-
-    // 5. Синхронизируем разрешение и UI
+    // 2. Синхронизация размеров (Умный зум)
     if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;
 
-        // Скрываем оверлей "No Desktop Data"
-        const overlay = wrapper ? wrapper.querySelector('.stream-overlay') : null;
+        // Сброс стилей важен для того, чтобы CSS правил балом
+        canvas.removeAttribute('style');
+
+        const overlay = document.querySelector('#wrapper-desktop .stream-overlay');
         if (overlay) overlay.style.display = 'none';
     }
 
-    // 6. Отрисовка
-    try {
-        const imgData = new ImageData(pixels, width, height);
-        ctx.putImageData(imgData, 0, 0);
-    } catch (e) {
-        console.error("[Renderer] Canvas Error:", e.message);
-    }
+    // 3. Отрисовка
+    const pixels = new Uint8ClampedArray(payload, 4, dataSize);
+    ctx.putImageData(new ImageData(pixels, width, height), 0, 0);
 }
+
+// В JS при клике на кнопку Fullscreen
+const fsBtn = document.querySelector('.fullscreen-btn');
+const appMain = document.querySelector('.app-main'); // Берем всё основное окно
+
+fsBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+        appMain.requestFullscreen(); // Разворачиваем всё, включая шапку
+    } else {
+        document.exitFullscreen();
+    }
+});
+
+// Отслеживаем изменение режима для смены иконок
+document.addEventListener('fullscreenchange', () => {
+    const icon = fsBtn.querySelector('i');
+    if (document.fullscreenElement) {
+        icon.classList.replace('fa-expand', 'fa-compress');
+    } else {
+        icon.classList.replace('fa-compress', 'fa-expand');
+    }
+});
