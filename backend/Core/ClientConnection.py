@@ -10,23 +10,30 @@ from backend.BenchUtils import add_bytes
 
 async def read_full_packet(reader: asyncio.StreamReader):
     try:
-        # 1. Читаем ID
-        id_len_b = await reader.readexactly(1)
-        id_bytes = await reader.readexactly(id_len_b[0])
+        # 1. Читаем длину ID
+        header_id = await reader.readexactly(1)
+        id_len = header_id[0]
+        id_bytes = await reader.readexactly(id_len)
 
-        # 2. Читаем Модуль
-        mod_len_b = await reader.readexactly(1)
-        mod_bytes = await reader.readexactly(mod_len_b[0])
+        # 2. Читаем длину модуля
+        header_mod = await reader.readexactly(1)
+        mod_len = header_mod[0]
+        mod_bytes = await reader.readexactly(mod_len)
 
         # 3. Читаем длину Payload
-        pay_len_b = await reader.readexactly(4)
-        pay_len = int.from_bytes(pay_len_b, byteorder="big")
+        header_pay_len = await reader.readexactly(4)
+        pay_len = int.from_bytes(header_pay_len, byteorder="big")
 
-        # 4. Читаем сам Payload
+        # 4. Читаем Payload
         payload = await reader.readexactly(pay_len)
 
-        return id_bytes.decode(errors='ignore'), (id_len_b + id_bytes + mod_len_b + mod_bytes + pay_len_b + payload)
-    except:
+        # Склеиваем всё в один пакет для ZMQ
+        full_packet = header_id + id_bytes + header_mod + mod_bytes + header_pay_len + payload
+        return id_bytes.decode(errors='ignore'), full_packet
+    except asyncio.IncompleteReadError:
+        return None, None
+    except Exception as e:
+        logger.debug(f"Read error: {e}")
         return None, None
 
 
