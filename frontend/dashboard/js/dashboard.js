@@ -20,6 +20,7 @@ const syncUI = () => {
     setActiveFilterUI(state.filter, isGrid);
 
     const rawData = getAllClients();
+    console.log("[UI] Данных для отрисовки:", rawData.length);
     const filtered = applyStatusFilter(rawData, state.filter);
     const searched = applySearchFilter(filtered, state.search);
 

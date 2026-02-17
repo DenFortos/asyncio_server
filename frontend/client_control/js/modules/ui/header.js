@@ -10,42 +10,29 @@ export function initHeaderControls() {
         { id: 'btn-audio-mic',       ref: AppState.audio,   key: 'input',   mod: 'AudioPulse',  cmds: ['listen_mic_on', 'listen_mic_off'] }
     ];
 
-    // Внутренняя функция для переключения состояния (используется и кликом, и синхронизацией)
     const toggleAction = (action, forceState = null) => {
         const { id, ref, key, mod, cmds } = action;
         const btn = document.getElementById(id);
 
-        // Если forceState передан, устанавливаем его, иначе инвертируем
         ref[key] = (forceState !== null) ? forceState : !ref[key];
-
         btn?.classList.toggle('active', ref[key]);
 
         if (window.sendToBot) {
-            const cmd = ref[key] ? cmds[0] : cmds[1];
-            window.sendToBot(mod, cmd);
-            console.log(`[Header] ${id} -> ${cmd}`);
+            window.sendToBot(mod, ref[key] ? cmds[0] : cmds[1]);
         }
     };
 
-    // Привязка кликов
-    actions.forEach(action => {
-        const btn = document.getElementById(action.id);
-        if (btn) btn.onclick = () => toggleAction(action);
+    actions.forEach(a => {
+        const el = document.getElementById(a.id);
+        if (el) el.onclick = () => toggleAction(a);
     });
 
-    /**
-     * Глобальная функция синхронизации ресурсов.
-     * Вызывается из sidebar.js при смене вкладок.
-     */
     window.syncModeResources = (mode) => {
         if (mode === 'webcam') {
-            // Если ушли на вебку - гасим экран и управление (индекс 0 и 1)
             if (AppState.desktop.observe) toggleAction(actions[0], false);
             if (AppState.desktop.control) toggleAction(actions[1], false);
         } else if (mode === 'desktop') {
-            // Если ушли на десктоп - гасим вебку (индекс 2)
             if (AppState.webcam.active) toggleAction(actions[2], false);
         }
-        // Звук (индексы 3, 4) игнорируем, он независим
     };
 }

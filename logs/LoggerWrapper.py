@@ -1,54 +1,48 @@
-# logs/LoggerWrapper.py
 from loguru import logger as _logger
-import asyncio
-from multiprocessing import Queue
 from typing import Optional
 
 class Log:
-    _queue: Optional[Queue] = None
-
     @staticmethod
     def setup(log_file_path: str = "server.log"):
-        """Настраивает логгер для записи в один файл без ротации."""
+        """Настраивает логгер для записи в файл и консоль."""
         _logger.remove()
+
+        # Запись в файл
         _logger.add(
             log_file_path,
             format="{time:HH:mm:ss} | {level:8} | {message}",
             level="DEBUG",
-            enqueue=True,
+            enqueue=True,  # Оставляем для безопасности при записи из разных корутин
         )
 
+        # Вывод в консоль (опционально, если хочешь видеть логи в терминале)
+        _logger.add(
+            lambda msg: print(msg, end=""),
+            format="<green>{time:HH:mm:ss}</green> | <level>{level:8}</level> | {message}",
+            level="INFO",
+            colorize=True
+        )
+
+    # Старые методы очереди нам больше не нужны, но мы оставляем обертки для совместимости
     @staticmethod
-    def for_worker(queue: Queue):
-        """Говорит воркеру писать в очередь."""
-        Log._queue = queue
+    async def start_queue_listener(queue=None):
+        """Больше не требуется, оставлен для совместимости интерфейса."""
+        pass
 
     @staticmethod
-    async def start_queue_listener(queue: Queue):
-        """Слушает очередь от воркеров и пишет в файл."""
-        while True:
-            level, msg = await asyncio.to_thread(queue.get)
-            if msg == "STOP":
-                break
-            _logger.log(level.upper(), msg)  # msg уже готовая строка
+    def info(msg: str):      _logger.info(msg)
 
     @staticmethod
-    def _log_worker(level: str, msg: str):
-        """Внутренний метод: воркер -> очередь, главный -> файл."""
-        if Log._queue:
-            Log._queue.put((level, msg))  # msg уже готовая строка
-        else:
-            _logger.log(level.upper(), msg)
+    def warning(msg: str):   _logger.warning(msg)
 
     @staticmethod
-    def info(msg: str):      Log._log_worker("INFO", msg)
+    def error(msg: str):     _logger.error(msg)
+
     @staticmethod
-    def warning(msg: str):   Log._log_worker("WARNING", msg)
+    def debug(msg: str):     _logger.debug(msg)
+
     @staticmethod
-    def error(msg: str):     Log._log_worker("ERROR", msg)
+    def critical(msg: str):  _logger.critical(msg)
+
     @staticmethod
-    def debug(msg: str):     Log._log_worker("DEBUG", msg)
-    @staticmethod
-    def critical(msg: str):  Log._log_worker("CRITICAL", msg)
-    @staticmethod
-    def exception(msg: str): Log._log_worker("EXCEPTION", msg)
+    def exception(msg: str): _logger.exception(msg)

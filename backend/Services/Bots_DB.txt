@@ -5,17 +5,7 @@
         "user": "Manager_John",
         "pc_name": "OFFICE-PC-01",
         "activeWindow": "Dashboard",
-        "last_active": "01:47:29",
-        "ip": "127.0.0.1",
-        "auth_key": "super_secret"
-    },
-    "u80a9-Bot-First": {
-        "id": "u80a9-Bot-First",
-        "loc": "RU",
-        "user": "Tester",
-        "pc_name": "DEBUG-PC",
-        "activeWindow": "Visual Studio Code",
-        "last_active": "01:45:51",
+        "last_active": "05:34:40",
         "ip": "127.0.0.1",
         "auth_key": "super_secret"
     }

@@ -10,12 +10,16 @@ export const AppState = {
         this.webcam.active = false;
         this.audio = { input: false, output: false };
 
-        // Сброс UI элементов
+        // Сброс активных кнопок
         document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
+
+        // Сброс оверлеев (надписей "Stream Offline")
         document.querySelectorAll('.stream-overlay').forEach(o => o.style.display = 'flex');
 
+        // Сброс индикатора статуса напрямую
         const dot = document.getElementById('status-indicator');
         const txt = document.getElementById('status-text');
+
         if (dot) dot.classList.remove('online');
         if (txt) txt.textContent = 'offline';
 

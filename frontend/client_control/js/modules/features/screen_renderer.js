@@ -1,54 +1,52 @@
 /* frontend/client_control/js/modules/features/screen_renderer.js */
 
-export function renderScreenRGBA(payload) {
+let isProcessing = false; // Флаг для предотвращения накопления очереди кадров
+
+export async function renderScreenRGBA(payload) {
+    // Если мы еще заняты отрисовкой предыдущего куска — дропаем текущий.
+    // Это критично для предотвращения Input Lag (лучше пропустить кадр, чем опоздать на 200мс)
+    if (isProcessing) return;
+
     const canvas = document.getElementById('desktopCanvas');
-    if (!canvas || payload.byteLength < 4) return;
+    if (!canvas || payload.byteLength < 8) return;
 
-    const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+    isProcessing = true;
+
+    const ctx = canvas.getContext('2d', {
+        alpha: false,
+        desynchronized: true, // Прямой вывод в буфер экрана
+        preserveDrawingBuffer: true // Важно для диффов (чтобы не стирались старые части)
+    });
+
     const view = new DataView(payload);
+    const x = view.getUint16(0, false);
+    const y = view.getUint16(2, false);
+    const w = view.getUint16(4, false);
+    const h = view.getUint16(6, false);
 
-    // 1. Парсинг заголовка
-    const width = view.getUint16(0);
-    const height = view.getUint16(2);
-    const dataSize = width * height * 4;
+    try {
+        // Извлекаем JPEG данные (смещение 8 байт)
+        const jpegPart = payload.slice(8);
+        const blob = new Blob([jpegPart], { type: 'image/jpeg' });
 
-    if (payload.byteLength < (dataSize + 4)) return;
+        // Создаем битмап. Это самая тяжелая часть, браузер делает её через GPU
+        const bitmap = await createImageBitmap(blob, {
+            premultiplyAlpha: 'none',
+            colorSpaceConversion: 'none' // Отключаем лишние преобразования для скорости
+        });
 
-    // 2. Синхронизация размеров (Умный зум)
-    if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
+        // Подгон размера холста только при полном кадре (0,0)
+        if (x === 0 && y === 0 && (canvas.width !== w || canvas.height !== h)) {
+            canvas.width = w;
+            canvas.height = h;
+        }
 
-        // Сброс стилей важен для того, чтобы CSS правил балом
-        canvas.removeAttribute('style');
+        ctx.drawImage(bitmap, x, y);
 
-        const overlay = document.querySelector('#wrapper-desktop .stream-overlay');
-        if (overlay) overlay.style.display = 'none';
+        bitmap.close();
+    } catch (e) {
+        console.error("Render fail:", e);
+    } finally {
+        isProcessing = false; // Освобождаем "замок" для следующего кадра
     }
-
-    // 3. Отрисовка
-    const pixels = new Uint8ClampedArray(payload, 4, dataSize);
-    ctx.putImageData(new ImageData(pixels, width, height), 0, 0);
 }
-
-// В JS при клике на кнопку Fullscreen
-const fsBtn = document.querySelector('.fullscreen-btn');
-const appMain = document.querySelector('.app-main'); // Берем всё основное окно
-
-fsBtn.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-        appMain.requestFullscreen(); // Разворачиваем всё, включая шапку
-    } else {
-        document.exitFullscreen();
-    }
-});
-
-// Отслеживаем изменение режима для смены иконок
-document.addEventListener('fullscreenchange', () => {
-    const icon = fsBtn.querySelector('i');
-    if (document.fullscreenElement) {
-        icon.classList.replace('fa-expand', 'fa-compress');
-    } else {
-        icon.classList.replace('fa-compress', 'fa-expand');
-    }
-});

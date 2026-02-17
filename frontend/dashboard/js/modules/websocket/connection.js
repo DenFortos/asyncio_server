@@ -1,8 +1,9 @@
 /* frontend/dashboard/js/modules/websocket/connection.js */
 import { updateClient, updateClients } from '../data/clients.js';
-import { decodePacket, encodePacket, isJson } from './protocol.js';
+import { decodePacket, encodePacket } from './protocol.js';
 
 let ws;
+const decoder = new TextDecoder();
 
 export function connectWebSocket() {
     const token = localStorage.getItem('auth_token');
@@ -16,48 +17,47 @@ export function connectWebSocket() {
 
     ws.onopen = () => {
         console.log("[WS] Connected");
-        // Пинг-понг для поддержания соединения
-        setInterval(() => ws?.readyState === 1 && ws.send(encodePacket("SERVER", "ping")), 25000);
+        // Пинг сервера для поддержания сессии
+        setInterval(() => ws?.readyState === 1 && ws.send(encodePacket("", "Heartbeat", "ping")), 25000);
     };
 
     ws.onmessage = ({ data }) => {
+        if (!(data instanceof ArrayBuffer)) return;
+
         const pkg = decodePacket(data);
         if (!pkg || pkg.module === 'pong') return;
 
+        // 1. Системные команды
         if (pkg.module === 'AuthUpdate') {
             localStorage.removeItem('auth_token');
             return window.location.reload();
         }
 
-        if (isJson(pkg.module)) {
-            try {
-                const decodedText = new TextDecoder().decode(pkg.payload);
-                const rawData = JSON.parse(decodedText);
+        // 2. Обработка данных
+        try {
+            const rawData = JSON.parse(decoder.decode(pkg.payload));
 
-                if (pkg.module === 'ClientList' || Array.isArray(rawData)) {
-                    updateClients(Array.isArray(rawData) ? rawData : [rawData]);
-                } else {
-                    /** * Передаем данные в обработчик.
-                     * rawData.net === 'heartbeat' вернет true только для коротких пульсов.
-                     * Для метаданных (DataScribe) вторым аргументом уйдет false,
-                     * и сработает проверка на отсутствие auth_key внутри updateClient.
-                     */
-                    updateClient({ ...rawData, id: rawData.id || pkg.id }, rawData.net === 'heartbeat');
-                }
-            } catch (e) {
-                console.error("[WS] JSON Parse Error:", e);
+            if (pkg.module === 'DataScribe' || pkg.module === 'Heartbeat') {
+                // Онлайн если: это Heartbeat ИЛИ в данных от DataScribe нет ключа БД (auth_key)
+                const isLive = !rawData.auth_key || pkg.module === 'Heartbeat';
+                updateClient({ ...rawData, id: rawData.id || pkg.id }, isLive);
             }
-        } else {
+            else if (Array.isArray(rawData)) {
+                updateClients(rawData);
+            }
+        } catch (e) {
+            // Бинарные данные (стрим экрана, камера)
             window.dispatchEvent(new CustomEvent('binaryDataReceived', { detail: pkg }));
         }
     };
 
     ws.onclose = (e) => {
+        console.log("[WS] Closed:", e.code);
         if (e.code === 1008) {
             localStorage.clear();
             window.location.href = '/sidebar/auth/auth.html';
-        } else {
-            setTimeout(connectWebSocket, 5000); // Авто-реконнект
+        } else if (e.code !== 1000 && e.code !== 1001) {
+            setTimeout(connectWebSocket, 5000);
         }
     };
 

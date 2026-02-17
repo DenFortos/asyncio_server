@@ -1,99 +1,77 @@
+# backend/Core/ClientConnection.py
+
 import asyncio
 from logs import Log as logger
-from backend.Services import authorize_client, close_client, client, client_info, fsmap
+from backend.Services import authorize_client, close_client
 from backend.BenchUtils import add_bytes
+from backend.API.api import manager
+from backend.Services.ClientManager import client, client_info, fsmap
 
-"""
-Читает данные по бинарному протоколу и возвращает ID и готовый пакет.
-[ID_len][ID][Mod_len][Mod][Pay_len][Payload]
-"""
 
+# ==========================================
+# БЛОК 1: ВЫСОКОСКОРОСТНОЙ ПАРСИНГ (MAX SPEED) [ID_LEN(1)][MOD_LEN(1)][PAY_LEN(4)] + [payload]
+# ==========================================
 async def read_full_packet(reader: asyncio.StreamReader):
+    """Читает тех-карту 6б и добирает тело. Возвращает готовый пакет байтов."""
     try:
-        # 1. Читаем длину ID
-        header_id = await reader.readexactly(1)
-        id_len = header_id[0]
-        id_bytes = await reader.readexactly(id_len)
+        # 1. Читаем заголовок (Header)
+        tech = await reader.readexactly(6)
 
-        # 2. Читаем длину модуля
-        header_mod = await reader.readexactly(1)
-        mod_len = header_mod[0]
-        mod_bytes = await reader.readexactly(mod_len)
+        # 2. Вычисляем длину оставшегося хвоста (ID + MOD + PAYLOAD)
+        body_len = tech[0] + tech[1] + int.from_bytes(tech[2:6], "big")
 
-        # 3. Читаем длину Payload
-        header_pay_len = await reader.readexactly(4)
-        pay_len = int.from_bytes(header_pay_len, byteorder="big")
+        # 3. Читаем тело целиком
+        body = await reader.readexactly(body_len)
 
-        # 4. Читаем Payload
-        payload = await reader.readexactly(pay_len)
-
-        # Склеиваем всё в один пакет для ZMQ
-        full_packet = header_id + id_bytes + header_mod + mod_bytes + header_pay_len + payload
-        return id_bytes.decode(errors='ignore'), full_packet
-    except asyncio.IncompleteReadError:
-        return None, None
-    except Exception as e:
-        logger.debug(f"Read error: {e}")
-        return None, None
+        return tech + body  # Склеенный пакет для фронтенда
+    except:
+        return None
 
 
-async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, push_socket):
+async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+    """Управляет жизненным циклом подключения бота."""
     client_id = None
-    addr = writer.get_extra_info("peername")
-    ip_address = addr[0]
+    ip_addr = writer.get_extra_info("peername")[0]
 
     try:
-        # 1. АВТОРИЗАЦИЯ
-        auth_result = await authorize_client(reader, ip_address)
-        if not auth_result:
-            try:
-                writer.close()
-                await writer.wait_closed()
-            except:
-                pass
+        # 1. Авторизация (Логика и исключения внутри authorize_client)
+        auth = await authorize_client(reader, ip_addr)
+        if not auth:
+            writer.close()
             return
 
-        client_id, payload_dict = auth_result
+        client_id, _ = auth  # Нам нужен только ID для регистрации
+
+        # Кикаем дубликат, если бот переподключился
         if client_id in client:
             await close_client(client_id, send_sleep=False)
 
-        client_info[client_id] = payload_dict
+        # Регистрация сессии
         client[client_id] = (reader, writer)
-        logger.info(f"[+] Клиент {client_id} подключен: {addr}")
+        logger.info(f"[+] Бот {client_id} авторизован ({ip_addr})")
 
-        # 2. ЦИКЛ ПЕРЕСЫЛКИ
+        # 2. Основной цикл (Fast Path)
         while True:
-            inc_id, packet = await read_full_packet(reader)
-            if not packet: break
+            packet = await read_full_packet(reader)
+            if not packet:
+                break
 
-            if inc_id != client_id:
-                logger.warning(f"ID Mismatch: {inc_id} != {client_id}")
-                continue
+            add_bytes(len(packet))  # Статистика
 
-            add_bytes(len(packet))
-            await push_socket.send(packet)
+            # Пробрасываем байты в API без единой проверки
+            await manager.broadcast_packet(packet)
 
-    except (ConnectionResetError, ConnectionAbortedError):
-        # Подавляем WinError 10054 (Бот закрыл соединение)
+    except (asyncio.CancelledError, ConnectionResetError, ConnectionAbortedError):
         pass
     except Exception as e:
-        logger.error(f"Ошибка в handler {client_id}: {e}")
+        logger.error(f"Handler Error [{client_id}]: {e}")
     finally:
-        # Очистка реестра
-        if client_id:
-            client.pop(client_id, None)
-            client_info.pop(client_id, None)
-            fsmap.pop(client_id, None)
-
-        # Безопасное закрытие сокета
+        # Очистка и закрытие
+        if client_id: client.pop(client_id, None)
         try:
             if not writer.is_closing():
                 writer.close()
-            # Пытаемся подождать закрытия, игнорируя ошибки "уже закрытого" сокета
-            await asyncio.wait_for(writer.wait_closed(), timeout=2.0)
-        except (ConnectionResetError, OSError, asyncio.TimeoutError):
+                await writer.wait_closed()
+        except:
             pass
-        except Exception as e:
-            logger.debug(f"Socket close detail for {client_id}: {e}")
-
-        logger.info(f"[-] Клиент {client_id or '?'} отключен.")
+        logger.info(f"[-] Бот {client_id or 'Unknown'} отключен.")

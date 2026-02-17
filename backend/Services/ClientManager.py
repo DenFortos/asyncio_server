@@ -1,8 +1,11 @@
 from logs import Log as logger
 
-client = {}
-client_info = {}
-fsmap = {}
+# ==========================================
+# БЛОК 1: ГЛОБАЛЬНЫЕ РЕЕСТРЫ СОЕДИНЕНИЙ
+# ==========================================
+client = {}  # {id: (reader, writer)}
+client_info = {}  # {id: metadata_dict}
+fsmap = {}  # {id: file_system_cache}
 
 # =================== Основные команды ===================
 
