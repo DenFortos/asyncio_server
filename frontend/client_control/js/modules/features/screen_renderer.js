@@ -1,52 +1,59 @@
 /* frontend/client_control/js/modules/features/screen_renderer.js */
 
-let isProcessing = false; // Флаг для предотвращения накопления очереди кадров
+let jmuxer = null;
+let lastLogTime = 0;
 
 export async function renderScreenRGBA(payload) {
-    // Если мы еще заняты отрисовкой предыдущего куска — дропаем текущий.
-    // Это критично для предотвращения Input Lag (лучше пропустить кадр, чем опоздать на 200мс)
-    if (isProcessing) return;
+    // 1. Проверяем наличие данных. Минимум 4 байта TS + хотя бы 1 байт видео
+    if (payload.byteLength < 5) {
+        console.warn("[RENDER] Слишком маленький пакет:", payload.byteLength);
+        return;
+    }
 
-    const canvas = document.getElementById('desktopCanvas');
-    if (!canvas || payload.byteLength < 8) return;
+    const videoElement = document.getElementById('desktopVideo');
+    const overlay = document.querySelector('#view-desktop .stream-overlay');
 
-    isProcessing = true;
+    // 2. Инициализируем JMuxer один раз при первом кадре
+    if (!jmuxer) {
+        videoElement.style.display = 'block';
+        if (overlay) overlay.style.display = 'none';
 
-    const ctx = canvas.getContext('2d', {
-        alpha: false,
-        desynchronized: true, // Прямой вывод в буфер экрана
-        preserveDrawingBuffer: true // Важно для диффов (чтобы не стирались старые части)
-    });
-
-    const view = new DataView(payload);
-    const x = view.getUint16(0, false);
-    const y = view.getUint16(2, false);
-    const w = view.getUint16(4, false);
-    const h = view.getUint16(6, false);
+        jmuxer = new JMuxer({
+            node: 'desktopVideo',
+            mode: 'video',
+            fps: 30,
+            flushingTime: 0,
+            clearBuffer: true,
+            debug: false // Поставь true, если хочешь видеть внутренние логи самой библиотеки
+        });
+        console.log("[RENDER] JMuxer initialized for H.264");
+    }
 
     try {
-        // Извлекаем JPEG данные (смещение 8 байт)
-        const jpegPart = payload.slice(8);
-        const blob = new Blob([jpegPart], { type: 'image/jpeg' });
+        const view = new DataView(payload);
 
-        // Создаем битмап. Это самая тяжелая часть, браузер делает её через GPU
-        const bitmap = await createImageBitmap(blob, {
-            premultiplyAlpha: 'none',
-            colorSpaceConversion: 'none' // Отключаем лишние преобразования для скорости
-        });
+        // 3. Извлекаем таймстемп (первые 4 байта)
+        const serverTs = view.getUint32(0, false);
 
-        // Подгон размера холста только при полном кадре (0,0)
-        if (x === 0 && y === 0 && (canvas.width !== w || canvas.height !== h)) {
-            canvas.width = w;
-            canvas.height = h;
+        // Вычисляем задержку (необязательно, для теста)
+        const now = Date.now() & 0xFFFFFFFF;
+        const latency = now - serverTs;
+
+        // 4. Извлекаем само видео (все что после 4-го байта)
+        const videoPart = new Uint8Array(payload.slice(4));
+
+        // 5. Логируем получение данных (не каждый кадр, чтобы не спамить, а раз в секунду)
+        if (Date.now() - lastLogTime > 1000) {
+            console.debug(`[RENDER] Поток идет. Размер видео-части: ${videoPart.length} байт. Задержка сети: ${latency}ms`);
+            lastLogTime = Date.now();
         }
 
-        ctx.drawImage(bitmap, x, y);
+        // 6. Отправляем в плеер
+        jmuxer.feed({
+            video: videoPart
+        });
 
-        bitmap.close();
-    } catch (e) {
-        console.error("Render fail:", e);
-    } finally {
-        isProcessing = false; // Освобождаем "замок" для следующего кадра
+    } catch (err) {
+        console.error("[RENDER] Ошибка при обработке видео-пакета:", err);
     }
 }

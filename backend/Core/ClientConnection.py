@@ -1,6 +1,7 @@
 # backend/Core/ClientConnection.py
 
 import asyncio
+import socket
 from logs import Log as logger
 from backend.Services import authorize_client, close_client
 from backend.BenchUtils import add_bytes
@@ -32,6 +33,12 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
     """Управляет жизненным циклом подключения бота."""
     client_id = None
     ip_addr = writer.get_extra_info("peername")[0]
+
+    # --- ОПТИМИЗАЦИЯ TCP ---
+    transport = writer.get_extra_info('socket')
+    if transport:
+        # Отключаем буферизацию: пакеты команд уйдут сразу, не дожидаясь заполнения буфера
+        transport.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     try:
         # 1. Авторизация (Логика и исключения внутри authorize_client)

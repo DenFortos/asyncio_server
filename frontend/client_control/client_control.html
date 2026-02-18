@@ -82,9 +82,8 @@
         <main class="workspace">
             <div id="view-desktop" class="view-panel active">
                 <div class="canvas-wrapper" id="wrapper-desktop">
-                    <canvas id="desktopCanvas"></canvas>
-
-                    <button class="fullscreen-btn" title="Toggle Fullscreen" data-target="wrapper-desktop">
+                    <video id="desktopVideo" autoplay muted playsinline style="width: 100%; height: auto; display: none;"></video>
+                    <canvas id="desktopCanvas"></canvas> <button class="fullscreen-btn" title="Toggle Fullscreen" data-target="wrapper-desktop">
                         <i class="fas fa-expand"></i>
                     </button>
 
@@ -93,6 +92,8 @@
                     </div>
                 </div>
             </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/jmuxer@2.0.5/dist/jmuxer.min.js"></script>
 
             <div id="view-webcam" class="view-panel">
                 <div class="canvas-wrapper" id="wrapper-webcam">
