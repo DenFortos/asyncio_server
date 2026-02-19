@@ -1,3 +1,9 @@
+/* frontend/client_control/css/layout.css */
+
+/* ==========================================================================
+   1. ГЛАВНЫЙ КОНТЕЙНЕР (Application Core)
+========================================================================= */
+
 .app-main {
     flex: 1;
     display: flex;
@@ -6,7 +12,10 @@
     height: 100%;
 }
 
-/* SIDEBAR */
+/* ==========================================================================
+   2. САЙДБАР (Sidebar Geometry)
+========================================================================== */
+
 .sidebar {
     position: relative;
     width: var(--sidebar-width);
@@ -18,6 +27,7 @@
     transition: width var(--transition);
 }
 
+/** Состояние скрытия (для фокуса на стриме) */
 .sidebar.hidden {
     width: 0;
     border-right-color: transparent;
@@ -33,13 +43,13 @@
     overflow: hidden;
 }
 
+/** Выносной "язычок" для открытия скрытого меню */
 .sidebar-tab {
     position: absolute;
     right: -25px;
     top: 50%;
     transform: translateY(-50%);
-    width: 25px;
-    height: 70px;
+    width: 25px; height: 70px;
     background-color: var(--panel-dark);
     border: 1px solid var(--border-dim);
     border-left: none;
@@ -51,7 +61,10 @@
     z-index: 101;
 }
 
-/* HEADER */
+/* ==========================================================================
+   3. ВЕРХНЯЯ ПАНЕЛЬ (Header & Auto-hide)
+========================================================================== */
+
 .header {
     height: var(--header-height);
     width: 100%;
@@ -66,7 +79,7 @@
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* Fullscreen Header logic */
+/** Логика "умного хедера" в полноэкранном режиме: скрывается вверх */
 .app-main:fullscreen .header {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -76,12 +89,16 @@
     backdrop-filter: blur(10px);
 }
 
+/** Появление хедера при наведении курсора в топ экрана */
 .app-main:fullscreen .header:hover {
     transform: translateY(0);
     opacity: 1;
 }
 
-/* WORKSPACE */
+/* ==========================================================================
+   4. РАБОЧАЯ ЗОНА (Workspace & Rendering)
+========================================================================== */
+
 .workspace {
     flex: 1;
     position: relative;
@@ -94,17 +111,13 @@
 .view-panel {
     display: none;
     flex: 1;
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
 }
 
-.view-panel.active {
-    display: flex;
-}
+.view-panel.active { display: flex; }
 
 .canvas-wrapper {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -112,29 +125,29 @@
     overflow: hidden;
 }
 
-/* VIDEO RENDERING (ANTI-BLUR) */
+/* ==========================================================================
+   5. ВИДЕО-ОПТИМИЗАЦИЯ (Anti-Blur & Precision)
+========================================================================== */
+
 #desktopVideo {
-    max-width: 100%;
-    max-height: 100%;
-    width: 100%;
-    height: 100%;
+    max-width: 100%; max-height: 100%;
+    width: 100%; height: 100%;
     object-fit: contain;
     background: #000;
     z-index: 10;
 
-    /* Убираем "мыло" при растягивании 1080p */
+    /** Критично: сохраняем резкость пикселей при апскейле (Pixel Art Rendering) */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
     image-rendering: pixelated;
 }
 
+/** Слой отрисовки курсора и кликов поверх видео */
 #desktopCanvas {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     object-fit: contain;
     z-index: 20;
-    pointer-events: none;
+    pointer-events: none; /* Пропускаем клики к видео-слою */
 }

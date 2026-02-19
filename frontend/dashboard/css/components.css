@@ -1,34 +1,30 @@
 /* frontend/dashboard/css/components.css
 
 /* ==========================================================================
-   1. САЙДБАР И ВНЕШНИЙ БУРГЕР
-   ========================================================================== */
+   1. НАВИГАЦИЯ (Sidebar & Navigation)
+========================================================================== */
 
 .sidebar {
+    position: fixed;
+    left: 0; top: 0;
     width: 80px;
     height: 100vh;
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    /* Усилили плотность фона, чтобы иконки не "тонули" в обоях */
+    padding: 20px 0;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(25px);
     border-right: 1px solid var(--glass-border);
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 1000;
-    padding: 20px 0;
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Кнопка БУРГЕР — прикреплена к ПРАВОМУ краю сайдбара снаружи */
+/** Внешняя кнопка развертывания меню */
 .menu-toggle {
     position: absolute;
-    right: -55px;
-    top: 20px;
-    width: 42px;
-    height: 42px;
+    right: -55px; top: 20px;
+    width: 42px; height: 42px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -49,89 +45,58 @@
     transform: scale(1.1);
 }
 
-/* Иконки навигации (внутри сайдбара) */
-.sidebar-icons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-}
+/** Иконки разделов */
+.sidebar-icons { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 
 .sidebar-icons .icon {
-    width: 50px;
-    height: 50px;
+    width: 50px; height: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 1.5rem;
-    /* Увеличили базовую яркость иконок, чтобы они были видны */
     color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
     border-radius: 12px;
     transition: all 0.3s ease;
 }
 
-/* Активное состояние и Ховер */
 .sidebar-icons .icon.active,
 .sidebar-icons .icon:hover {
-    color: var(--accent-blue); /* Теперь иконка "горит" голубым */
+    color: var(--accent-blue);
     background: rgba(0, 212, 255, 0.15);
     border: 1px solid var(--accent-blue);
-    /* Добавили свечение для эффекта глянца */
     box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
 }
 
 /* ==========================================================================
-   2. ШАПКА И УПРАВЛЕНИЕ (Buttons & Stats)
-   ========================================================================== */
+   2. БРЕНДИНГ И КНОПКИ (Identity & Controls)
+========================================================================== */
 
-/* Логотип/Заголовок */
 .brand-title {
-    background: none;
-    border: none;
-    padding: 0;
     font-size: 1.8rem;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 3px;
     white-space: nowrap;
-
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.9) 0%,
-        rgba(255, 255, 255, 0.4) 50%,
-        rgba(0, 212, 255, 0.5) 100%
-    );
+    cursor: pointer;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(0, 212, 255, 0.5) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-
     filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
-    text-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.3),
-        0 2px 0 rgba(255, 255, 255, 0.1),
-        0 3px 0 rgba(0, 212, 255, 0.2),
-        0 4px 0 rgba(0, 212, 255, 0.3),
-        0 5px 10px rgba(0, 0, 0, 0.4),
-        0 0 15px rgba(0, 212, 255, 0.2);
-
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3), 0 3px 0 rgba(0, 212, 255, 0.2), 0 5px 10px rgba(0, 0, 0, 0.4);
     transition: all 0.4s ease;
-    cursor: pointer;
 }
 
 .brand-title:hover {
     transform: translateY(-3px) scale(1.02);
     filter: drop-shadow(0 5px 15px rgba(0, 212, 255, 0.4));
-    background: linear-gradient(180deg, #ffffff 0%, rgba(0, 212, 255, 0.8) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
-/* Глобальные кнопки управления */
+/** Универсальная кнопка со стеклянным эффектом */
 .bg-btn {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     color: #ffffff;
     padding: 12px 20px;
     border-radius: 10px;
@@ -141,19 +106,16 @@
     gap: 12px;
     font-size: 1.05rem;
     font-weight: 700;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: 0.3s;
 }
 
-.bg-btn i { font-size: 1.2rem; color: var(--accent-blue); }
+.bg-btn i { color: var(--accent-blue); }
+.bg-btn:hover { border-color: var(--accent-blue); box-shadow: 0 5px 20px rgba(0, 212, 255, 0.2); }
 
-.bg-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: var(--accent-blue);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(0, 212, 255, 0.2);
-}
+/* ==========================================================================
+   3. ФИЛЬТРЫ И СТАТИСТИКА (Stats Filters)
+========================================================================== */
 
-/* Контейнер для фильтров статистики */
 .stats-filters {
     display: flex;
     gap: 12px;
@@ -161,7 +123,6 @@
     padding: 6px;
     border-radius: 14px;
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
 }
 
 .stat-box {
@@ -170,290 +131,122 @@
     text-align: center;
     min-width: 95px;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid transparent;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    transition: 0.3s;
 }
 
-.stat-box:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
-
-/* Состояния активности фильтров */
-.stat-box#filter-all.active {
-    background: rgba(0, 212, 255, 0.25);
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-}
-.stat-box#filter-online.active {
-    background: rgba(0, 255, 136, 0.2);
-    border-color: #00ff88;
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-}
-.stat-box#filter-offline.active {
-    background: rgba(255, 75, 43, 0.2);
-    border-color: #ff4b2b;
-    box-shadow: 0 0 20px rgba(255, 75, 43, 0.3);
-}
+/** Состояния фильтров */
+.stat-box#filter-all.active { background: rgba(0, 212, 255, 0.25); border-color: var(--accent-blue); }
+.stat-box#filter-online.active { background: rgba(0, 255, 136, 0.2); border-color: var(--accent-green); }
+.stat-box#filter-offline.active { background: rgba(255, 75, 43, 0.2); border-color: var(--accent-red); }
 
 .stat-value { font-size: 1.5rem; font-weight: 800; display: block; }
 .stat-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; opacity: 0.8; }
 
-#online-count { color: #00ff88; }
-#offline-count { color: #ff4b2b; }
+#online-count { color: var(--accent-green); }
+#offline-count { color: var(--accent-red); }
 
 /* ==========================================================================
-   3. ПОИСК (Улучшенная видимость и компактность)
-   ========================================================================== */
-.search-bar {
-    position: relative;
-    width: 100%;
-    /* Ограничиваем длину поиска по твоему запросу */
-    max-width: 500px;
-    margin: 0 auto; /* Центрируем */
-}
+   4. ПОИСКОВАЯ СТРОКА (Search Interface)
+========================================================================== */
 
+.search-bar { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
 .search-bar i {
-    position: absolute;
-    left: 20px;
-    top: 50%;
+    position: absolute; left: 20px; top: 50%;
     transform: translateY(-50%);
     color: var(--accent-blue);
-    font-size: 1.2rem;
-    pointer-events: none;
     z-index: 5;
-    /* Свечение иконки для заметности */
     filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.4));
 }
 
 .search-input {
     width: 100%;
-    /* Делаем фон темнее, чтобы белый текст "горел" */
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.15);
-
     padding: 14px 25px 14px 55px;
-    border-radius: 12px; /* Прямоугольный стиль под стать кнопкам */
-
-    /* Текст внутри поиска */
+    border-radius: 12px;
     color: #ffffff;
     font-size: 1.1rem;
     font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    transition: 0.3s;
 }
 
-.search-input::placeholder {
-    /* Делаем подсказку более читаемой */
-    color: rgba(255, 255, 255, 0.5);
-    font-weight: 500;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--accent-blue);
-    background: rgba(0, 0, 0, 0.5);
-    /* Эффект свечения при печати */
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-    transform: translateY(-1px);
-}
+.search-input:focus { border-color: var(--accent-blue); background: rgba(0, 0, 0, 0.5); box-shadow: 0 0 20px rgba(0, 212, 255, 0.2); }
 
 /* ==========================================================================
-   4. ТАБЛИЦА БОТОВ (Финальная интерактивная версия)
-   ========================================================================== */
+   5. ТАБЛИЦА КЛИЕНТОВ (Clients Table)
+========================================================================== */
 
 .table-container {
     width: 100%;
     border-radius: 15px;
     overflow: hidden;
     background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(12px); /* Возвращаем как было */
     border: 1px solid var(--glass-border);
-    margin-top: 10px;
 }
 
-.clients-table {
-    width: 100%;
-    border-collapse: collapse;
-}
+.clients-table { width: 100%; border-collapse: collapse; }
+.clients-table thead { background: rgba(0, 212, 255, 0.07); }
 
-.clients-table thead {
-    /* Делаем шапку более выразительной */
-    background: rgba(0, 212, 255, 0.07);
-}
-
-.clients-table thead th {
+.clients-table th {
     padding: 20px 15px;
     text-align: left;
     font-size: 0.8rem;
-    font-weight: 800;
-    text-transform: uppercase;
     color: var(--accent-blue);
-    border-bottom: 2px solid rgba(0, 212, 255, 0.2);
+    text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .clients-table td {
     padding: 12px 15px;
-    font-family: 'Inter', system-ui, sans-serif;
     font-size: 0.95rem;
-    font-weight: 500;
-    color: #ffffff !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    vertical-align: middle;
-}
-
-.clients-table tbody tr {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    transition: background 0.2s ease;
-}
-
-.clients-table tbody tr:hover {
-    background: rgba(0, 212, 255, 0.1);
-}
-
-.clients-table tbody tr:hover td {
-    /* Текст становится чуть ярче при наведении */
     color: #fff !important;
-    border-bottom-color: rgba(0, 212, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* --- СТАТУСЫ --- */
-.status-online {
-    color: #00ff88 !important;
-    text-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
-}
+.clients-table tr:hover { background: rgba(0, 212, 255, 0.1); }
 
-.status-offline {
-    color: #888888 !important;
-}
+/** Статусные индикаторы */
+.status-online { color: var(--accent-green) !important; text-shadow: 0 0 8px rgba(0, 255, 136, 0.2); }
+.status-offline { color: #888 !important; }
 
-/* IP и ID */
-.clients-table td:nth-child(5),
-.client-id-cell {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.9rem;
-}
-
-.client-id-cell {
-    color: #555555 !important;
-}
-
-/* ТОЧКИ И ФЛАГИ */
 .status-dot-mini {
     display: inline-block;
-    width: 7px;
-    height: 7px;
+    width: 7px; height: 7px;
     border-radius: 50%;
     margin-right: 10px;
-    vertical-align: middle;
 }
-.status-dot-mini.online { background: #00ff88; box-shadow: 0 0 8px #00ff88; }
-.status-dot-mini.offline { background: #ff4b2b; }
-
-.flag-icon {
-    width: 16px;
-    margin-right: 8px;
-    vertical-align: middle;
-}
+.status-dot-mini.online { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+.status-dot-mini.offline { background: var(--accent-red); }
 
 /* ==========================================================================
-   4.1. СЕТКА БОТОВ (Grid View для раздела Bots)
-   ========================================================================== */
-
-/* Контейнер сетки */
-#grid-view {
-    display: grid;
-    /* Колонки по 300px, чтобы карточки не растягивались */
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    width: 100%;
-}
+   6. СЕТКА И КАРТОЧКИ (Grid & Cards)
+========================================================================== */
 
 .client-card {
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 15px;
-    transition: border-color 0.3s, transform 0.3s;
+    transition: 0.3s;
 }
 
-.client-card:hover {
-    border-color: var(--accent-blue);
-    transform: translateY(-3px);
-    background: rgba(0, 0, 0, 0.3);
-}
+.client-card:hover { border-color: var(--accent-blue); transform: translateY(-3px); }
 
-/* Превью/Скриншот внутри карточки */
 .bot-preview {
-    width: 100%;
-    height: 160px;
+    width: 100%; height: 160px;
     border-radius: 10px;
     overflow: hidden;
     background: #000;
 }
 
-.bot-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.7;
-    transition: 0.5s;
-}
-
-.client-card:hover .bot-preview img {
-    opacity: 1;
-    transform: scale(1.05);
-}
-
-/* Инфо-блок карточки */
-.bot-card-body {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.bot-primary-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 700;
-    color: #fff;
-}
-
-.bot-secondary-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.5);
-}
-
-/* Точка статуса на карточке */
-.card-status-dot {
-    position: absolute;
-    top: 25px;
-    right: 25px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    z-index: 10;
-    border: 2px solid rgba(0,0,0,0.5);
-    pointer-events: none;
-}
-
-/* Класс скрытия (ВАЖНО для работы переключателя) */
-.hidden {
-    display: none !important;
-}
+.bot-preview img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.5s; }
+.client-card:hover .bot-preview img { opacity: 1; transform: scale(1.05); }
 
 /* ==========================================================================
-   5. КАРТОЧКИ ФАЙЛОВ (File Grid)
-   ========================================================================== */
-.files-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
-}
+   7. ФАЙЛОВЫЙ МЕНЕДЖЕР (File Cards)
+========================================================================== */
 
 .file-card {
     padding: 20px;
@@ -465,154 +258,35 @@
     transition: 0.3s;
 }
 
-.file-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--accent-blue);
-}
-
-.file-icon {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    color: var(--accent-blue);
-}
-
-.file-name {
-    font-weight: 500;
-    display: block;
-    word-break: break-all;
-}
-
-.file-size {
-    font-size: 0.8rem;
-    opacity: 0.6;
-}
-
-.file-source {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--glass-border);
-    width: 100%;
-    font-size: 0.75rem;
-    display: flex;
-    justify-content: space-between;
-    opacity: 0.8;
-}
+.file-card:hover { transform: translateY(-5px); border-color: var(--accent-blue); }
+.file-icon { font-size: 3rem; color: var(--accent-blue); }
+.file-name { font-weight: 500; word-break: break-all; }
+.file-size { font-size: 0.8rem; opacity: 0.6; }
 
 /* ==========================================================================
-   6. МОДАЛКИ (Modal Content)
-   ========================================================================== */
-.modal-content {
-    padding: 30px;
-    color: white;
-}
-
-.close-modal {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    opacity: 0.5;
-}
-
-.close-modal:hover { opacity: 1; }
-
-.bg-option-item {
-    width: 100%;
-    aspect-ratio: 16/9;
-    border-radius: 8px;
-    cursor: pointer;
-    background-size: cover;
-    background-position: center;
-    border: 2px solid transparent;
-    transition: 0.3s;
-}
-
-.bg-option-item:hover {
-    border-color: var(--accent-blue);
-    transform: scale(1.05);
-}
-
-.global-controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 25px; /* Отодвигаем статы от кнопок */
-}
-
-
-/* ==========================================================================
-   7. ВИЗУАЛЬНОЕ ВЫДЕЛЕНИЕ КОНТЕНТА (Чистое стекло)
-   ========================================================================== */
+   8. АНИМАЦИИ И ЭФФЕКТЫ (Animations)
+========================================================================== */
 
 .content-viewport {
     flex: 1;
-    overflow-y: auto;
     padding: 20px 40px;
     margin: 15px 25px;
     border-radius: 16px;
-
-    /* Убираем размытие совсем или ставим минимум, чтобы не болели глаза */
     background: rgba(0, 0, 0, 0.15);
-    backdrop-filter: none; /* Убрали мыло */
-
-    /* Четкая видимая граница */
     border: 1px solid rgba(255, 255, 255, 0.1);
-
-    /* Легкая тень, чтобы приподнять зону над фоном */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* Обертка данных внутри каждой секции */
-.data-wrapper {
-    width: 100%;
-    animation: contentAppear 0.5s ease-out;
-}
-
-/* Анимация плавного появления контента при переключении вкладок */
 @keyframes contentAppear {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Стилизация скроллбара для сохранения "глянцевого" вида */
-.content-viewport::-webkit-scrollbar {
-    width: 6px;
-}
+.data-wrapper { animation: contentAppear 0.5s ease-out; }
 
-.content-viewport::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.content-viewport::-webkit-scrollbar-thumb {
-    background: rgba(0, 212, 255, 0.2);
-    border-radius: 10px;
-    border: 2px solid transparent;
-    background-clip: padding-box;
-}
-
-.content-viewport::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-blue);
-}
-
-/* Элемент для отображения эмодзи флага (из Renderer) */
 .flag-emoji {
     display: inline-block;
     font-size: 1.2rem;
-    line-height: 1;
-    margin-right: 8px;
     vertical-align: middle;
-    /* Легкая тень, чтобы флаг не "тонул" в темном фоне */
     filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
 }

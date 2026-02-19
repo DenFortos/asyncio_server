@@ -1,4 +1,9 @@
 /* frontend/dashboard/js/dashboard.js */
+
+/* ==========================================================================
+   1. ИМПОРТЫ И ГЛОБАЛЬНОЕ СОСТОЯНИЕ (Imports & State)
+========================================================================== */
+
 import { connectWebSocket } from './modules/websocket/connection.js';
 import { getAllClients, checkDeadClients } from './modules/data/clients.js';
 import { updateStats } from './modules/data/stats.js';
@@ -13,6 +18,11 @@ const state = {
     tab: 'bots'
 };
 
+/* ==========================================================================
+   2. ЯДРО СИНХРОНИЗАЦИИ (Core Sync Logic)
+========================================================================== */
+
+/** Оркестратор: фильтрует данные и заставляет Renderer их отрисовать */
 const syncUI = () => {
     if (state.tab !== 'bots' && state.tab !== 'files') return;
 
@@ -20,17 +30,20 @@ const syncUI = () => {
     setActiveFilterUI(state.filter, isGrid);
 
     const rawData = getAllClients();
-    console.log("[UI] Данных для отрисовки:", rawData.length);
     const filtered = applyStatusFilter(rawData, state.filter);
     const searched = applySearchFilter(filtered, state.search);
 
     Renderer.render(searched);
 };
 
+/* ==========================================================================
+   3. НАВИГАЦИЯ ПО ТАБАМ (Tab Management)
+========================================================================== */
+
 function showTab(name) {
     state.tab = name.toLowerCase().trim().replace('section-', '');
 
-    // Переключение видимости секций
+    // Переключение видимости HTML-секций
     document.querySelectorAll('.content-section').forEach(s => {
         const isTarget = s.id === `section-${state.tab}`;
         s.classList.toggle('hidden', !isTarget);
@@ -41,8 +54,15 @@ function showTab(name) {
     syncUI();
 }
 
+/* ==========================================================================
+   4. ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ (DOM Ready)
+========================================================================== */
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Настройка боковой панели
     initializeSidebar({ onTabChange: showTab });
+
+    // Настройка шапки (вид, фильтры)
     initializeHeader({
         Renderer,
         onViewToggled: (isGrid) => {
@@ -55,11 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Запуск системных модулей
     initializeSearch();
     connectWebSocket();
-    // updateStats() вызовется сам через событие при загрузке данных
+
+    // Проверка "мертвых" ботов каждую секунду
     setInterval(checkDeadClients, 1000);
 
+    /* ==========================================================================
+       5. ОБРАБОТЧИКИ СОБЫТИЙ (Event Listeners)
+    ========================================================================== */
+
+    // Клик по боту -> переход в панель управления
     document.addEventListener('click', e => {
         const row = e.target.closest('.client-row, .client-card');
         if (row && !e.target.closest('button')) {
@@ -67,15 +94,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Реакция на ввод в поиске
     window.addEventListener('searchUpdated', e => {
         state.search = e.detail;
         syncUI();
     });
 
-    // Слушаем изменения данных для перерисовки
+    // Глобальная перерисовка при любом обновлении данных
     ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => {
         window.addEventListener(ev, syncUI);
     });
 
+    // Стартовая вкладка
     showTab('bots');
 });

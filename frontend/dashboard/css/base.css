@@ -1,14 +1,18 @@
 /* frontend/dashboard/css/base.css
-1. ОБНУЛЕНИЕ И ШРИФТЫ */
+
+/* ==========================================================================
+   1. ОБНУЛЕНИЕ И ПЕРЕМЕННЫЕ (Reset & Variables)
+========================================================================== */
+
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box; /* Чтобы padding не раздувал блоки */
+    box-sizing: border-box;
     outline: none;
 }
 
 :root {
-    /* Переменные для Glassmorphism — их удобно менять в одном месте */
+    /* Glassmorphism Design System */
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-text: rgba(255, 255, 255, 0.9);
@@ -18,25 +22,26 @@
     --blur-val: 12px;
 }
 
-/* 2. НАСТРОЙКИ СТРАНИЦЫ */
+/* ==========================================================================
+   2. ГЛОБАЛЬНЫЕ СТИЛИ СТРАНИЦЫ (Body & Overlay)
+========================================================================== */
+
 body {
     height: 100vh;
     width: 100vw;
     font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
     color: var(--glass-text);
     overflow: hidden;
-
-    background-color: #000; /* Глубокий черный фон под картинкой */
+    background-color: #000;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
-    position: relative; /* Нужно для позиционирования оверлея */
-
+    position: relative;
     transition: background-image 0.5s ease-in-out;
 }
 
-/* Слой затемнения фона (Overlay) */
+/** Затемняющий слой для улучшения читаемости текста */
 body::before {
     content: "";
     position: fixed;
@@ -44,24 +49,14 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    /* Затемнение на 45%. Можно увеличить до 0.6 для еще большей читаемости */
     background: rgba(0, 0, 0, 0.45);
-    z-index: -1; /* Слой между фоновой картинкой и контентом */
-}
-
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.45); /* Затемнение */
     z-index: -1;
 }
 
-/* 3. УНИВЕРСАЛЬНЫЙ СТЕКЛЯННЫЙ СТИЛЬ */
-/* Этот класс мы будем добавлять к шапке, поиску, карточкам и модалкам */
+/* ==========================================================================
+   3. ГРАФИЧЕСКИЕ ЭФФЕКТЫ (Effects & Glass)
+========================================================================== */
+
 .glass-effect {
     background: var(--glass-bg);
     backdrop-filter: blur(var(--blur-val));
@@ -70,22 +65,15 @@ body::before {
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* 4. ТИПОГРАФИКА И ОБЩИЕ ЭЛЕМЕНТЫ */
-h1, h2, h3 {
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
+/* ==========================================================================
+   4. ТИПОГРАФИКА И СКРОЛЛ (Typography & Scroll)
+========================================================================== */
 
-ul {
-    list-style: none;
-}
+h1, h2, h3 { font-weight: 600; letter-spacing: 0.5px; }
+ul { list-style: none; }
+a { text-decoration: none; color: inherit; }
 
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-/* Скроллбар в стеклянном стиле (для Chrome, Edge, Safari) */
+/** Стилизация скроллбара под WebKit (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
     width: 6px;
 }

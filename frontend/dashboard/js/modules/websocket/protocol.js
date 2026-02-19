@@ -1,18 +1,19 @@
 /* frontend/dashboard/js/modules/websocket/protocol.js */
 
-/**
- * ЕДИНЫЙ БИНАРНЫЙ ПРОТОКОЛ [Header 6b] + [Body]
- * Header: [ID_LEN (1b)][MOD_LEN (1b)][PAY_LEN (4b)]
- * Body:   [ID][MODULE][PAYLOAD]
- */
+/* ==========================================================================
+   1. КОНСТАНТЫ И ИНСТРУМЕНТЫ (Tools)
+========================================================================== */
 
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 
+/* ==========================================================================
+   2. ДЕКОДИРОВАНИЕ ПАКЕТА (Decoding)
+========================================================================== */
+
 /**
- * Декодирует пакет из ArrayBuffer
- * @param {ArrayBuffer} buf
- * @returns {Object|null} {id, module, payload}
+ * Превращает ArrayBuffer в объект {id, module, payload}
+ * [Header 6b: ID_LEN(1), MOD_LEN(1), PAY_LEN(4)] + [Body]
  */
 export function decodePacket(buf) {
     if (!buf || buf.byteLength < 6) return null;
@@ -20,17 +21,17 @@ export function decodePacket(buf) {
     try {
         const view = new DataView(buf);
 
-        // 1. Читаем тех-карту (заголовок 6 байт)
+        // Чтение заголовка (техническая карта пакета)
         const idLen  = view.getUint8(0);
         const modLen = view.getUint8(1);
         const payLen = view.getUint32(2, false);
 
-        // 2. Расчет смещений
+        // Расчет точек входа для данных
         const idStart  = 6;
         const modStart = idStart + idLen;
         const payStart = modStart + modLen;
 
-        // 3. Извлечение данных (используем Uint8Array для корректного среза)
+        // Извлечение строк и бинарного хвоста
         const id      = decoder.decode(new Uint8Array(buf, idStart, idLen)).replace(/\0/g, '');
         const module  = decoder.decode(new Uint8Array(buf, modStart, modLen));
         const payload = buf.slice(payStart, payStart + payLen);
@@ -42,19 +43,19 @@ export function decodePacket(buf) {
     }
 }
 
+/* ==========================================================================
+   3. КОДИРОВАНИЕ ПАКЕТА (Encoding)
+========================================================================== */
+
 /**
- * Кодирует данные в ArrayBuffer для отправки
- * @param {string} id - ID бота (или пустая строка для сервера)
- * @param {string} mod - Имя модуля
- * @param {string|Uint8Array|Array} pay - Полезная нагрузка
- * @returns {ArrayBuffer}
+ * Собирает данные в бинарный пакет для отправки по сети
  */
 export function encodePacket(id, mod, pay = "") {
-    // Подготовка контента
+    // Подготовка текстовых полей
     const bId  = encoder.encode(id);
     const bMod = encoder.encode(mod);
 
-    // Автоматическая конвертация payload в байты
+    // Подготовка полезной нагрузки (строка или байты)
     let bPay;
     if (typeof pay === 'string') {
         bPay = encoder.encode(pay);
@@ -64,16 +65,16 @@ export function encodePacket(id, mod, pay = "") {
         bPay = new Uint8Array(pay);
     }
 
-    // Аллокация памяти: 6 байт заголовка + тело
+    // Аллокация памяти: заголовок (6б) + ID + Модуль + Данные
     const buf = new Uint8Array(6 + bId.length + bMod.length + bPay.length);
     const view = new DataView(buf.buffer);
 
-    // Запись заголовка
+    // Запись метаданных в первые 6 байт
     view.setUint8(0, bId.length);
     view.setUint8(1, bMod.length);
     view.setUint32(2, bPay.length, false);
 
-    // Запись тела
+    // Последовательная запись данных в буфер
     buf.set(bId, 6);
     buf.set(bMod, 6 + bId.length);
     buf.set(bPay, 6 + bId.length + bMod.length);

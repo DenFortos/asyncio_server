@@ -1,19 +1,30 @@
 /* frontend/dashboard/js/modules/ui/sidebar.js */
+
+/* ==========================================================================
+   1. ИНИЦИАЛИЗАЦИЯ ПАНЕЛИ (Sidebar Init)
+========================================================================== */
+
 export function initializeSidebar(callbacks) {
     const toggleBtn = document.getElementById('menuToggle');
     const sidebarIcons = document.querySelectorAll('.sidebar .icon');
 
+    // Переключение видимости боковой панели
     toggleBtn?.addEventListener('click', () => document.body.classList.toggle('sidebar-hidden'));
+
+    /* ==========================================================================
+       2. НАВИГАЦИЯ ПО ВКЛАДКАМ (Tab Navigation)
+    ========================================================================== */
 
     sidebarIcons.forEach(icon => {
         icon.addEventListener('click', () => {
-            // Берем title (например, "Bots", "Files") или данные из атрибута
+            // Определение целевой секции (bots, files, settings)
             const tabName = (icon.getAttribute('title') || icon.dataset.section || 'bots').toLowerCase();
 
+            // Визуальное переключение активного состояния
             sidebarIcons.forEach(i => i.classList.remove('active'));
             icon.classList.add('active');
 
-            // Передаем чистое имя: "bots", "files", "settings"
+            // Уведомление системы о смене вкладки
             if (callbacks?.onTabChange) {
                 callbacks.onTabChange(tabName);
             }

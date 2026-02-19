@@ -1,4 +1,9 @@
-/* SIDEBAR NAVIGATION */
+/* frontend/client_control/css/components.css */
+
+/* ==========================================================================
+   1. НАВИГАЦИОННЫЕ ЭЛЕМЕНТЫ (Sidebar Items)
+========================================================================== */
+
 .nav-item {
     width: 60px;
     height: 60px;
@@ -19,6 +24,7 @@
     background: rgba(255, 255, 255, 0.05);
 }
 
+/** Активный режим (Desktop/Webcam) */
 .nav-item.active {
     color: var(--accent-green);
     border-color: var(--accent-green);
@@ -32,26 +38,26 @@
     letter-spacing: 1px;
 }
 
-/* HEADER CONTROLS */
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+/* ==========================================================================
+   2. УПРАВЛЕНИЕ В ХЕДЕРЕ (Header Action Buttons)
+========================================================================== */
 
+.header-left { display: flex; align-items: center; gap: 15px; }
+
+/** Контекстные группы кнопок */
 .control-group {
-    display: none;
+    display: none; /* Скрыты по умолчанию */
     align-items: center;
     gap: 10px;
 }
 
+/* Показываем кнопки только для активного режима (управляется через JS атрибут) */
 .header[data-active-mode="desktop"] .for-desktop { display: flex; }
 .header[data-active-mode="webcam"] .for-webcam { display: flex; }
 .control-group.global { display: flex; }
 
 .action-btn {
-    width: 38px;
-    height: 38px;
+    width: 38px; height: 38px;
     background: var(--panel-dark);
     border: 1px solid var(--border-bright);
     border-radius: var(--radius);
@@ -62,9 +68,7 @@
     transition: all 0.2s;
 }
 
-.action-btn:hover {
-    border-color: var(--text-main);
-}
+.action-btn:hover { border-color: var(--text-main); }
 
 .action-btn.active {
     color: var(--accent-green);
@@ -74,36 +78,22 @@
 }
 
 .divider {
-    width: 1px;
-    height: 20px;
+    width: 1px; height: 20px;
     background: var(--border-dim);
     margin: 0 5px;
 }
 
-/* HEADER RIGHT (META & STATUS) */
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
+/* ==========================================================================
+   3. ИНФОРМАЦИОННАЯ ПАНЕЛЬ (Meta & Status)
+========================================================================== */
 
-.meta-item {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
+.header-right { display: flex; align-items: center; gap: 25px; }
 
-.meta-label {
-    font-size: 0.6rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-}
+.meta-item { display: flex; flex-direction: column; align-items: flex-end; }
+.meta-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; }
+.meta-value { font-size: 0.85rem; font-weight: 600; }
 
-.meta-value {
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
+/** Капсула статуса онлайн/офлайн */
 .status-capsule {
     display: flex;
     align-items: center;
@@ -114,15 +104,10 @@
     background: rgba(255, 255, 255, 0.02);
 }
 
-.status-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
-}
+.status-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 8px; height: 8px;
     border-radius: 50%;
     background-color: #222;
     transition: all 0.4s ease;
@@ -133,7 +118,11 @@
     box-shadow: 0 0 10px var(--accent-green);
 }
 
-/* OVERLAYS & UTILS */
+/* ==========================================================================
+   4. СЛУЖЕБНЫЕ ОВЕРЛЕИ (Overlays & Utils)
+========================================================================== */
+
+/** Заглушка, когда стрим не запущен */
 .stream-overlay {
     position: absolute;
     inset: 0;
@@ -149,27 +138,24 @@
 
 .stream-overlay i { font-size: 2rem; }
 
+/** Кнопка перехода в полноэкранный режим */
 .fullscreen-btn {
     position: absolute;
-    bottom: 20px;
-    right: 20px;
+    bottom: 20px; right: 20px;
     z-index: 30;
-    width: 44px;
-    height: 44px;
+    width: 44px; height: 44px;
     background: rgba(0, 0, 0, 0.6);
     border: 1px solid var(--border-dim);
     border-radius: var(--radius);
     color: var(--text-main);
-    opacity: 0;
+    opacity: 0; /* Появляется при наведении на рабочую область */
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.workspace:hover .fullscreen-btn {
-    opacity: 1;
-}
+.workspace:hover .fullscreen-btn { opacity: 1; }
 
 .fullscreen-btn:hover {
     color: var(--accent-green);

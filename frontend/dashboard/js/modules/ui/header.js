@@ -1,4 +1,9 @@
 /* frontend/dashboard/js/modules/ui/header.js */
+
+/* ==========================================================================
+   1. УПРАВЛЕНИЕ ФОНОМ (Background Management)
+========================================================================== */
+
 const BG_LIST = ['bg1', 'bg2', 'bg3', 'bg4'];
 
 export const setBackground = (p) => {
@@ -9,9 +14,11 @@ export const setBackground = (p) => {
 const savedBg = localStorage.getItem('selectedBackground');
 if (savedBg) setBackground(savedBg);
 
-/** * Управляет состоянием кнопок при смене вкладок.
- * Эта функция теперь только ставит маркер (класс disabled).
- */
+/* ==========================================================================
+   2. КОНТЕКСТ И ФИЛЬТРАЦИЯ (Context & Filters)
+========================================================================== */
+
+/** Управляет состоянием кнопок при смене вкладок */
 export const updateHeaderContext = (tabName) => {
     const isBots = tabName === 'bots';
     const controls = document.querySelectorAll('#toggleView, .stat-box.clickable');
@@ -23,6 +30,7 @@ export const updateHeaderContext = (tabName) => {
 
 export const applyStatusFilter = (c, f) => (!f || f === 'all') ? c : c.filter(i => i.status === f);
 
+/** Визуальное обновление активных фильтров в UI */
 export const setActiveFilterUI = (f, isGrid) => {
     document.querySelectorAll('.stat-box.clickable, #toggleView').forEach(el => {
         const type = el.id.replace('filter-', '');
@@ -34,12 +42,15 @@ export const setActiveFilterUI = (f, isGrid) => {
             el.classList.toggle('active', type === f);
         }
 
-        // Применяем состояние через стили (лучше перенести в .locked класс в CSS)
         el.style.opacity = locked ? '0.4' : '1';
         el.style.pointerEvents = locked ? 'none' : 'auto';
         el.style.filter = locked ? 'grayscale(1)' : 'none';
     });
 };
+
+/* ==========================================================================
+   3. СТАТИСТИКА (Header Stats)
+========================================================================== */
 
 export const updateHeaderStats = (stats) => {
     const ids = { online: 'online-count', total: 'total-count', offline: 'offline-count' };
@@ -48,6 +59,10 @@ export const updateHeaderStats = (stats) => {
         if (el) el.textContent = stats[k] || 0;
     });
 };
+
+/* ==========================================================================
+   4. ИНИЦИАЛИЗАЦИЯ И СОБЫТИЯ (Init & Listeners)
+========================================================================== */
 
 export function initializeHeader(callbacks) {
     const modal = document.getElementById('bgModal');

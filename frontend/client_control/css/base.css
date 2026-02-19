@@ -1,26 +1,36 @@
+/* frontend/client_control/css/base.css */
+
+/* ==========================================================================
+   1. СИСТЕМНЫЕ ПЕРЕМЕННЫЕ (Terminal Palette)
+========================================================================== */
+
 :root {
-    /* Палитра терминала */
+    /* Цветовая схема "Matrix/Void" */
     --bg-black: #000000;
     --panel-dark: #0a0a0a;
     --border-dim: #222222;
     --border-bright: #444444;
 
-    /* Акценты */
+    /* Функциональные акценты */
     --accent-green: #00ff41;
     --accent-green-dim: rgba(0, 255, 65, 0.1);
     --accent-red: #ff3333;
 
-    /* Текст */
+    /* Типографика */
     --text-main: #ffffff;
     --text-muted: #666666;
     --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 
-    /* Геометрия */
+    /* Геометрия интерфейса */
     --sidebar-width: 80px;
     --header-height: 60px;
     --radius: 8px;
     --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ==========================================================================
+   2. ГЛОБАЛЬНЫЙ СБРОС (Global Reset)
+========================================================================== */
 
 * {
     margin: 0;
@@ -37,9 +47,10 @@ body {
     width: 100vw;
     overflow: hidden;
     line-height: 1.5;
-    display: flex;
+    display: flex; /* Сайдбар и основной контент в ряд */
 }
 
+/* Элементы управления */
 button {
     background: none;
     border: none;
@@ -49,20 +60,26 @@ button {
 }
 
 i {
-    pointer-events: none;
+    pointer-events: none; /* Чтобы клик не "застревал" на иконке внутри кнопки */
 }
 
-/* Стилизация скроллбара */
+/* ==========================================================================
+   3. КАСТОМНЫЙ СКРОЛЛ (Minimalist Scrollbar)
+========================================================================== */
+
 ::-webkit-scrollbar {
     width: 4px;
 }
+
 ::-webkit-scrollbar-track {
     background: var(--bg-black);
 }
+
 ::-webkit-scrollbar-thumb {
     background: var(--border-bright);
     border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-green);
 }

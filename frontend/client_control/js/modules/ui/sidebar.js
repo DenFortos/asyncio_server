@@ -1,41 +1,49 @@
 /* frontend/client_control/js/modules/ui/sidebar.js */
 
+/* ==========================================================================
+   1. ИНИЦИАЛИЗАЦИЯ САЙДБАРА (Sidebar Init)
+========================================================================== */
+
 export function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     const header = document.getElementById('header');
 
-    // 1. Сворачивание / Разворачивание меню
+    // Переключение видимости меню
     document.getElementById('sidebarToggle')?.addEventListener('click', (e) => {
         e.stopPropagation();
         sidebar?.classList.toggle('hidden');
-        // Даем время на анимацию, затем уведомляем систему о пересчете размеров (для Canvas)
+
+        // Пересчет размеров Canvas после завершения анимации CSS
         setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
     });
 
-    // 2. Переключение режимов (Desktop / Webcam)
+    /* ==========================================================================
+       2. ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ ПРОСМОТРА (View Switching)
+    ========================================================================== */
+
     document.querySelectorAll('.nav-item').forEach(item => {
         item.onclick = () => {
             const mode = item.dataset.target;
             if (!mode) return;
 
-            // Смена активных классов в навигации
+            // Визуальное обновление навигации
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
 
-            // Устанавливаем режим в хедере (для CSS стилей)
+            // Обновление атрибута хедера (для контекстных стилей CSS)
             if (header) header.dataset.activeMode = mode;
 
-            // Переключение видимости панелей (view-desktop, view-webcam)
+            // Переключение панелей (Desktop / Webcam)
             document.querySelectorAll('.view-panel').forEach(p =>
                 p.classList.toggle('active', p.id === `view-${mode}`)
             );
 
-            // Оркестрация ресурсов (выключение стрима другой вкладки)
+            // Авто-очистка ресурсов (выключаем старый поток при переходе в новый)
             if (window.syncModeResources) {
                 window.syncModeResources(mode);
             }
 
-            // Триггер для подстройки размеров Canvas под новое окно
+            // Глобальный триггер изменения размера для корректного масштабирования стрима
             window.dispatchEvent(new Event('resize'));
         };
     });

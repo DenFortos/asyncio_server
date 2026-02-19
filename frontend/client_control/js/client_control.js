@@ -1,18 +1,34 @@
 /* frontend/client_control/js/client_control.js */
 
+/* ==========================================================================
+   ТОЧКА ВХОДА (Main Entry Point)
+   ========================================================================== */
+
 import { AppState } from './modules/core/states.js';
 import { initSidebar } from './modules/ui/sidebar.js';
-import { initHeaderControls } from './modules/ui/header.js'; // Создадим его сейчас
+import { initHeaderControls } from './modules/ui/header.js';
 import { initControlConnection } from './modules/websocket/connection.js';
 
+/**
+ * Инициализация контрольной панели
+ * Запускается строго после загрузки DOM
+ */
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Сброс состояния (уже включает визуальный сброс)
+
+    /* 1. ПОДГОТОВКА (Initialization) */
+    // Сбрасываем старые состояния и очищаем UI перед новой сессией
     AppState.reset();
 
-    // 2. Инициализация UI
-    initSidebar();        // Переключает вкладки и сворачивает боковое меню
-    initHeaderControls(); // Привязывает клики к кнопкам в шапке (Start Stream и т.д.)
+    /* 2. ИНТЕРФЕЙС (User Interface) */
+    // Включаем логику бокового меню (навигация Desktop/Webcam)
+    initSidebar();
 
-    // 3. Сеть
-    initControlConnection(); // Подключает сокет
+    // Активируем кнопки управления в шапке (Stream, Control, Mic)
+    initHeaderControls();
+
+    /* 3. СЕТЕВОЙ СЛОЙ (Networking) */
+    // Устанавливаем WebSocket соединение и запускаем Watchdog
+    initControlConnection();
+
+    console.log(`[Control] Dashboard initialized for Client: ${AppState.clientId}`);
 });
