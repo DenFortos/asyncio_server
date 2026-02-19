@@ -1,4 +1,3 @@
-/* frontend/client_control/js/modules/ui/header.js */
 import { AppState } from '../core/states.js';
 
 export function initHeaderControls() {
@@ -11,14 +10,14 @@ export function initHeaderControls() {
     ];
 
     const toggleAction = (action, forceState = null) => {
-        const { id, ref, key, mod, cmds } = action;
-        const btn = document.getElementById(id);
+        const btn = document.getElementById(action.id);
+        const newState = (forceState !== null) ? forceState : !action.ref[action.key];
 
-        ref[key] = (forceState !== null) ? forceState : !ref[key];
-        btn?.classList.toggle('active', ref[key]);
+        action.ref[action.key] = newState;
+        if (btn) btn.classList.toggle('active', newState);
 
         if (window.sendToBot) {
-            window.sendToBot(mod, ref[key] ? cmds[0] : cmds[1]);
+            window.sendToBot(action.mod, newState ? action.cmds[0] : action.cmds[1]);
         }
     };
 

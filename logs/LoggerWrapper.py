@@ -1,5 +1,7 @@
+# logs/LoggerWrapper.py
+
+import sys
 from loguru import logger as _logger
-from typing import Optional
 
 class Log:
     @staticmethod
@@ -7,23 +9,25 @@ class Log:
         """Настраивает логгер для записи в файл и консоль."""
         _logger.remove()
 
-        # Запись в файл
+        # 1. Запись в файл (БЕЗ цветовых кодов, чтобы файл был чистым)
         _logger.add(
             log_file_path,
             format="{time:HH:mm:ss} | {level:8} | {message}",
             level="DEBUG",
-            enqueue=True,  # Оставляем для безопасности при записи из разных корутин
+            enqueue=True,
+            colorize=False  # Файлу цвета не нужны
         )
 
-        # Вывод в консоль (опционально, если хочешь видеть логи в терминале)
+        # 2. Вывод в консоль (через стандартный обработчик loguru)
+        # Мы используем sys.stderr (стандарт для логов) вместо print
         _logger.add(
-            lambda msg: print(msg, end=""),
-            format="<green>{time:HH:mm:ss}</green> | <level>{level:8}</level> | {message}",
+            sys.stderr,
+            format="<green>{time:HH:mm:ss}</green> | <level>{level:7}</level> | {message}",
             level="INFO",
-            colorize=True
+            colorize=True, # Loguru сама поймет, если терминал не поддерживает цвета
+            enqueue=True
         )
 
-    # Старые методы очереди нам больше не нужны, но мы оставляем обертки для совместимости
     @staticmethod
     async def start_queue_listener(queue=None):
         """Больше не требуется, оставлен для совместимости интерфейса."""

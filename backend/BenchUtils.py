@@ -2,44 +2,47 @@ import asyncio
 import time
 from logs.LoggerWrapper import Log as logger
 
-# глобальные счётчики
 _total_bytes = 0
-_start_time = None
 
 
 def add_bytes(n: int):
-    """Вызывается из client_handler при получении чанка"""
-    global _total_bytes, _start_time
-    if _start_time is None:
-        _start_time = time.time()
+    global _total_bytes
     _total_bytes += n
 
 
 async def _print_stats(interval: int = 1):
-    """Фоновая задача для печати статистики только при наличии трафика"""
-    global _total_bytes, _start_time
+    global _total_bytes
     prev_bytes = 0
-    prev_time = time.time()
+    # Фиксируем время ровно перед началом цикла
+    last_check_time = time.perf_counter()
 
     while True:
         await asyncio.sleep(interval)
-        now = time.time()
-        elapsed = now - prev_time
-        if elapsed <= 0:
-            continue
 
-        new_bytes = _total_bytes - prev_bytes
-        if new_bytes == 0:
-            # нет трафика — не спамим
-            continue
+        # Используем perf_counter для сверхточных замеров времени
+        now = time.perf_counter()
+        elapsed = now - last_check_time
 
-        mbps = (new_bytes * 8) / (elapsed * 1024 * 1024)
-        logger.info(f"[BENCH] {new_bytes} bytes in {elapsed:.2f}s -> {mbps:.2f} Mbit/s")
+        current_total = _total_bytes
+        new_bytes = current_total - prev_bytes
 
-        prev_bytes = _total_bytes
-        prev_time = now
+        if new_bytes > 0:
+            # (Байты * 8 бит) / (секунды * 1024 * 1024) = Mbit/s
+            mbps = (new_bytes * 8) / (elapsed * 1024 * 1024)
+
+            # Если байт мало (меньше 1 КБ), пишем в байтах, если много — в КБ или МБ
+            if new_bytes < 1024:
+                size_str = f"{new_bytes} B"
+            elif new_bytes < 1024 * 1024:
+                size_str = f"{new_bytes / 1024:.1f} KB"
+            else:
+                size_str = f"{new_bytes / (1024 * 1024):.2f} MB"
+
+            logger.info(f"[BENCH] {size_str} in {elapsed:.2f}s -> {mbps:.2f} Mbit/s")
+
+        prev_bytes = current_total
+        last_check_time = now
 
 
 def start_benchmark(loop: asyncio.AbstractEventLoop, interval: int = 1):
-    """Запускает задачу в event loop для печати статистики"""
     loop.create_task(_print_stats(interval))

