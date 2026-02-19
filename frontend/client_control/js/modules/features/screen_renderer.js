@@ -1,59 +1,99 @@
 /* frontend/client_control/js/modules/features/screen_renderer.js */
 
 let jmuxer = null;
-let lastLogTime = 0;
+let isJpegMode = null;
+let packetCount = 0;
 
-export async function renderScreenRGBA(payload) {
-    // 1. Проверяем наличие данных. Минимум 4 байта TS + хотя бы 1 байт видео
-    if (payload.byteLength < 5) {
-        console.warn("[RENDER] Слишком маленький пакет:", payload.byteLength);
-        return;
+export function resetRenderer() {
+    console.log("♻️ [Renderer] Сброс плеера");
+    if (jmuxer) {
+        try { jmuxer.destroy(); } catch (e) {}
+        jmuxer = null;
+    }
+    const video = document.getElementById('desktopVideo');
+    if (video) {
+        video.pause();
+        video.src = "";
+        video.load();
+        video.style.display = 'none';
+        video.playbackRate = 1.0; // Сброс скорости
+    }
+    const overlay = document.getElementById('desktopOverlay');
+    if (overlay) overlay.style.display = 'flex';
+    isJpegMode = null;
+    packetCount = 0;
+}
+
+export async function renderScreenRGBA(cleanPayload) {
+    if (!cleanPayload || cleanPayload.byteLength < 10) return;
+
+    const videoData = new Uint8Array(cleanPayload);
+    packetCount++;
+
+    const video = document.getElementById('desktopVideo');
+    const overlay = document.getElementById('desktopOverlay');
+
+    if (isJpegMode === null) {
+        isJpegMode = (videoData[0] === 0xFF && videoData[1] === 0xD8);
+        console.log("🛠 [Renderer] Формат:", isJpegMode ? "MJPEG" : "H264");
     }
 
-    const videoElement = document.getElementById('desktopVideo');
-    const overlay = document.querySelector('#view-desktop .stream-overlay');
-
-    // 2. Инициализируем JMuxer один раз при первом кадре
-    if (!jmuxer) {
-        videoElement.style.display = 'block';
-        if (overlay) overlay.style.display = 'none';
-
-        jmuxer = new JMuxer({
+    if (!isJpegMode && !jmuxer) {
+        if (!window.JMuxer) {
+            console.error("❌ JMuxer не найден в window");
+            return;
+        }
+        jmuxer = new window.JMuxer({
             node: 'desktopVideo',
             mode: 'video',
-            fps: 30,
-            flushingTime: 0,
+            fps: 60,
+            flushingTime: 0,     // Мгновенный вывод без ожидания
             clearBuffer: true,
-            debug: false // Поставь true, если хочешь видеть внутренние логи самой библиотеки
+            onReady: () => console.log("✅ [JMuxer] Декодер готов"),
+            onError: (err) => console.error("❌ [JMuxer Error]:", err)
         });
-        console.log("[RENDER] JMuxer initialized for H.264");
     }
 
-    try {
-        const view = new DataView(payload);
+    if (video && video.style.display === 'none') {
+        video.style.display = 'block';
+        if (overlay) overlay.style.display = 'none';
+    }
 
-        // 3. Извлекаем таймстемп (первые 4 байта)
-        const serverTs = view.getUint32(0, false);
-
-        // Вычисляем задержку (необязательно, для теста)
-        const now = Date.now() & 0xFFFFFFFF;
-        const latency = now - serverTs;
-
-        // 4. Извлекаем само видео (все что после 4-го байта)
-        const videoPart = new Uint8Array(payload.slice(4));
-
-        // 5. Логируем получение данных (не каждый кадр, чтобы не спамить, а раз в секунду)
-        if (Date.now() - lastLogTime > 1000) {
-            console.debug(`[RENDER] Поток идет. Размер видео-части: ${videoPart.length} байт. Задержка сети: ${latency}ms`);
-            lastLogTime = Date.now();
+    if (!isJpegMode && jmuxer) {
+        // Контрольный HEX
+        if (packetCount % 200 === 0 || packetCount < 3) {
+            console.log(`🔍 [Check] Packet #${packetCount} HEX:`,
+                Array.from(videoData.slice(0, 5)).map(b => b.toString(16).padStart(2, '0')).join(' '));
         }
 
-        // 6. Отправляем в плеер
-        jmuxer.feed({
-            video: videoPart
-        });
+        jmuxer.feed({ video: videoData });
 
-    } catch (err) {
-        console.error("[RENDER] Ошибка при обработке видео-пакета:", err);
+        // --- УМНАЯ СИНХРОНИЗАЦИЯ И ПЛАВНОСТЬ ---
+        if (video && video.buffered.length > 0) {
+            const bufferEnd = video.buffered.end(video.buffered.length - 1);
+            const delta = bufferEnd - video.currentTime;
+
+            // 1. Первичный запуск
+            if (video.paused || video.currentTime === 0) {
+                video.currentTime = bufferEnd;
+                video.play().catch(() => {});
+                return;
+            }
+
+            // 2. Адаптивная скорость (ликвидирует микро-задержки без рывков)
+            // Если отстаем более чем на 100мс — чуть ускоряем видео (на 10%)
+            if (delta > 0.1 && delta < 0.5) {
+                video.playbackRate = 1.1;
+            }
+            // Если отстаем критично — прыгаем в конец
+            else if (delta >= 0.5) {
+                video.currentTime = bufferEnd;
+                video.playbackRate = 1.0;
+            }
+            // Если все в норме — обычная скорость
+            else {
+                video.playbackRate = 1.0;
+            }
+        }
     }
 }

