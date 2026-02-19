@@ -30,5 +30,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Устанавливаем WebSocket соединение и запускаем Watchdog
     initControlConnection();
 
+    /* ==========================================================================
+       4. ЛОГИКА БЕЗОПАСНОГО ЗАВЕРШЕНИЯ (Safe Exit)
+    ========================================================================== */
+
+    /**
+     * Обработка закрытия или перезагрузки страницы (F5 / Close Tab)
+     */
+    window.addEventListener('beforeunload', () => {
+        // Проверяем, жив ли сокет и доступен ли метод отправки
+        if (window.sendToBot && AppState.clientId) {
+            console.log("[Control] Page unload detected. Stopping all streams...");
+
+            // Отправляем форсированный сигнал остановки
+            // Бот при получении session_stop должен немедленно убить все
+            // активные процессы (скриншоты, аудио, видео)
+            window.sendToBot("Heartbeat", "session_stop");
+        }
+    });
+
     console.log(`[Control] Dashboard initialized for Client: ${AppState.clientId}`);
 });
