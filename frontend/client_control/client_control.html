@@ -6,26 +6,12 @@
     <title>SpectralWeb - Client Control</title>
 
     <script src="../auth/auth_check.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/jmuxer@2.0.5/dist/jmuxer.min.js"></script>
 
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        /* Гарантируем, что видео контейнер не схлопнется */
-        #wrapper-desktop {
-            position: relative;
-            background: #000;
-            overflow: hidden;
-            min-height: 400px; /* Чтобы не был нулевой высоты до загрузки */
-        }
-        #desktopVideo {
-            object-fit: contain; /* Чтобы картинка не растягивалась уродливо */
-        }
-    </style>
 </head>
 <body>
 
@@ -48,7 +34,6 @@
 
     <div class="app-main">
         <header class="header" id="header" data-active-mode="desktop">
-
             <div class="header-left">
                 <div class="control-group for-desktop">
                     <button id="btn-desktop-stream" class="action-btn" title="Start/Stop Stream">
@@ -78,16 +63,16 @@
 
             <div class="header-right">
                 <div class="meta-item">
-                    <span class="meta-label">ID:</span>
+                    <span class="meta-label">ID</span>
                     <span id="display-id" class="meta-value">unknown</span>
                 </div>
 
                 <div class="meta-item">
-                    <span class="meta-label">IP:</span>
+                    <span class="meta-label">IP</span>
                     <span id="display-ip" class="meta-value">0.0.0.0</span>
                 </div>
 
-                <div class="meta-item status-wrapper">
+                <div class="status-capsule">
                     <span id="status-text" class="status-label">offline</span>
                     <div id="status-indicator" class="status-dot"></div>
                 </div>
@@ -95,29 +80,20 @@
         </header>
 
         <main class="workspace">
-            <div id="view-desktop" class="view-panel active" data-mode="desktop">
+            <div id="view-desktop" class="view-panel active">
                 <div class="canvas-wrapper" id="wrapper-desktop">
 
-                    <video id="desktopVideo"
-                           autoplay
-                           muted
-                           playsinline
-                           webkit-playsinline
-                           style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 10; background: #000; display: none;">
-                    </video>
+                    <video id="desktopVideo" autoplay muted playsinline></video>
 
-                    <canvas id="desktopCanvas"
-                            style="position: absolute; top: 0; left: 0; z-index: 15; pointer-events: none; width: 100%; height: 100%;">
-                    </canvas>
+                    <canvas id="desktopCanvas"></canvas>
 
-                    <button class="fullscreen-btn" title="Toggle Fullscreen" data-target="wrapper-desktop"
-                            style="z-index: 30; position: absolute; right: 10px; bottom: 10px;">
+                    <button class="fullscreen-btn" title="Toggle Fullscreen" data-target="wrapper-desktop">
                         <i class="fas fa-expand"></i>
                     </button>
 
-                    <div class="stream-overlay" id="desktopOverlay"
-                         style="z-index: 5; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #1a1a1a; color: #666;">
-                        <p><i class="fas fa-ghost" style="margin-right: 10px;"></i> No Desktop Data</p>
+                    <div class="stream-overlay" id="desktopOverlay">
+                        <i class="fas fa-ghost"></i>
+                        <p>No Desktop Data</p>
                     </div>
                 </div>
             </div>

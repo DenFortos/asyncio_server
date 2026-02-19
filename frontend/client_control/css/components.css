@@ -1,15 +1,7 @@
-/* frontend/client_control/css/components.css */
-
-/* ==========================================================================
-   1. САЙДБАР: НАВИГАЦИЯ (Иконки режимов)
-   ========================================================================== */
-
+/* SIDEBAR NAVIGATION */
 .nav-item {
-    /* Жестко фиксируем размер кнопки */
     width: 60px;
-    min-width: 60px;
     height: 60px;
-
     margin: 10px auto;
     display: flex;
     flex-direction: column;
@@ -19,15 +11,18 @@
     border-radius: var(--radius);
     color: var(--text-muted);
     border: 1px solid transparent;
-    position: relative;
-
-    /* Анимируем только визуальные эффекты, но не движение */
-    transition: color 0.2s, background 0.2s, border-color 0.2s;
+    transition: all 0.2s;
 }
 
-.nav-item i {
-    font-size: 1.2rem;
-    pointer-events: none;
+.nav-item:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-item.active {
+    color: var(--accent-green);
+    border-color: var(--accent-green);
+    background: var(--accent-green-dim);
 }
 
 .nav-label {
@@ -35,54 +30,25 @@
     margin-top: 5px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    pointer-events: none;
 }
 
-/* Состояния */
-.nav-item:hover {
-    color: var(--text-main);
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.nav-item.active {
-    color: var(--accent-green) !important;
-    border-color: var(--accent-green) !important;
-    background: var(--accent-green-dim) !important;
-    box-shadow: 0 0 15px var(--accent-green-dim);
-}
-
-
-/* ==========================================================================
-   2. ШАПКА: ГРУППЫ УПРАВЛЕНИЯ (Кнопки действий)
-   ========================================================================== */
-
+/* HEADER CONTROLS */
 .header-left {
     display: flex;
     align-items: center;
-    gap: 0;
+    gap: 15px;
 }
 
 .control-group {
     display: none;
     align-items: center;
     gap: 10px;
-    padding: 0 10px;
 }
 
-/* Логика отображения режимов */
-.header[data-active-mode="desktop"] .for-desktop {
-    display: flex;
-}
+.header[data-active-mode="desktop"] .for-desktop { display: flex; }
+.header[data-active-mode="webcam"] .for-webcam { display: flex; }
+.control-group.global { display: flex; }
 
-.header[data-active-mode="webcam"] .for-webcam {
-    display: flex;
-}
-
-.control-group.global {
-    display: flex;
-}
-
-/* СТИЛЬ КНОПОК */
 .action-btn {
     width: 38px;
     height: 38px;
@@ -93,166 +59,120 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .action-btn:hover {
     border-color: var(--text-main);
-    background: #1a1a1a;
 }
 
-/* ИСПРАВЛЕНО: ЭФФЕКТ ЗАГОРАНИЯ (Active) */
 .action-btn.active {
-    color: var(--accent-green) !important;
-    border-color: var(--accent-green) !important;
-    background: var(--accent-green-dim) !important;
-    box-shadow: 0 0 15px var(--accent-green-dim);
-    text-shadow: 0 0 5px var(--accent-green);
+    color: var(--accent-green);
+    border-color: var(--accent-green);
+    background: var(--accent-green-dim);
+    box-shadow: 0 0 10px var(--accent-green-dim);
 }
 
 .divider {
     width: 1px;
-    height: 24px;
+    height: 20px;
     background: var(--border-dim);
     margin: 0 5px;
 }
 
-
-/* ==========================================================================
-   3. ШАПКА: МЕТАДАННЫЕ И СТАТУС (Инфо-панель)
-   ========================================================================== */
-
+/* HEADER RIGHT (META & STATUS) */
 .header-right {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 25px;
 }
 
-/* Общие стили для ID и IP */
 .meta-item {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    min-width: 80px; /* Чтобы контент не смещался при загрузке данных */
 }
 
 .meta-label {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    line-height: 1.2;
 }
 
 .meta-value {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    color: var(--text-main);
 }
 
-/* Контейнер статуса (Капсула) */
-.status-wrapper {
+.status-capsule {
     display: flex;
-    flex-direction: row;
     align-items: center;
     gap: 10px;
     padding: 6px 14px;
     border: 1px solid var(--border-dim);
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.02);
-    transition: border-color var(--transition);
 }
 
-/* Текст статуса */
 .status-label {
-    text-transform: uppercase;
     font-size: 0.7rem;
-    letter-spacing: 1px;
+    text-transform: uppercase;
     color: var(--text-muted);
-    /* Фикс ширины, чтобы "online" и "offline" не двигали соседние элементы */
-    min-width: 55px;
-    text-align: right;
 }
 
-/* Базовое состояние - СТРОГО OFFLINE (Индикатор выключен) */
 .status-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    /* Глубокий серый цвет по умолчанию */
-    background-color: #222222 !important;
-    box-shadow: none !important;
-    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    background-color: #222;
+    transition: all 0.4s ease;
 }
 
-/* Состояние ONLINE - Активируется через JS (.classList.add('online')) */
 .status-dot.online {
-    background-color: var(--accent-green) !important;
-    box-shadow: 0 0 10px var(--accent-green), 0 0 20px rgba(0, 255, 65, 0.2) !important;
+    background-color: var(--accent-green);
+    box-shadow: 0 0 10px var(--accent-green);
 }
 
-/* Опционально: подсвечиваем рамку капсулы, когда бот онлайн */
-.status-dot.online + .status-label {
-    color: var(--text-main);
-}
-
-
-/* ==========================================================================
-   4. РАБОЧАЯ ОБЛАСТЬ: СТРИМ И FULLSCREEN
-   ========================================================================== */
-
+/* OVERLAYS & UTILS */
 .stream-overlay {
     position: absolute;
     inset: 0;
     background: #050505;
     display: flex;
-    flex-direction: column; /* Чтобы иконка и текст были друг под другом */
+    flex-direction: column;
     gap: 15px;
     align-items: center;
     justify-content: center;
-    z-index: 15; /* Выше видео */
+    z-index: 5;
     color: var(--text-muted);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    transition: opacity 0.5s ease;
 }
 
-/* Когда JS удаляет оверлей, делаем это плавно */
-.stream-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
+.stream-overlay i { font-size: 2rem; }
 
-/* Кнопка развертывания (Fullscreen) */
 .fullscreen-btn {
     position: absolute;
     bottom: 20px;
     right: 20px;
-    z-index: 25; /* Самый верхний слой */
+    z-index: 30;
     width: 44px;
     height: 44px;
-    background: rgba(10, 10, 10, 0.7);
-    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.6);
     border: 1px solid var(--border-dim);
     border-radius: var(--radius);
     color: var(--text-main);
     opacity: 0;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
 }
 
-/* Показываем кнопку при наведении на рабочую область */
 .workspace:hover .fullscreen-btn {
     opacity: 1;
 }
 
 .fullscreen-btn:hover {
-    border-color: var(--accent-green);
     color: var(--accent-green);
-    transform: scale(1.05);
+    border-color: var(--accent-green);
+    transform: scale(1.1);
 }

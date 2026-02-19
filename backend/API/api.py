@@ -76,59 +76,43 @@ class ConnectionManager:
         logger.info(f"[API] [-] {login} отключен, ресурсы очищены.")
 
     def broadcast_packet_sync(self, packet: bytes):
-        """Рассылка бинарных данных. При переполнении (видео) — полная очистка затора."""
         try:
+            # Извлекаем метаданные пакета
             id_len = packet[0]
             mod_len = packet[1]
-            raw_id = packet[6:6 + id_len]
-
-            # Извлекаем имя модуля для определения видеопотока
-            # ... извлечение имен ...
             mod_name_raw = packet[6 + id_len: 6 + id_len + mod_len].decode(errors='ignore').strip()
             is_video = "ScreenWatch" in mod_name_raw
 
-            # ДОБАВЬ ЭТОТ ПРИНТ:
-            if is_video:
-                print(f"🎬 [VIDEO] Пакет ScreenWatch прошел! Размер: {len(packet)} байт")
-            else:
-                print(f"❓ [OTHER] Модуль: {mod_name_raw}")
-
-            if raw_id not in self.bot_prefix_cache:
+            raw_id = packet[6:6 + id_len]
+            prefix = self.bot_prefix_cache.get(raw_id)
+            if not prefix:
                 bot_id = raw_id.decode(errors='ignore')
-                self.bot_prefix_cache[raw_id] = bot_id.split('-')[0]
-
-            prefix = self.bot_prefix_cache[raw_id]
+                prefix = bot_id.split('-')[0]
+                self.bot_prefix_cache[raw_id] = prefix
 
             targets = []
-            if prefix in self.tunnels:
-                targets.extend(self.tunnels[prefix])
-            if "ALL" in self.tunnels:
-                targets.extend(self.tunnels["ALL"])
-
-            if not targets:
-                return
+            if prefix in self.tunnels: targets.extend(self.tunnels[prefix])
+            if "ALL" in self.tunnels: targets.extend(self.tunnels["ALL"])
 
             for ws in targets:
                 queue = self.queues.get(ws)
                 if not queue: continue
 
                 try:
-                    queue.put_nowait(packet)
-                except asyncio.QueueFull:
-                    # КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ:
-                    # Если это видео, то выбрасывать один пакет нельзя (будет каша).
-                    # Мы полностью чистим очередь, чтобы "прыгнуть" к самому новому кадру.
                     if is_video:
-                        print(f"DEBUG: Отправляю видео-кадр ({len(packet)} байт)")
+                        # АГРЕССИВНАЯ ОЧИСТКА:
+                        # Если пришло новое видео, а старое еще не ушло —
+                        # выкидываем ВСЁ старое из очереди. Нам нужен только реалтайм.
                         while not queue.empty():
                             try:
                                 queue.get_nowait()
-                            except:
+                            except asyncio.QueueEmpty:
                                 break
-                        queue.put_nowait(packet)
-                    else:
-                        # Для обычных команд (не видео) просто игнорируем переполнение
-                        pass
+
+                    queue.put_nowait(packet)
+                except asyncio.QueueFull:
+                    # Если даже после очистки очередь полная (бывает при лаге воркера)
+                    pass
         except Exception:
             pass
 
