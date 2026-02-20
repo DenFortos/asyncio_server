@@ -1,53 +1,44 @@
 /* frontend/client_control/js/client_control.js */
 
 /* ==========================================================================
-   ТОЧКА ВХОДА (Main Entry Point)
+   1. ИМПОРТ МОДУЛЕЙ
    ========================================================================== */
-
 import { AppState } from './modules/core/states.js';
 import { initSidebar } from './modules/ui/sidebar.js';
 import { initHeaderControls } from './modules/ui/header.js';
 import { initControlConnection } from './modules/websocket/connection.js';
+import { initInputHandlers } from './modules/features/input_handler.js'; // Добавлен InputForge
 
-/**
- * Инициализация контрольной панели
- * Запускается строго после загрузки DOM
- */
+/* ==========================================================================
+   2. ТОЧКА ВХОДА (DOMContentLoaded)
+   ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* 1. ПОДГОТОВКА (Initialization) */
-    // Сбрасываем старые состояния и очищаем UI перед новой сессией
+    /* --- ПОДГОТОВКА --- */
     AppState.reset();
 
-    /* 2. ИНТЕРФЕЙС (User Interface) */
-    // Включаем логику бокового меню (навигация Desktop/Webcam)
+    /* --- ИНТЕРФЕЙС --- */
     initSidebar();
-
-    // Активируем кнопки управления в шапке (Stream, Control, Mic)
     initHeaderControls();
 
-    /* 3. СЕТЕВОЙ СЛОЙ (Networking) */
-    // Устанавливаем WebSocket соединение и запускаем Watchdog
+    /* --- СЕТЕВОЙ СЛОЙ --- */
     initControlConnection();
 
+    /* --- УПРАВЛЕНИЕ (InputForge) --- */
+    // Передаем глобальную функцию отправки пакетов в обработчик ввода
+    initInputHandlers((mod, pay) => {
+        if (window.sendToBot) window.sendToBot(mod, pay);
+    });
+
     /* ==========================================================================
-       4. ЛОГИКА БЕЗОПАСНОГО ЗАВЕРШЕНИЯ (Safe Exit)
-    ========================================================================== */
-
-    /**
-     * Обработка закрытия или перезагрузки страницы (F5 / Close Tab)
-     */
+       3. БЕЗОПАСНОСТЬ (Safe Exit)
+       ========================================================================== */
     window.addEventListener('beforeunload', () => {
-        // Проверяем, жив ли сокет и доступен ли метод отправки
         if (window.sendToBot && AppState.clientId) {
-            console.log("[Control] Page unload detected. Stopping all streams...");
-
-            // Отправляем форсированный сигнал остановки
-            // Бот при получении session_stop должен немедленно убить все
-            // активные процессы (скриншоты, аудио, видео)
+            console.log("[Control] Stop signal sent via Heartbeat");
             window.sendToBot("Heartbeat", "session_stop");
         }
     });
 
-    console.log(`[Control] Dashboard initialized for Client: ${AppState.clientId}`);
+    console.log(`[Control] Dashboard ready | Client: ${AppState.clientId}`);
 });

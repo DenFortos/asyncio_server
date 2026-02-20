@@ -5,7 +5,17 @@
         "user": "Manager_John",
         "pc_name": "OFFICE-PC-01",
         "activeWindow": "Dashboard",
-        "last_active": "02:29:44",
+        "last_active": "17:32:31",
+        "ip": "127.0.0.1",
+        "auth_key": "super_secret"
+    },
+    "u80a9-Bot-Worker": {
+        "id": "u80a9-Bot-Worker",
+        "loc": "US",
+        "user": "Manager_John",
+        "pc_name": "OFFICE-PC-01",
+        "activeWindow": "Dashboard",
+        "last_active": "04:16:05",
         "ip": "127.0.0.1",
         "auth_key": "super_secret"
     }

@@ -119,36 +119,40 @@
 }
 
 /* ==========================================================================
-   4. СЛУЖЕБНЫЕ ОВЕРЛЕИ (Overlays & Utils)
+   4. СЛУЖЕБНЫЕ ОВЕРЛЕИ (Исправлено перекрытие)
 ========================================================================== */
 
-/** Заглушка, когда стрим не запущен */
 .stream-overlay {
     position: absolute;
     inset: 0;
-    background: #050505;
-    display: flex;
+    background: #0a0a0a;
+    display: flex; /* По умолчанию виден */
     flex-direction: column;
-    gap: 15px;
     align-items: center;
     justify-content: center;
-    z-index: 5;
+    z-index: 15; /* Между видео и канвасом */
     color: var(--text-muted);
 }
 
-.stream-overlay i { font-size: 2rem; }
+/* Когда видео активно, мы будем скрывать оверлей через JS */
+.stream-overlay.hidden {
+    display: none !important;
+}
 
-/** Кнопка перехода в полноэкранный режим */
+.stream-overlay i { font-size: 2.5rem; color: var(--accent-green-dim); }
+
 .fullscreen-btn {
     position: absolute;
-    bottom: 20px; right: 20px;
+    bottom: 20px;
+    right: 20px;
     z-index: 30;
-    width: 44px; height: 44px;
-    background: rgba(0, 0, 0, 0.6);
+    width: 44px;
+    height: 44px;
+    background: rgba(20, 20, 20, 0.8);
     border: 1px solid var(--border-dim);
     border-radius: var(--radius);
     color: var(--text-main);
-    opacity: 0; /* Появляется при наведении на рабочую область */
+    opacity: 0;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -156,9 +160,3 @@
 }
 
 .workspace:hover .fullscreen-btn { opacity: 1; }
-
-.fullscreen-btn:hover {
-    color: var(--accent-green);
-    border-color: var(--accent-green);
-    transform: scale(1.1);
-}

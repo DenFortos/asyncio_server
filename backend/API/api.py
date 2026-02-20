@@ -187,11 +187,12 @@ async def auth(action: str, data=Body(...)):
 
 
 # ==========================================
-# БЛОК 5: REAL-TIME HUB (WEBSOCKET)
+# БЛОК 5: REAL-TIME HUB (WEBSOCKET) - OPTIMIZED FOR CONTROL
 # ==========================================
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket, token: str = Query(None), login: str = Query(None),
                              mode: str = Query(None)):
+    # 1. Первичная авторизация (остается как была)
     user_login = get_login_by_token(token)
     if not user_login or user_login != login:
         await ws.accept()
@@ -200,36 +201,53 @@ async def websocket_endpoint(ws: WebSocket, token: str = Query(None), login: str
     user = load_db().get(user_login)
     await manager.connect(ws, user_login, user)
 
+    # 2. КЭШ ДОСТУПА (Туннель "Админ -> Бот")
+    # Чтобы не дергать БД на каждый чих мышки
+    allowed_bots_cache = set()
+
     try:
-        # Инициализация списка ботов из БД
         if mode != "control":
+            # Логика списка ботов (Dashboard)
             bots = load_bots_from_file()
             for bid, data in bots.items():
                 if has_access(user, bid):
-                    # Отправляем данные из БД и сразу пингуем бота для обновления
                     await ws.send_bytes(pack_bot_command(bid, "DataScribe", json.dumps(data)))
                     asyncio.create_task(send_binary_to_bot(bid, pack_bot_command(bid, "DataScribe", "get_metadata")))
+        else:
+            # Режим управления (Control Panel)
+            logger.info(f"[WS] {user_login} вошел в режим прямого управления")
 
         while True:
             msg = await ws.receive()
             if "bytes" in msg:
                 pkt = msg["bytes"]
-                if len(pkt) < 6: continue
+                if len(pkt) < 7: continue  # Минимальный заголовок + 1 байт ID
 
-                target_id = pkt[6:6 + pkt[0]].decode(errors='ignore').strip()
+                # Извлекаем ID цели из пакета
+                id_len = pkt[0]
+                target_id = pkt[6:6 + id_len].decode(errors='ignore').strip()
 
-                # Игнорируем пустые ID (системный пинг от фронтенда)
                 if not target_id: continue
 
-                if has_access(user, target_id):
-                    # ЛОГ 1: Отправка команды от админа конкретному боту
-                    logger.info(f"[WS] UI -> Bot: {target_id} | Pkt: {len(pkt)} bytes")
+                # ПРОВЕРКА ЧЕРЕЗ КЭШ (Быстрый туннель)
+                if target_id not in allowed_bots_cache:
+                    if has_access(user, target_id):
+                        allowed_bots_cache.add(target_id)
+                    else:
+                        continue  # Нет доступа — игнорируем пакет
 
-                    if not await send_binary_to_bot(target_id, pkt):
-                        logger.warning(f"[WS] Bot {target_id} offline")
+                # МГНОВЕННАЯ ПЕРЕСЫЛКА
+                # Здесь не нужно логировать каждое движение мыши,
+                # иначе лог забьет диск за 5 минут.
+                is_input = b"InputForge" in pkt  # Проверяем, не команда ли это управления
+
+                if not is_input:
+                    logger.info(f"[WS] UI -> Bot: {target_id} | {len(pkt)} bytes")
+
+                # Отправляем в TCP туннель бота
+                await send_binary_to_bot(target_id, pkt)
 
     except Exception as e:
-        # ЛОГ 2: Системный лог отключения или ошибки сессии
         logger.info(f"[WS] Session closed for {user_login}: {e}")
     finally:
         manager.disconnect(ws, user_login)

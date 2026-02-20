@@ -6,9 +6,9 @@
 
 let jmuxer = null;
 let isJpegMode = null;
-let packetCount = 0;
 
 const video = document.getElementById('desktopVideo');
+const canvas = document.getElementById('desktopCanvas'); // Добавлено для синхронизации управления
 const overlay = document.getElementById('desktopOverlay');
 
 /* ==========================================================================
@@ -22,9 +22,10 @@ export function resetRenderer() {
         video.src = "";
         video.style.display = 'none';
     }
-    if (overlay) overlay.style.display = 'flex';
+    // Используем класс hidden вместо прямого style.display
+    if (overlay) overlay.classList.remove('hidden');
+
     isJpegMode = null;
-    packetCount = 0;
 }
 
 /* ==========================================================================
@@ -35,13 +36,13 @@ export async function renderScreenRGBA(cleanPayload) {
     if (!cleanPayload || cleanPayload.byteLength < 10) return;
     const videoData = new Uint8Array(cleanPayload);
 
-    // Автоматическое определение формата (MJPEG vs H264) по сигнатуре первых байт
+    // Определение формата (MJPEG vs H264)
     if (isJpegMode === null) {
         isJpegMode = (videoData[0] === 0xFF && videoData[1] === 0xD8);
         console.log("🛠 [Renderer] Mode:", isJpegMode ? "MJPEG" : "H264");
     }
 
-    // Инициализация аппаратного декодера JMuxer для H264
+    // Инициализация JMuxer для H264
     if (!isJpegMode && !jmuxer) {
         jmuxer = new window.JMuxer({
             node: 'desktopVideo',
@@ -52,14 +53,26 @@ export async function renderScreenRGBA(cleanPayload) {
         });
     }
 
-    // Переключение видимости: убираем заглушку, показываем холст
-    if (video.style.display === 'none') {
+    // ПЕРЕКЛЮЧЕНИЕ ВИДИМОСТИ (Синхронизировано с CSS)
+    if (video.style.display === 'none' || video.style.display === '') {
         video.style.display = 'block';
-        if (overlay) overlay.style.display = 'none';
+        if (overlay) overlay.classList.add('hidden'); // Скрываем заглушку через класс
     }
 
     /* ==========================================================================
-       4. СИНХРОНИЗАЦИЯ И ТАЙМИНГИ (Sync & Buffer)
+       4. СИНХРОНИЗАЦИЯ РАЗМЕРОВ (Canvas Sync)
+       Важно для корректных координат мыши InputForge
+    ========================================================================== */
+    if (video.videoWidth > 0 && canvas) {
+        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            console.log(`[Renderer] Sync: Canvas size set to ${canvas.width}x${canvas.height}`);
+        }
+    }
+
+    /* ==========================================================================
+       5. ОБРАБОТКА ПОТОКА (Stream Handling)
     ========================================================================== */
 
     if (!isJpegMode && jmuxer) {
@@ -71,11 +84,11 @@ export async function renderScreenRGBA(cleanPayload) {
 
             if (video.paused) video.play().catch(() => {});
 
-            // WATCHDOG: Если видео начинает отставать от потока данных
+            // WATCHDOG: Минимизация задержки
             if (delta > 0.15 && delta < 1.0) {
-                video.playbackRate = 1.1; // Плавное ускорение
+                video.playbackRate = 1.08; // Чуть быстрее, чтобы догнать поток
             } else if (delta >= 1.0) {
-                video.currentTime = bufferEnd; // Мгновенный прыжок (лаг более 1с)
+                video.currentTime = bufferEnd; // Прыжок при большом лаге
                 video.playbackRate = 1.0;
             } else {
                 video.playbackRate = 1.0;

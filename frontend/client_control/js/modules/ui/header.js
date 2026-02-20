@@ -24,11 +24,26 @@ export function initHeaderControls() {
         const btn = document.getElementById(action.id);
         const newState = (forceState !== null) ? forceState : !action.ref[action.key];
 
-        // Синхронизация состояния и UI
+        // 1. Синхронизация состояния и UI кнопки
         action.ref[action.key] = newState;
         if (btn) btn.classList.toggle('active', newState);
 
-        // Отправка команды через глобальный метод связи
+        // 2. УПРАВЛЕНИЕ КАНВАСОМ (Слой перехвата ввода)
+        // Если переключаем режим управления десктопом, меняем кликабельность канваса
+        if (action.id === 'btn-desktop-control') {
+            const canvas = document.getElementById('desktopCanvas');
+            if (canvas) {
+                if (newState) {
+                    canvas.classList.add('control-active');
+                    console.log("[Header] InputForge activated: Canvas is now intercepting events");
+                } else {
+                    canvas.classList.remove('control-active');
+                    console.log("[Header] InputForge deactivated: Canvas is transparent");
+                }
+            }
+        }
+
+        // 3. Отправка команды через глобальный метод связи
         if (window.sendToBot) {
             window.sendToBot(action.mod, newState ? action.cmds[0] : action.cmds[1]);
         }
@@ -44,7 +59,6 @@ export function initHeaderControls() {
        3. ОРКЕСТРАЦИЯ РЕСУРСОВ (Resource Sync)
     ========================================================================== */
 
-    /** Выключает активные стримы при смене вкладок для экономии трафика */
     window.syncModeResources = (mode) => {
         if (mode === 'webcam') {
             if (AppState.desktop.observe) toggleAction(actions[0], false);
