@@ -160,3 +160,25 @@
 }
 
 .workspace:hover .fullscreen-btn { opacity: 1; }
+
+.fullscreen-btn:hover {
+    background: var(--panel-dark);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+    transform: scale(1.05);
+}
+
+/* Класс, который мы будем вешать через JS при активации FS */
+.fullscreen-btn.active {
+    background: var(--accent-green-dim);
+    color: var(--accent-green);
+    border-color: var(--accent-green);
+}
+
+/* Улучшаем видимость в фуллскрине */
+.app-main:fullscreen .fullscreen-btn {
+    bottom: 30px; /* Сдвигаем чуть выше от края */
+    right: 30px;
+    background: rgba(10, 10, 10, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+}

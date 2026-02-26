@@ -6,8 +6,9 @@
 import { AppState } from './modules/core/states.js';
 import { initSidebar } from './modules/ui/sidebar.js';
 import { initHeaderControls } from './modules/ui/header.js';
+import { initFullscreen } from './modules/ui/fullscreen.js'; // Добавлен Fullscreen
 import { initControlConnection } from './modules/websocket/connection.js';
-import { initInputHandlers } from './modules/features/input_handler.js'; // Добавлен InputForge
+import { initInputHandlers } from './modules/features/input_handler.js';
 
 /* ==========================================================================
    2. ТОЧКА ВХОДА (DOMContentLoaded)
@@ -20,12 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
     /* --- ИНТЕРФЕЙС --- */
     initSidebar();
     initHeaderControls();
+    initFullscreen(); // Инициализация фуллскрина
 
     /* --- СЕТЕВОЙ СЛОЙ --- */
     initControlConnection();
 
     /* --- УПРАВЛЕНИЕ (InputForge) --- */
-    // Передаем глобальную функцию отправки пакетов в обработчик ввода
     initInputHandlers((mod, pay) => {
         if (window.sendToBot) window.sendToBot(mod, pay);
     });
@@ -35,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
        ========================================================================== */
     window.addEventListener('beforeunload', () => {
         if (window.sendToBot && AppState.clientId) {
-            console.log("[Control] Stop signal sent via Heartbeat");
             window.sendToBot("Heartbeat", "session_stop");
         }
     });
