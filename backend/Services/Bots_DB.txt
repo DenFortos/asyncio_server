@@ -5,7 +5,7 @@
         "user": "Manager_John",
         "pc_name": "OFFICE-PC-01",
         "activeWindow": "Dashboard",
-        "last_active": "20:49:50",
+        "last_active": "20:52:27",
         "ip": "127.0.0.1",
         "auth_key": "super_secret"
     },

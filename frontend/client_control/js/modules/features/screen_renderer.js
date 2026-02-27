@@ -16,15 +16,26 @@ const overlay = document.getElementById('desktopOverlay');
 ========================================================================== */
 
 export function resetRenderer() {
-    if (jmuxer) { jmuxer.destroy(); jmuxer = null; }
+    console.log("🧹 [Renderer] Full Cleanup...");
+
+    if (jmuxer) {
+        try { jmuxer.destroy(); } catch (e) {}
+        jmuxer = null;
+    }
+
     if (video) {
         video.pause();
+        // СБРОС ДЕКОДЕРА: Очищаем источник и форсируем полную перезагрузку элемента
         video.src = "";
+        video.removeAttribute('src');
+        video.load();
+
         video.style.display = 'none';
     }
-    // Используем класс hidden вместо прямого style.display
+
     if (overlay) overlay.classList.remove('hidden');
 
+    // Сбрасываем флаг режима, чтобы при следующем старте заново определить H264/MJPEG
     isJpegMode = null;
 }
 
@@ -39,29 +50,38 @@ export async function renderScreenRGBA(cleanPayload) {
     // Определение формата (MJPEG vs H264)
     if (isJpegMode === null) {
         isJpegMode = (videoData[0] === 0xFF && videoData[1] === 0xD8);
-        console.log("🛠 [Renderer] Mode:", isJpegMode ? "MJPEG" : "H264");
+        console.log("🛠 [Renderer] Mode Detected:", isJpegMode ? "MJPEG" : "H264");
     }
 
-    // Инициализация JMuxer для H264
+    // Инициализация JMuxer (с улучшенными параметрами для живого потока)
     if (!isJpegMode && !jmuxer) {
         jmuxer = new window.JMuxer({
-            node: 'desktopVideo',
+            node: video,
             mode: 'video',
             fps: 60,
-            flushingTime: 0,
-            clearBuffer: true
+            flushingTime: 10,    // Даем 10мс на сборку кадров (убирает микро-дергания)
+            clearBuffer: true,
+            onError: function(err) {
+                console.error("❌ [JMuxer Error]:", err);
+                resetRenderer();
+            }
         });
     }
 
-    // ПЕРЕКЛЮЧЕНИЕ ВИДИМОСТИ (Синхронизировано с CSS)
+    // ПЕРЕКЛЮЧЕНИЕ ВИДИМОСТИ
     if (video.style.display === 'none' || video.style.display === '') {
         video.style.display = 'block';
-        if (overlay) overlay.classList.add('hidden'); // Скрываем заглушку через класс
+        if (overlay) overlay.classList.add('hidden');
+    }
+
+    // Принудительный старт, если видео встало (важно для обхода блокировок браузера)
+    if (video.paused && video.readyState >= 1) {
+        video.play().catch(() => {});
     }
 
     /* ==========================================================================
        4. СИНХРОНИЗАЦИЯ РАЗМЕРОВ (Canvas Sync)
-       Важно для корректных координат мыши InputForge
+       (Без изменений)
     ========================================================================== */
     if (video.videoWidth > 0 && canvas) {
         if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
@@ -78,19 +98,22 @@ export async function renderScreenRGBA(cleanPayload) {
     if (!isJpegMode && jmuxer) {
         jmuxer.feed({ video: videoData });
 
+        if (video.paused && video.readyState >= 1) {
+            video.play().catch(() => {});
+        }
+
         if (video.buffered.length > 0) {
             const bufferEnd = video.buffered.end(video.buffered.length - 1);
             const delta = bufferEnd - video.currentTime;
 
-            if (video.paused) video.play().catch(() => {});
+            // Вместо постоянной подстройки скорости, делаем "мягкий прыжок",
+            // только если накопилось больше 0.3 сек задержки.
+            if (delta > 0.3) {
+                video.currentTime = bufferEnd - 0.05;
+            }
 
-            // WATCHDOG: Минимизация задержки
-            if (delta > 0.15 && delta < 1.0) {
-                video.playbackRate = 1.08; // Чуть быстрее, чтобы догнать поток
-            } else if (delta >= 1.0) {
-                video.currentTime = bufferEnd; // Прыжок при большом лаге
-                video.playbackRate = 1.0;
-            } else {
+            // Держим скорость всегда 1.0, чтобы не было визуальных искажений
+            if (video.playbackRate !== 1.0) {
                 video.playbackRate = 1.0;
             }
         }

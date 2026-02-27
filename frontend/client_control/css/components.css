@@ -1,60 +1,8 @@
-/* frontend/client_control/css/components.css */
+/* frontend/client_control/css/components.css
 
 /* ==========================================================================
-   1. НАВИГАЦИОННЫЕ ЭЛЕМЕНТЫ (Sidebar Items)
+   1. КНОПКИ И НАВИГАЦИЯ
 ========================================================================== */
-
-.nav-item {
-    width: 60px;
-    height: 60px;
-    margin: 10px auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border-radius: var(--radius);
-    color: var(--text-muted);
-    border: 1px solid transparent;
-    transition: all 0.2s;
-}
-
-.nav-item:hover {
-    color: var(--text-main);
-    background: rgba(255, 255, 255, 0.05);
-}
-
-/** Активный режим (Desktop/Webcam) */
-.nav-item.active {
-    color: var(--accent-green);
-    border-color: var(--accent-green);
-    background: var(--accent-green-dim);
-}
-
-.nav-label {
-    font-size: 0.6rem;
-    margin-top: 5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* ==========================================================================
-   2. УПРАВЛЕНИЕ В ХЕДЕРЕ (Header Action Buttons)
-========================================================================== */
-
-.header-left { display: flex; align-items: center; gap: 15px; }
-
-/** Контекстные группы кнопок */
-.control-group {
-    display: none; /* Скрыты по умолчанию */
-    align-items: center;
-    gap: 10px;
-}
-
-/* Показываем кнопки только для активного режима (управляется через JS атрибут) */
-.header[data-active-mode="desktop"] .for-desktop { display: flex; }
-.header[data-active-mode="webcam"] .for-webcam { display: flex; }
-.control-group.global { display: flex; }
 
 .action-btn {
     width: 38px; height: 38px;
@@ -62,10 +10,9 @@
     border: 1px solid var(--border-bright);
     border-radius: var(--radius);
     color: var(--text-main);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     transition: all 0.2s;
+    cursor: pointer;
 }
 
 .action-btn:hover { border-color: var(--text-main); }
@@ -77,6 +24,46 @@
     box-shadow: 0 0 10px var(--accent-green-dim);
 }
 
+.nav-item {
+    width: 60px; height: 60px;
+    margin: 10px auto;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer;
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.nav-item:hover { background: rgba(255, 255, 255, 0.05); }
+
+.nav-item.active {
+    color: var(--accent-green);
+    background: var(--accent-green-dim);
+    border: 1px solid var(--accent-green);
+}
+
+.nav-label {
+    font-size: 0.6rem; margin-top: 5px;
+    text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   2. ПАНЕЛИ И ВКЛАДКИ
+========================================================================== */
+
+.sidebar-tab i {
+    transition: transform var(--transition) ease;
+}
+
+.sidebar.hidden .sidebar-tab i {
+    transform: rotate(180deg);
+}
+
+.sidebar-tab:hover {
+    color: var(--accent-green);
+    background: rgba(255, 255, 255, 0.05);
+}
+
 .divider {
     width: 1px; height: 20px;
     background: var(--border-dim);
@@ -84,33 +71,21 @@
 }
 
 /* ==========================================================================
-   3. ИНФОРМАЦИОННАЯ ПАНЕЛЬ (Meta & Status)
+   3. ИНФОРМАЦИЯ И СТАТУСЫ
 ========================================================================== */
 
-.header-right { display: flex; align-items: center; gap: 25px; }
-
-.meta-item { display: flex; flex-direction: column; align-items: flex-end; }
-.meta-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; }
-.meta-value { font-size: 0.85rem; font-weight: 600; }
-
-/** Капсула статуса онлайн/офлайн */
 .status-capsule {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: flex; align-items: center; gap: 10px;
     padding: 6px 14px;
     border: 1px solid var(--border-dim);
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.02);
 }
 
-.status-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); }
-
 .status-dot {
     width: 8px; height: 8px;
     border-radius: 50%;
     background-color: #222;
-    transition: all 0.4s ease;
 }
 
 .status-dot.online {
@@ -118,67 +93,32 @@
     box-shadow: 0 0 10px var(--accent-green);
 }
 
+.meta-item { display: flex; flex-direction: column; align-items: flex-end; }
+.meta-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; }
+.meta-value { font-size: 0.85rem; font-weight: 600; }
+
 /* ==========================================================================
-   4. СЛУЖЕБНЫЕ ОВЕРЛЕИ (Исправлено перекрытие)
+   4. СПЕЦИАЛЬНЫЕ КОМПОНЕНТЫ
 ========================================================================== */
 
 .stream-overlay {
-    position: absolute;
-    inset: 0;
     background: #0a0a0a;
-    display: flex; /* По умолчанию виден */
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 15; /* Между видео и канвасом */
     color: var(--text-muted);
 }
 
-/* Когда видео активно, мы будем скрывать оверлей через JS */
-.stream-overlay.hidden {
-    display: none !important;
-}
-
 .stream-overlay i { font-size: 2.5rem; color: var(--accent-green-dim); }
+.stream-overlay.hidden { display: none !important; }
 
 .fullscreen-btn {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    z-index: 30;
-    width: 44px;
-    height: 44px;
+    width: 44px; height: 44px;
     background: rgba(20, 20, 20, 0.8);
     border: 1px solid var(--border-dim);
     border-radius: var(--radius);
     color: var(--text-main);
     opacity: 0;
+    display: flex; align-items: center; justify-content: center;
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .workspace:hover .fullscreen-btn { opacity: 1; }
-
-.fullscreen-btn:hover {
-    background: var(--panel-dark);
-    border-color: var(--accent-green);
-    color: var(--accent-green);
-    transform: scale(1.05);
-}
-
-/* Класс, который мы будем вешать через JS при активации FS */
-.fullscreen-btn.active {
-    background: var(--accent-green-dim);
-    color: var(--accent-green);
-    border-color: var(--accent-green);
-}
-
-/* Улучшаем видимость в фуллскрине */
-.app-main:fullscreen .fullscreen-btn {
-    bottom: 30px; /* Сдвигаем чуть выше от края */
-    right: 30px;
-    background: rgba(10, 10, 10, 0.5);
-    border-color: rgba(255, 255, 255, 0.1);
-}
+.fullscreen-btn:hover { transform: scale(1.05); color: var(--accent-green); }
