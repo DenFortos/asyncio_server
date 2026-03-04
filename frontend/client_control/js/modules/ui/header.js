@@ -1,13 +1,8 @@
 // frontend/client_control/js/modules/ui/header.js
 
-/* ==========================================================================
-   1. КОНФИГУРАЦИЯ И ИНИЦИАЛИЗАЦИЯ (Setup)
-========================================================================== */
-
 import { AppState } from '../core/states.js';
 
 export function initHeaderControls() {
-    // Карта действий: связываем ID кнопок с состоянием AppState и командами бота
     const actions = [
         { id: 'btn-desktop-stream',  ref: AppState.desktop, key: 'observe', mod: 'ScreenWatch', cmds: ['start_stream', 'stop_stream'] },
         { id: 'btn-desktop-control', ref: AppState.desktop, key: 'control', mod: 'InputForge',  cmds: ['start_control', 'stop_control'] },
@@ -16,48 +11,46 @@ export function initHeaderControls() {
         { id: 'btn-audio-mic',       ref: AppState.audio,   key: 'input',   mod: 'AudioPulse',  cmds: ['listen_mic_on', 'listen_mic_off'] }
     ];
 
-    /* ==========================================================================
-       2. ЛОГИКА ПЕРЕКЛЮЧЕНИЯ (Toggle Logic)
-    ========================================================================== */
-
     const toggleAction = (action, forceState = null) => {
         const btn = document.getElementById(action.id);
+
+        // Сброс флага paused перед переключением
+        if (btn && btn.dataset.paused === 'true') {
+            console.log("🔄 [Header] Сброс паузы перед переключением");
+            btn.dataset.paused = 'false';
+            btn.title = 'Start/Stop Stream';
+        }
+
         const newState = (forceState !== null) ? forceState : !action.ref[action.key];
 
-        // 1. Синхронизация состояния и UI кнопки
         action.ref[action.key] = newState;
         if (btn) btn.classList.toggle('active', newState);
 
-        // 2. УПРАВЛЕНИЕ КАНВАСОМ (Слой перехвата ввода)
-        // Если переключаем режим управления десктопом, меняем кликабельность канваса
+        // Управление канвасом при включении контроля
         if (action.id === 'btn-desktop-control') {
             const canvas = document.getElementById('desktopCanvas');
             if (canvas) {
                 if (newState) {
                     canvas.classList.add('control-active');
-                    console.log("[Header] InputForge activated: Canvas is now intercepting events");
+                    canvas.focus();
+                    canvas.tabIndex = 1;
+                    console.log("[Header] InputForge activated: Canvas focused");
                 } else {
                     canvas.classList.remove('control-active');
-                    console.log("[Header] InputForge deactivated: Canvas is transparent");
+                    console.log("[Header] InputForge deactivated");
                 }
             }
         }
 
-        // 3. Отправка команды через глобальный метод связи
         if (window.sendToBot) {
             window.sendToBot(action.mod, newState ? action.cmds[0] : action.cmds[1]);
         }
     };
 
-    // Вешаем слушатели на все кнопки
     actions.forEach(a => {
         const el = document.getElementById(a.id);
         if (el) el.onclick = () => toggleAction(a);
     });
-
-    /* ==========================================================================
-       3. ОРКЕСТРАЦИЯ РЕСУРСОВ (Resource Sync)
-    ========================================================================== */
 
     window.syncModeResources = (mode) => {
         if (mode === 'webcam') {

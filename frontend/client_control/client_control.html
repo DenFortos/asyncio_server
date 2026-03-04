@@ -85,7 +85,8 @@
 
                     <video id="desktopVideo" autoplay muted playsinline></video>
 
-                    <canvas id="desktopCanvas"></canvas>
+                    <!-- ← ВАЖНО: tabindex="1" для фокуса клавиатуры -->
+                    <canvas id="desktopCanvas" tabindex="1"></canvas>
 
                     <button class="fullscreen-btn" title="Toggle Fullscreen" data-target="wrapper-desktop">
                         <i class="fas fa-expand"></i>

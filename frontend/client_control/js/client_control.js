@@ -6,7 +6,7 @@
 import { AppState } from './modules/core/states.js';
 import { initSidebar } from './modules/ui/sidebar.js';
 import { initHeaderControls } from './modules/ui/header.js';
-import { initFullscreen } from './modules/ui/fullscreen.js'; // Добавлен Fullscreen
+import { initFullscreen } from './modules/ui/fullscreen.js';
 import { initControlConnection } from './modules/websocket/connection.js';
 import { initInputHandlers } from './modules/features/input_handler.js';
 
@@ -18,10 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
     /* --- ПОДГОТОВКА --- */
     AppState.reset();
 
+    /* ← КРИТИЧЕСКИ ВАЖНО: Экспорт AppState глобально для screen_renderer */
+    window.AppState = AppState;
+
     /* --- ИНТЕРФЕЙС --- */
     initSidebar();
     initHeaderControls();
-    initFullscreen(); // Инициализация фуллскрина
+    initFullscreen();
 
     /* --- СЕТЕВОЙ СЛОЙ --- */
     initControlConnection();

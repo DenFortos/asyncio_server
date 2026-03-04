@@ -1,30 +1,87 @@
-/* frontend/client_control/js/modules/features/input_handler.js */
+// frontend/client_control/js/modules/features/input_handler.js
 
 import { AppState } from '../core/states.js';
 
 const canvas = document.getElementById('desktopCanvas');
 const video = document.getElementById('desktopVideo');
 
-export function initInputHandlers(sendCallback) {
-    if (!canvas || !video) return;
-    const pressedKeys = new Set();
+/* ==========================================================================
+   1. ЧЁРНЫЙ СПИСОК КЛАВИШ
+========================================================================== */
+const BLOCKED_KEYS = new Set(['MetaLeft', 'MetaRight']);
 
-    // Движение мыши (Throttle 8ms вместо 30ms)
+/* ==========================================================================
+   2. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+========================================================================== */
+const focusCanvas = () => {
+    if (AppState.desktop.control && canvas) {
+        canvas.focus();
+        canvas.tabIndex = 1;
+    }
+};
+
+const isBlocked = (code) => BLOCKED_KEYS.has(code);
+
+/* ==========================================================================
+   3. КЛАВИАТУРА (ОДИН ПАКЕТ НА КЛАВИШУ)
+========================================================================== */
+function initKeyboard(sendCallback) {
+    const systemKeys = ['Alt', 'Tab', 'Escape', 'Meta', 'Control', 'Shift'];
+
+    // Системные комбинации
+    window.addEventListener('keydown', (e) => {
+        if (!AppState.desktop.control) return;
+        if (e.altKey || e.ctrlKey || e.metaKey ||
+            systemKeys.includes(e.key) || (e.shiftKey && e.altKey)) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            if (!isBlocked(e.code)) sendCallback("InputForge", `kd:${e.code}`);
+            return false;
+        }
+    }, true);
+
+    window.addEventListener('keyup', (e) => {
+        if (!AppState.desktop.control) return;
+        if (e.altKey || e.ctrlKey || e.metaKey || systemKeys.includes(e.key)) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            if (!isBlocked(e.code)) sendCallback("InputForge", `ku:${e.code}`);
+            return false;
+        }
+    }, true);
+
+    // ← Обычные клавиши: ОДИН ПАКЕТ (down+up вместе)
+    canvas.addEventListener('keydown', (e) => {
+        if (!AppState.desktop.control) return;
+        if (isBlocked(e.code)) { e.preventDefault(); return; }
+        e.preventDefault();
+        e.stopPropagation();
+
+        // ← Отправляем полное нажатие одним пакетом!
+        sendCallback("InputForge", `k:${e.code}`);
+    });
+}
+
+/* ==========================================================================
+   4. МЫШЬ
+========================================================================== */
+function initMouse(sendCallback) {
     let lastMove = 0;
+
     canvas.addEventListener('mousemove', (e) => {
         if (!AppState.desktop.control) return;
         const now = Date.now();
-        if (now - lastMove < 8) return;  // ← 8ms = ~125 событий/сек
+        if (now - lastMove < 8) return;
         lastMove = now;
-
         const coords = getCorrectedCoords(e);
         if (coords) sendCallback("InputForge", `m:${coords.x.toFixed(4)}:${coords.y.toFixed(4)}`);
     });
 
-    // Mouse buttons
     canvas.addEventListener('mousedown', (e) => {
         if (!AppState.desktop.control) return;
-        canvas.focus();
+        focusCanvas();
         const btn = e.button === 0 ? 'l' : (e.button === 2 ? 'r' : 'm');
         sendCallback("InputForge", `d:${btn}`);
     });
@@ -35,30 +92,32 @@ export function initInputHandlers(sendCallback) {
         sendCallback("InputForge", `u:${btn}`);
     });
 
-    // Scroll
     canvas.addEventListener('wheel', (e) => {
         if (!AppState.desktop.control) return;
         e.preventDefault();
+        e.stopPropagation();
         sendCallback("InputForge", `s:${e.deltaY > 0 ? 'down' : 'up'}`);
     }, { passive: false });
 
-    // Keyboard
-    window.addEventListener('keydown', (e) => {
-        if (!AppState.desktop.control || pressedKeys.has(e.key)) return;
-        pressedKeys.add(e.key);
-        if (shouldPreventDefault(e)) e.preventDefault();
-        sendCallback("InputForge", `kd:${e.key}`);
-    });
-
-    window.addEventListener('keyup', (e) => {
+    canvas.addEventListener('contextmenu', (e) => {
         if (!AppState.desktop.control) return;
-        pressedKeys.delete(e.key);
-        sendCallback("InputForge", `ku:${e.key}`);
+        e.preventDefault();
+        e.stopPropagation();
     });
-
-    canvas.addEventListener('contextmenu', e => e.preventDefault());
 }
 
+/* ==========================================================================
+   5. ТОЧКА ВХОДА
+========================================================================== */
+export function initInputHandlers(sendCallback) {
+    if (!canvas || !video) return;
+    initKeyboard(sendCallback);
+    initMouse(sendCallback);
+}
+
+/* ==========================================================================
+   6. УТИЛИТЫ
+========================================================================== */
 function getCorrectedCoords(event) {
     const rect = canvas.getBoundingClientRect();
     const vW = video.videoWidth;
@@ -82,9 +141,4 @@ function getCorrectedCoords(event) {
     const x = (event.clientX - rect.left - offX) / actualW;
     const y = (event.clientY - rect.top - offY) / actualH;
     return (x >= 0 && x <= 1 && y >= 0 && y <= 1) ? { x, y } : null;
-}
-
-function shouldPreventDefault(e) {
-    const keys = ['Tab', 'Alt', 'F5', 'F11', 'Control', 'Shift', 'Escape'];
-    return keys.includes(e.key) || (e.ctrlKey && ['r', 'f', 'p'].includes(e.key.toLowerCase()));
 }
