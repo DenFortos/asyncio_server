@@ -1,9 +1,6 @@
-/* frontend/client_control/css/layout.css
-
 /* ==========================================================================
-   1. ГЛАВНЫЕ КОНТЕЙНЕРЫ (Skeleton)
+   1. ГЛАВНЫЕ КОНТЕЙНЕРЫ
 ========================================================================== */
-
 .app-main {
     flex: 1;
     display: flex;
@@ -12,7 +9,6 @@
     position: relative;
     overflow: hidden;
     background: #000;
-    /* Резервируем место. Переход margin-left тяжелый, но это база для стабильности видео */
     margin-left: var(--sidebar-width);
     transition: margin-left var(--transition) ease-in-out;
 }
@@ -26,16 +22,13 @@
     z-index: 100;
     background-color: var(--panel-dark);
     border-right: 1px solid var(--border-dim);
-    /* GPU ускорение для сдвига */
     transition: transform var(--transition) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Сдвигаем сайдбар влево */
 .sidebar.hidden {
     transform: translateX(-100%);
 }
 
-/* Убираем отступ у контента мгновенно или плавно вместе с сайдбаром */
 .sidebar.hidden + .app-main {
     margin-left: 0;
 }
@@ -72,12 +65,10 @@
 }
 
 /* ==========================================================================
-   2. СПЕЦИАЛЬНЫЕ ЭЛЕМЕНТЫ ПАНЕЛЕЙ
+   2. ЭЛЕМЕНТЫ ПАНЕЛЕЙ
 ========================================================================== */
-
 .sidebar-tab {
     position: absolute;
-    /* Кнопка остается снаружи сайдбара справа */
     right: -25px;
     top: 50%;
     transform: translateY(-50%);
@@ -95,7 +86,6 @@
     color: var(--text-muted);
 }
 
-/* Вращение иконки — самая легкая анимация */
 .sidebar-tab i {
     transition: transform 0.3s ease;
 }
@@ -121,9 +111,8 @@
 .control-group.global { display: flex; }
 
 /* ==========================================================================
-   3. ИЕРАРХИЯ СЛОЕВ (Stacking Order)
+   3. СЛОИ (Stacking Order)
 ========================================================================== */
-
 .view-panel {
     display: none;
     width: 100%;
@@ -164,7 +153,8 @@
 
 #desktopCanvas {
     position: absolute;
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     z-index: 20;
     max-width: 100%;
@@ -172,19 +162,20 @@
     pointer-events: none;
 }
 
-#desktopCanvas.control-active { pointer-events: auto !important; }
+#desktopCanvas.control-active {
+    pointer-events: auto !important;
+}
 
 .fullscreen-btn {
     position: absolute;
-    bottom: 20px; right: 20px;
+    bottom: 20px;
+    right: 20px;
     z-index: 30;
 }
 
 /* ==========================================================================
-   4. FULLSCREEN LOGIC (Оптимизированная версия)
+   4. FULLSCREEN
 ========================================================================== */
-
-/* Убираем отступы и скрываем лишнее */
 .app-main:fullscreen {
     margin-left: 0;
 }
@@ -193,26 +184,23 @@
     display: none !important;
 }
 
-/* Видео контейнер — просто на весь экран */
 .app-main:fullscreen .workspace {
     width: 100%;
     height: 100%;
 }
 
-/* Видео центрируется автоматически через object-fit */
 .app-main:fullscreen #desktopVideo {
     width: 100vw;
     height: 100vh;
-    object-fit: contain; /* Сохраняет пропорции без искажений */
+    object-fit: contain;
+    pointer-events: none;
 }
 
-/* Канвас управления ДОЛЖЕН повторять позиционирование видео */
 .app-main:fullscreen #desktopCanvas {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    /* Важно: не даем канвасу растянуться больше, чем само видео */
     max-width: 100vw;
     max-height: 100vh;
     width: 100%;
@@ -220,7 +208,10 @@
     z-index: 1000;
 }
 
-/* Header — выезжает сверху */
+.app-main:fullscreen #desktopCanvas.control-active {
+    pointer-events: auto !important;
+}
+
 .app-main:fullscreen .header {
     position: fixed;
     top: 0;
@@ -229,10 +220,14 @@
     z-index: 2000;
     transform: translateY(-100%);
     transition: transform 0.3s ease;
+    pointer-events: none;
 }
 
-/* Показ хедера при наведении или по классу */
-.app-main:fullscreen .header:hover,
 .app-main:fullscreen .header.header-show {
     transform: translateY(0);
+    pointer-events: auto;
+}
+
+.app-main:fullscreen .fullscreen-btn {
+    display: none !important;
 }

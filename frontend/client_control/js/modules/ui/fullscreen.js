@@ -4,18 +4,22 @@ const fsTarget = document.querySelector('.app-main');
 const header = document.getElementById('header');
 const fsBtn = document.querySelector('.fullscreen-btn');
 
+const CORNER_SIZE = 3;
+const CORNER_DELAY = 200;
+
+let showTimer = null;
+let hideTimer = null;
+
 /* ==========================================================================
-   1. ИНИЦИАЛИЗАЦИЯ И ПЕРЕКЛЮЧЕНИЕ
+   1. ИНИЦИАЛИЗАЦИЯ
 ========================================================================== */
 export function initFullscreen() {
     if (!fsBtn || !fsTarget) return;
 
     fsBtn.onclick = () => {
-        if (!document.fullscreenElement) {
-            fsTarget.requestFullscreen().catch(err => console.error(err));
-        } else {
-            document.exitFullscreen();
-        }
+        document.fullscreenElement
+            ? document.exitFullscreen()
+            : fsTarget.requestFullscreen().catch(console.error);
     };
 
     document.addEventListener('fullscreenchange', syncFsState);
@@ -32,26 +36,37 @@ function syncFsState() {
     const icon = fsBtn.querySelector('i');
     if (icon) icon.className = isFs ? 'fas fa-compress' : 'fas fa-expand';
 
-    if (!isFs) header.classList.remove('header-show');
+    if (!isFs) {
+        header.classList.remove('header-show');
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+    }
 }
 
 /* ==========================================================================
-   3. ЛОГИКА ТРИГГЕРА ШАПКИ
+   3. ЛОГИКА ТРИГГЕРА
 ========================================================================== */
 function initTriggerLogic() {
-    // Stage: Capture (true) — ловим клик до того, как его перехватит Canvas
-    window.addEventListener('mousedown', (e) => {
+    document.addEventListener('mousemove', (e) => {
         if (!document.fullscreenElement) return;
 
-        if (e.clientY <= 30) {
-            console.log("[FS] Top zone clicked");
-            header.classList.add('header-show');
+        const inCorner = (e.clientX <= CORNER_SIZE || e.clientX >= window.innerWidth - CORNER_SIZE)
+                      && e.clientY <= CORNER_SIZE;
+
+        if (inCorner && !showTimer) {
+            showTimer = setTimeout(() => header.classList.add('header-show'), CORNER_DELAY);
+        } else if (!inCorner) {
+            clearTimeout(showTimer);
+            showTimer = null;
         }
-    }, true);
+    });
 
     header.addEventListener('mouseleave', () => {
         if (document.fullscreenElement) {
             header.classList.remove('header-show');
+            clearTimeout(hideTimer);
         }
     });
+
+    header.addEventListener('click', () => clearTimeout(hideTimer));
 }

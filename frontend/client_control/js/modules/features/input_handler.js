@@ -5,30 +5,25 @@ import { AppState } from '../core/states.js';
 const canvas = document.getElementById('desktopCanvas');
 const video = document.getElementById('desktopVideo');
 
-/* ==========================================================================
-   1. ИНИЦИАЛИЗАЦИЯ И СОБЫТИЯ
-========================================================================== */
 export function initInputHandlers(sendCallback) {
     if (!canvas || !video) return;
     const pressedKeys = new Set();
 
-    // Движение мыши (Throttle 30ms)
+    // Движение мыши (Throttle 8ms вместо 30ms)
     let lastMove = 0;
     canvas.addEventListener('mousemove', (e) => {
         if (!AppState.desktop.control) return;
         const now = Date.now();
-        if (now - lastMove < 30) return;
+        if (now - lastMove < 8) return;  // ← 8ms = ~125 событий/сек
         lastMove = now;
 
         const coords = getCorrectedCoords(e);
         if (coords) sendCallback("InputForge", `m:${coords.x.toFixed(4)}:${coords.y.toFixed(4)}`);
     });
 
-    // Кнопки мыши (с блокировкой FS зоны)
+    // Mouse buttons
     canvas.addEventListener('mousedown', (e) => {
         if (!AppState.desktop.control) return;
-        if (document.fullscreenElement && e.clientY <= 30) return;
-
         canvas.focus();
         const btn = e.button === 0 ? 'l' : (e.button === 2 ? 'r' : 'm');
         sendCallback("InputForge", `d:${btn}`);
@@ -40,14 +35,14 @@ export function initInputHandlers(sendCallback) {
         sendCallback("InputForge", `u:${btn}`);
     });
 
-    // Скролл
+    // Scroll
     canvas.addEventListener('wheel', (e) => {
         if (!AppState.desktop.control) return;
         e.preventDefault();
         sendCallback("InputForge", `s:${e.deltaY > 0 ? 'down' : 'up'}`);
     }, { passive: false });
 
-    // Клавиатура
+    // Keyboard
     window.addEventListener('keydown', (e) => {
         if (!AppState.desktop.control || pressedKeys.has(e.key)) return;
         pressedKeys.add(e.key);
@@ -64,19 +59,14 @@ export function initInputHandlers(sendCallback) {
     canvas.addEventListener('contextmenu', e => e.preventDefault());
 }
 
-/* ==========================================================================
-   2. ВСПОРМОГАТЕЛЬНЫЕ ФУНКЦИИ (Математика и Фильтры)
-========================================================================== */
 function getCorrectedCoords(event) {
     const rect = canvas.getBoundingClientRect();
     const vW = video.videoWidth;
     const vH = video.videoHeight;
-
     if (!vW || !vH) return null;
 
     const canvasRatio = rect.width / rect.height;
     const videoRatio = vW / vH;
-
     let actualW, actualH, offX = 0, offY = 0;
 
     if (canvasRatio > videoRatio) {
@@ -91,7 +81,6 @@ function getCorrectedCoords(event) {
 
     const x = (event.clientX - rect.left - offX) / actualW;
     const y = (event.clientY - rect.top - offY) / actualH;
-
     return (x >= 0 && x <= 1 && y >= 0 && y <= 1) ? { x, y } : null;
 }
 
