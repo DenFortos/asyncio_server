@@ -1,0 +1,36 @@
+/* src/index.css - Глобальный фундамент Spectral */
+
+:root {
+  /* Оставляем только системные шрифты и сглаживание */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Растягиваем приложение на весь экран */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background-color: #000000; /* Твой основной фон */
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Убираем стандартные отступы у заголовков, чтобы они не ломали верстку компонентов */
+h1, h2, h3, p {
+  margin: 0;
+}
+
+/* Чтобы картинки и инпуты не вылезали за пределы контейнеров */
+* {
+  box-sizing: border-box;
+}
