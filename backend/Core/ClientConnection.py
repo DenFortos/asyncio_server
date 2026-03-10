@@ -9,6 +9,7 @@ from backend.Services.ClientManager import client, client_info, fsmap
 
 
 async def read_full_packet(reader: asyncio.StreamReader):
+    # [Byte 0: ID_LEN] [Byte 1: MOD_LEN] [Bytes 2-5: PAYLOAD_LEN] + [PAYLOAD DATA]
     try:
         # Читаем заголовок (6 байт)
         tech = await reader.readexactly(6)

@@ -77,10 +77,19 @@ export const Renderer = {
     drawGrid(clients, container) {
         container.innerHTML = clients.length ? clients.map(c => {
             const online = isOnline(c.status);
+
+            // Если превью нет, используем стандартную заглушку.
+            // Но если превью пришло по WS (blob:), оно подставится сюда автоматически при рендере
+            const currentPreview = c.lastPreview || "../images/test2.jpg";
+
             return `
             <div class="client-card" data-client-id="${c.id}">
                 <div class="card-status-dot ${online ? 'online' : 'offline'}"></div>
-                <div class="bot-preview"><img src="../images/test2.jpg" alt="Preview"></div>
+                <div class="bot-preview">
+                    <img src="${currentPreview}" id="prev-img-${c.id}"
+                         style="opacity: ${c.lastPreview ? '1' : '0.5'}; transition: opacity 0.3s;"
+                         alt="Preview">
+                </div>
                 <div class="bot-card-body">
                     <div class="bot-primary-info">
                         <span><i class="fas fa-user"></i> ${c.user || 'Anon'}</span>
@@ -95,3 +104,19 @@ export const Renderer = {
         }).join('') : '<div class="empty-msg">No bots found</div>';
     }
 };
+
+/* ==========================================================================
+   5. ЖИВОЕ ОБНОВЛЕНИЕ КАРТИНОК
+========================================================================== */
+
+window.addEventListener('botPreviewReceived', ({ detail }) => {
+    const { id, url } = detail;
+    const imgElement = document.getElementById(`prev-img-${id}`);
+
+    if (imgElement) {
+        // Просто обновляем src.
+        // RevokeObjectURL делать здесь НЕ НУЖНО, так как мы сделали его в clients.js
+        imgElement.src = url;
+        imgElement.style.opacity = '1';
+    }
+});

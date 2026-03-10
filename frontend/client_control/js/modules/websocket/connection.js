@@ -95,7 +95,7 @@ export function initControlConnection() {
         // 3. Keep-Alive для сервера (чтобы прокси не рвал соединение)
         setInterval(() => {
             if (socket?.readyState === 1) socket.send(encodePacket("", "Heartbeat", "ping"));
-        }, 25000);
+        }, 5000);
     };
 
     socket.onmessage = (e) => e.data instanceof ArrayBuffer && handleIncomingData(e.data);
