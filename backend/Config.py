@@ -3,4 +3,3 @@ IP = "188.190.156.120"
 PORT = 50001
 API_PORT = 8001
 AUTH_KEY = "super_secret"
-NUM_WORKERS = 8

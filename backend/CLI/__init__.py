@@ -1,1 +1,0 @@
-from .CLI import operator_interface, print_c2_ready_message
