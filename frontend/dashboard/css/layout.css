@@ -1,9 +1,8 @@
-/** frontend\dashboard\css\layout.css */
+/* frontend/dashboard/css/layout.css */
 
 /* ==========================================================================
-   1. БОКОВАЯ ПАНЕЛЬ (Sidebar Navigation)
+   1. БОКОВАЯ ПАНЕЛЬ (Sidebar Layout)
 ========================================================================== */
-
 .sidebar {
     position: fixed;
     top: 0;
@@ -13,181 +12,151 @@
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(20px);
-    border-right: 1px solid var(--glass-border);
+    justify-content: space-between;
+    padding: 20px 0;
+    transition: transform 0.3s ease;
 }
 
-/** Состояние скрытого сайдбара */
-.sidebar-hidden .sidebar { transform: translateX(-80px); }
-
-.menu-toggle-wrapper {
-    position: absolute;
-    right: -45px;
-    top: 15px;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border);
-    border-left: none;
-    border-radius: 0 8px 8px 0;
-    color: white;
-    transition: all 0.3s ease;
+/* Состояние скрытого сайдбара */
+.sidebar-hidden .sidebar {
+    transform: translateX(-80px);
 }
 
-.sidebar-top { display: flex; flex-direction: column; padding-top: 80px; }
-.sidebar-bottom { margin-top: auto; padding-bottom: 25px; }
-.sidebar-icons { display: flex; flex-direction: column; gap: 15px; align-items: center; }
-
-/* ==========================================================================
-   2. ОСНОВНАЯ ОБОЛОЧКА (Main Layout Containers)
-========================================================================== */
-
+/* Основная обертка контента */
 .main-wrapper {
     margin-left: 80px;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: margin-left 0.3s ease;
 }
 
-.sidebar-hidden .main-wrapper { margin-left: 0; }
+.sidebar-hidden .main-wrapper {
+    margin-left: 0;
+}
 
-/** Шапка страницы */
+/* ==========================================================================
+   2. ШАПКА И ПОИСК (Header & Search Geometry)
+========================================================================== */
 .main-header {
-    min-height: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 30px;
     gap: 20px;
+    flex-shrink: 0;
 }
 
 .header-left {
-    display: flex;
-    align-items: center;
-    padding-left: 120px;
-    transition: padding-left 0.4s ease;
+    padding-left: 100px;
+    transition: padding-left 0.3s;
 }
 
-.sidebar-hidden .header-left { padding-left: 60px; }
-.header-right { display: flex; align-items: center; gap: 30px; }
-.global-controls, .stats-filters { display: flex; gap: 15px; }
+.sidebar-hidden .header-left {
+    padding-left: 40px;
+}
 
-/* ==========================================================================
-   3. КОНТЕЙНЕР ПОИСКА (Search Geometry)
-========================================================================== */
+.header-right, 
+.global-controls, 
+.stats-filters {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
 
 .global-search-container {
     height: 60px;
     display: flex;
     align-items: center;
-    padding: 0 40px;
-    margin-top: 5px;
+    padding: 0 30px;
+    flex-shrink: 0;
 }
 
 .search-bar {
     width: 100%;
-    max-width: 900px;
+    max-width: 800px;
     margin: 0 auto;
     position: relative;
 }
 
 /* ==========================================================================
-   4. РАБОЧАЯ ОБЛАСТЬ И СЕТКИ (Viewport & Grids)
+   3. РАБОЧАЯ ЗОНА (Content Viewport)
+   Прозрачная область с контентом
 ========================================================================== */
-
 .content-viewport {
     flex: 1;
-    overflow-y: overlay;
-    padding: 20px 40px;
-    height: calc(100vh - 150px);
+    overflow-y: auto;
+    padding: 25px 30px;
+    margin: 15px 25px 25px 25px;
+    
+    /* Визуальное выделение зоны */
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.content-section { display: none; }
-.content-section.active { display: block; }
-
-/** Сетка ботов */
-.clients-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    padding-bottom: 30px;
+.content-section {
+    display: none;
 }
 
-/** Сетка файлов */
-.files-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+.content-section.active {
+    display: block;
 }
-
-.data-wrapper, .table-container { width: 100%; }
-.table-container { overflow-x: auto; }
-.hidden { display: none !important; }
 
 /* ==========================================================================
-   5. МОДАЛЬНЫЕ ОКНА (Modal Layers)
+   4. СЕТКИ (Grids)
+   Адаптивные сетки для ботов и файлов
 ========================================================================== */
+.clients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 25px;
+    padding-bottom: 20px;
+}
 
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+/* ==========================================================================
+   5. МОДАЛЬНЫЕ ОКНА (Modal Structure)
+========================================================================== */
 .modal {
     position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
+    inset: 0;
     z-index: 2000;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0,0,0,0.7);
     backdrop-filter: blur(8px);
-    transition: opacity 0.3s ease;
 }
 
 .modal-content {
     width: 90%;
-    max-width: 550px;
+    max-width: 480px;
     max-height: 85vh;
-    padding: 25px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    padding: 30px;
+    position: relative;
     display: flex;
     flex-direction: column;
-    position: relative;
-    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid var(--glass-border);
+    background: rgba(15, 15, 20, 0.85);
 }
 
-.close-modal {
-    position: absolute;
-    top: 15px; right: 20px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    opacity: 0.6;
-}
-
+/* Сетка выбора фонов */
 .bg-options-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
-    padding: 10px 5px;
+    margin-top: 20px;
     overflow-y: auto;
+    max-height: 400px;
+    padding-right: 5px;
 }
-
-.bg-option {
-    cursor: pointer;
-    border-radius: 12px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid transparent;
-    transition: 0.3s;
-}
-
-.bg-option img { width: 100%; height: 80px; object-fit: cover; }
-.bg-option span { display: block; padding: 8px; font-size: 0.75rem; text-align: center; }

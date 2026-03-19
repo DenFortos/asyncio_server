@@ -1,1 +1,61 @@
 /* frontend/dashboard/css/animations.css */
+
+/* ==========================================================================
+   1. ПОЯВЛЕНИЕ КОНТЕНТА (Fade In)
+   Плавное появление секций при переключении вкладок
+========================================================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content-section {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* ==========================================================================
+   2. ПЛАВНОСТЬ ЭЛЕМЕНТОВ (Global Transitions)
+   Единый стандарт плавности для всех интерактивных элементов
+========================================================================== */
+.sidebar, 
+.main-wrapper, 
+.header-left, 
+.bg-btn, 
+.stat-box, 
+.search-input, 
+.client-card, 
+.bot-preview img, 
+.menu-toggle-wrapper {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ==========================================================================
+   3. НЕОНОВОЕ СВЕЧЕНИЕ (Glow Effects)
+   Пульсация для активных фильтров статистики
+========================================================================== */
+@keyframes pulse-green {
+    0% { box-shadow: 0 0 5px var(--accent-green); }
+    50% { box-shadow: 0 0 15px var(--accent-green); }
+    100% { box-shadow: 0 0 5px var(--accent-green); }
+}
+
+@keyframes pulse-blue {
+    0% { box-shadow: 0 0 5px var(--accent-blue); }
+    50% { box-shadow: 0 0 15px var(--accent-blue); }
+    100% { box-shadow: 0 0 5px var(--accent-blue); }
+}
+
+/* Применение анимаций к активным элементам */
+.stat-box#filter-online.active {
+    animation: pulse-green 2s infinite;
+}
+
+.stat-box#filter-all.active {
+    animation: pulse-blue 2s infinite;
+}

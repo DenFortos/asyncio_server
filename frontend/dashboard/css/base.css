@@ -1,9 +1,30 @@
-/* frontend/dashboard/css/base.css
+/* frontend/dashboard/css/base.css */
 
 /* ==========================================================================
-   1. ОБНУЛЕНИЕ И ПЕРЕМЕННЫЕ (Reset & Variables)
+   1. ПЕРЕМЕННЫЕ (Design System Variables)
+   Централизованное управление цветами и эффектами
 ========================================================================== */
+:root {
+    /* Glassmorphism Colors */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-panel: rgba(10, 10, 15, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-text: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.5);
+    
+    /* Accent Colors */
+    --accent-blue: #00d4ff;
+    --accent-green: #00ff88;
+    --accent-red: #ff4b2b;
+    
+    /* Effects */
+    --blur: 16px;
+    --font-main: 'Inter', system-ui, sans-serif;
+}
 
+/* ==========================================================================
+   2. СБРОС И БАЗА (Reset & Base)
+========================================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -11,69 +32,32 @@
     outline: none;
 }
 
-:root {
-    /* Glassmorphism Design System */
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-text: rgba(255, 255, 255, 0.9);
-    --accent-blue: #00d4ff;
-    --accent-red: #ff4b2b;
-    --accent-green: #00ff88;
-    --blur-val: 12px;
+body {
+    height: 100vh;
+    font-family: var(--font-main);
+    color: var(--glass-text);
+    background: #050505 center/cover no-repeat fixed;
+    overflow: hidden;
+    position: relative;
 }
 
 /* ==========================================================================
-   2. ГЛОБАЛЬНЫЕ СТИЛИ СТРАНИЦЫ (Body & Overlay)
+   3. ФОНОВЫЕ ЭФФЕКТЫ (Background Overlays)
+   Мягкое затемнение для читаемости контента
 ========================================================================== */
-
-body {
-    height: 100vh;
-    width: 100vw;
-    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
-    color: var(--glass-text);
-    overflow: hidden;
-    background-color: #000;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: fixed;
-    position: relative;
-    transition: background-image 0.5s ease-in-out;
-}
-
-/** Затемняющий слой для улучшения читаемости текста */
 body::before {
     content: "";
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.45);
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
     z-index: -1;
+    transition: background-image 0.5s ease;
 }
 
 /* ==========================================================================
-   3. ГРАФИЧЕСКИЕ ЭФФЕКТЫ (Effects & Glass)
+   4. СКРОЛЛБАР (Custom Scrollbar)
+   Тонкий и ненавязчивый скроллбар
 ========================================================================== */
-
-.glass-effect {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--blur-val));
-    -webkit-backdrop-filter: blur(var(--blur-val));
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-}
-
-/* ==========================================================================
-   4. ТИПОГРАФИКА И СКРОЛЛ (Typography & Scroll)
-========================================================================== */
-
-h1, h2, h3 { font-weight: 600; letter-spacing: 0.5px; }
-ul { list-style: none; }
-a { text-decoration: none; color: inherit; }
-
-/** Стилизация скроллбара под WebKit (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -83,10 +67,17 @@ a { text-decoration: none; color: inherit; }
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-blue);
+}
+
+/* ==========================================================================
+   5. УТИЛИТЫ (Utilities)
+========================================================================== */
+.hidden {
+    display: none !important;
 }
