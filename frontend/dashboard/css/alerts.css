@@ -1,3 +1,5 @@
+/* frontend\dashboard\css\alerts.css */
+
 :root {
   /* Цвета для логов (можно вынести в глобальные переменные, если нужно) */
   --log-color-debug: #64b5f6;

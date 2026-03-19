@@ -1,10 +1,11 @@
+<!-- frontend\dashboard\dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>SpectralWeb C2 Dashboard</title>
-    <script src="../auth/auth_check.js"></script>
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -17,7 +18,6 @@
         <div class="menu-toggle-wrapper" id="menuToggle">
             <i class="fas fa-bars"></i>
         </div>
-
         <div class="sidebar-top">
             <nav class="sidebar-icons">
                 <div class="icon active" title="Bots" data-section="section-bots"><i class="fas fa-users"></i></div>
@@ -26,7 +26,6 @@
                 <div class="icon" title="Stats" data-section="section-stats"><i class="fas fa-chart-line"></i></div>
             </nav>
         </div>
-
         <div class="sidebar-bottom">
             <nav class="sidebar-icons">
                 <div class="icon" title="Settings" data-section="section-settings"><i class="fas fa-cog"></i></div>
@@ -35,22 +34,15 @@
     </aside>
 
     <div class="main-wrapper">
-
         <header class="main-header">
             <div class="header-left">
                 <h1 class="brand-title">SpectralWeb C2</h1>
             </div>
-
             <div class="header-right">
                 <div class="global-controls">
-                    <button class="bg-btn" id="bgButton">
-                        <i class="fas fa-image"></i> <span>Background</span>
-                    </button>
-                    <button class="bg-btn" id="toggleView">
-                        <i class="fas fa-th"></i> <span>Grid View</span>
-                    </button>
+                    <button class="bg-btn" id="bgButton"><i class="fas fa-image"></i> <span>Background</span></button>
+                    <button class="bg-btn" id="toggleView"><i class="fas fa-th"></i> <span>Grid View</span></button>
                 </div>
-
                 <div class="stats-filters">
                     <div class="stat-box clickable" id="filter-online">
                         <div class="stat-value" id="online-count">0</div>
@@ -76,50 +68,29 @@
         </div>
 
         <main class="content-viewport">
-
             <section id="section-bots" class="content-section active">
                 <div class="data-wrapper">
                     <div class="table-container" id="table-container">
                         <table class="clients-table">
                             <thead>
                                 <tr>
-                                    <th>loc</th>
-                                    <th>user</th>
-                                    <th>pc-name</th>
-                                    <th>last active</th>
-                                    <th>ip</th>
-                                    <th>active window</th>
-                                    <th>id</th>
+                                    <th>loc</th><th>user</th><th>pc-name</th><th>last active</th>
+                                    <th>ip</th><th>active window</th><th>id</th>
                                 </tr>
                             </thead>
-                            <tbody id="clients-list">
-                                </tbody>
+                            <tbody id="clients-list"></tbody>
                         </table>
                     </div>
-                    <div id="grid-view" class="clients-grid hidden">
-                        </div>
+                    <div id="grid-view" class="clients-grid hidden"></div>
                 </div>
             </section>
 
             <section id="section-files" class="content-section hidden">
-                <div class="data-wrapper">
-                    <div class="files-grid" id="files-grid">
-                        </div>
-                </div>
+                <div class="data-wrapper"><div class="files-grid" id="files-grid"></div></div>
             </section>
-
-            <section id="section-alerts" class="content-section hidden">
-                <div class="data-wrapper"><h2>Alerts Monitoring</h2></div>
-            </section>
-
-            <section id="section-stats" class="content-section hidden">
-                <div class="data-wrapper"><h2>System Statistics</h2></div>
-            </section>
-
-            <section id="section-settings" class="content-section hidden">
-                <div class="data-wrapper"><h2>Panel Settings</h2></div>
-            </section>
-
+            <section id="section-alerts" class="content-section hidden"><div class="data-wrapper"><h2>Alerts Monitoring</h2></div></section>
+            <section id="section-stats" class="content-section hidden"><div class="data-wrapper"><h2>System Statistics</h2></div></section>
+            <section id="section-settings" class="content-section hidden"><div class="data-wrapper"><h2>Panel Settings</h2></div></section>
         </main>
     </div>
 
@@ -132,6 +103,5 @@
     </div>
 
     <script type="module" src="js/dashboard.js"></script>
-
 </body>
 </html>

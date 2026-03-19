@@ -1,92 +1,71 @@
 /* frontend/dashboard/js/dashboard.js */
 
 /* ==========================================================================
-   1. ИМПОРТЫ И ГЛОБАЛЬНОЕ СОСТОЯНИЕ (Imports & State)
+   1. ИМПОРТЫ И СОСТОЯНИЕ
 ========================================================================== */
-
 import { connectWebSocket } from './modules/websocket/connection.js';
 import { getAllClients, checkDeadClients } from './modules/data/clients.js';
-import { updateStats } from './modules/data/stats.js';
+import { updateStats } from './modules/data/stats.js'; // <--- ВОЗВРАЩАЕМ ЭТУ СТРОКУ
 import { initializeSidebar } from './modules/ui/sidebar.js';
 import { initializeHeader, applyStatusFilter, setActiveFilterUI, updateHeaderContext } from './modules/ui/header.js';
 import { initializeSearch, applySearchFilter } from './modules/ui/search.js';
 import { Renderer } from './modules/ui/renderer.js';
 
-const state = {
-    filter: 'all',
-    search: '',
-    tab: 'bots'
-};
+const state = { filter: 'all', search: '', tab: 'bots' };
 
 /* ==========================================================================
-   2. ЯДРО СИНХРОНИЗАЦИИ (Core Sync Logic)
+   2. ЯДРО СИНХРОНИЗАЦИИ
 ========================================================================== */
-
-/** Оркестратор: фильтрует данные и заставляет Renderer их отрисовать */
 const syncUI = () => {
     if (state.tab !== 'bots' && state.tab !== 'files') return;
-
     const isGrid = Renderer.getIsGridView();
     setActiveFilterUI(state.filter, isGrid);
-
     const rawData = getAllClients();
     const filtered = applyStatusFilter(rawData, state.filter);
     const searched = applySearchFilter(filtered, state.search);
-
     Renderer.render(searched);
 };
 
 /* ==========================================================================
-   3. НАВИГАЦИЯ ПО ТАБАМ (Tab Management)
+   3. НАВИГАЦИЯ
 ========================================================================== */
-
 function showTab(name) {
     state.tab = name.toLowerCase().trim().replace('section-', '');
-
-    // Переключение видимости HTML-секций
     document.querySelectorAll('.content-section').forEach(s => {
         const isTarget = s.id === `section-${state.tab}`;
         s.classList.toggle('hidden', !isTarget);
         s.classList.toggle('active', isTarget);
     });
-
     updateHeaderContext(state.tab);
     syncUI();
 }
 
 /* ==========================================================================
-   4. ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ (DOM Ready)
+   4. ИНИЦИАЛИЗАЦИЯ
 ========================================================================== */
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Настройка боковой панели
-    initializeSidebar({ onTabChange: showTab });
+    const token = localStorage.getItem('auth_token');
+    const login = localStorage.getItem('user_login');
 
-    // Настройка шапки (вид, фильтры)
+    if (!token || !login) {
+        window.location.href = '/sidebar/auth/auth.html';
+        return;
+    }
+
+    initializeSidebar({ onTabChange: showTab });
     initializeHeader({
         Renderer,
-        onViewToggled: (isGrid) => {
-            if (isGrid) state.filter = 'online';
-            syncUI();
-        },
-        onFilterChange: (newFilter) => {
-            state.filter = newFilter;
-            syncUI();
-        }
+        onViewToggled: (isGrid) => { if (isGrid) state.filter = 'online'; syncUI(); },
+        onFilterChange: (f) => { state.filter = f; syncUI(); }
     });
 
-    // Запуск системных модулей
     initializeSearch();
     connectWebSocket();
-
-    // Проверка "мертвых" ботов каждую секунду
+    
+    // Запуск Watchdog (проверка мертвых ботов)
     setInterval(checkDeadClients, 1000);
 
-    /* ==========================================================================
-       5. ОБРАБОТЧИКИ СОБЫТИЙ (Event Listeners)
-    ========================================================================== */
-
-    // Клик по боту -> переход в панель управления
+    // Обработчики событий
     document.addEventListener('click', e => {
         const row = e.target.closest('.client-row, .client-card');
         if (row && !e.target.closest('button')) {
@@ -94,17 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Реакция на ввод в поиске
-    window.addEventListener('searchUpdated', e => {
-        state.search = e.detail;
-        syncUI();
-    });
+    window.addEventListener('searchUpdated', e => { state.search = e.detail; syncUI(); });
+    ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => window.addEventListener(ev, syncUI));
 
-    // Глобальная перерисовка при любом обновлении данных
-    ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => {
-        window.addEventListener(ev, syncUI);
-    });
-
-    // Стартовая вкладка
     showTab('bots');
 });

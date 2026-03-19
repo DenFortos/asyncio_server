@@ -1,35 +1,21 @@
-// frontend/dashboard/js/modules/ui/renderer.js
+/* frontend/dashboard/js/modules/ui/renderer.js */
 
 /* ==========================================================================
    1. УТИЛИТЫ (Helpers)
 ========================================================================== */
-
-const isOnline = (s) => s === 'online';
-
-/** Превращает код страны (RU, US) в эмодзи-флаг. Не требует сети. */
-const getFlagEmoji = (loc) => {
+const getFlag = (loc) => {
     if (!loc || loc.length !== 2) return '🏳️';
-    return loc.toUpperCase().replace(/./g, char =>
-        String.fromCodePoint(char.charCodeAt(0) + 127397)
-    );
+    return loc.toUpperCase().replace(/./g, c => String.fromCodePoint(c.charCodeAt(0) + 127397));
 };
 
-const renderFlag = (loc) =>
-    `<span class="flag-emoji" style="font-size:1.2rem; margin-right:8px; vertical-align:middle;">${getFlagEmoji(loc)}</span>`;
-
 /* ==========================================================================
-   2. ЯДРО ОТРИСОВКИ (Renderer Engine)
+   2. ЯДРО ОТРИСОВКИ (Core Engine)
 ========================================================================== */
-
 let isGridView = false;
 
 export const Renderer = {
     getIsGridView: () => isGridView,
-
-    toggleView() {
-        isGridView = !isGridView;
-        return isGridView;
-    },
+    toggleView: () => { isGridView = !isGridView; return isGridView; },
 
     render(clients) {
         const tableCont = document.getElementById('table-container');
@@ -42,59 +28,41 @@ export const Renderer = {
         isGridView ? this.drawGrid(clients, gridCont) : this.drawTable(clients);
     },
 
-    /* ==========================================================================
-       3. ТАБЛИЧНЫЙ ШАБЛОН (Table Template)
-    ========================================================================== */
-
+    /* --- Табличный вид (Table View) --- */
     drawTable(clients) {
         const el = document.getElementById('clients-list');
         if (!el) return;
 
         el.innerHTML = clients.length ? clients.map(c => {
-            const online = isOnline(c.status);
-            const sClass = online ? 'status-online' : 'status-offline';
-
+            const online = c.status === 'online';
             return `
             <tr class="client-row" data-client-id="${c.id}">
-                <td>
-                    <span class="status-dot-mini ${online ? 'online' : 'offline'}"></span>
-                    ${renderFlag(c.loc)}
-                </td>
+                <td><span class="status-dot-mini ${online ? 'online' : 'offline'}"></span> ${getFlag(c.loc)}</td>
                 <td>${c.user || 'Anon'}</td>
                 <td>${c.pc_name || 'PC'}</td>
-                <td class="${sClass}">${c.last_active || '--'}</td>
-                <td class="${sClass}">${c.ip || '0.0.0.0'}</td>
+                <td class="${online ? 'status-online' : 'status-offline'}">${c.last_active || '--'}</td>
+                <td class="${online ? 'status-online' : 'status-offline'}">${c.ip || '0.0.0.0'}</td>
                 <td class="text-truncate" title="${c.active_window || ''}">${c.active_window || 'Idle'}</td>
                 <td class="client-id-cell">${c.id}</td>
             </tr>`;
         }).join('') : '<tr><td colspan="7" class="empty-msg">No bots found</td></tr>';
     },
 
-    /* ==========================================================================
-       4. ПЛИТОЧНЫЙ ШАБЛОН (Grid Template)
-    ========================================================================== */
-
+    /* --- Плиточный вид (Grid View) --- */
     drawGrid(clients, container) {
         container.innerHTML = clients.length ? clients.map(c => {
-            const online = isOnline(c.status);
-
-            // Если превью нет, используем стандартную заглушку.
-            // Но если превью пришло по WS (blob:), оно подставится сюда автоматически при рендере
-            const currentPreview = c.lastPreview || "../images/test2.jpg";
+            const online = c.status === 'online';
+            const imgSrc = c.lastPreview || "../images/test2.jpg";
+            const opacity = c.lastPreview ? '1' : '0.5';
 
             return `
             <div class="client-card" data-client-id="${c.id}">
                 <div class="card-status-dot ${online ? 'online' : 'offline'}"></div>
                 <div class="bot-preview">
-                    <img src="${currentPreview}" id="prev-img-${c.id}"
-                         style="opacity: ${c.lastPreview ? '1' : '0.5'}; transition: opacity 0.3s;"
-                         alt="Preview">
+                    <img src="${imgSrc}" id="prev-${c.id}" style="opacity:${opacity}; transition:opacity 0.3s" alt="Preview">
                 </div>
                 <div class="bot-card-body">
-                    <div class="bot-primary-info">
-                        <span><i class="fas fa-user"></i> ${c.user || 'Anon'}</span>
-                        <span>${renderFlag(c.loc)}</span>
-                    </div>
+                    <div class="bot-primary-info"><span><i class="fas fa-user"></i> ${c.user || 'Anon'}</span> ${getFlag(c.loc)}</div>
                     <div class="bot-secondary-info">
                         <span class="${online ? 'status-online' : 'status-offline'}">${c.ip || '0.0.0.0'}</span>
                         <span class="bot-id">#${c.id}</span>
@@ -102,21 +70,14 @@ export const Renderer = {
                 </div>
             </div>`;
         }).join('') : '<div class="empty-msg">No bots found</div>';
+    },
+
+    /* --- Точечное обновление превью (Live Preview Update) --- */
+    updatePreview(id, url) {
+        const img = document.getElementById(`prev-${id}`);
+        if (img) {
+            img.src = url;
+            img.style.opacity = '1';
+        }
     }
 };
-
-/* ==========================================================================
-   5. ЖИВОЕ ОБНОВЛЕНИЕ КАРТИНОК
-========================================================================== */
-
-window.addEventListener('botPreviewReceived', ({ detail }) => {
-    const { id, url } = detail;
-    const imgElement = document.getElementById(`prev-img-${id}`);
-
-    if (imgElement) {
-        // Просто обновляем src.
-        // RevokeObjectURL делать здесь НЕ НУЖНО, так как мы сделали его в clients.js
-        imgElement.src = url;
-        imgElement.style.opacity = '1';
-    }
-});

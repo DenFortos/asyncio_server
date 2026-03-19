@@ -1,10 +1,8 @@
-# backend\API\api.py
-
+# backend/API/api.py
 import uvicorn, asyncio, json
 from fastapi import FastAPI, WebSocket, Query, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse, JSONResponse
-from contextlib import asynccontextmanager
 
 from .config import FRONTEND_PATH
 from .database import load_user_db, load_bots_from_file
@@ -49,10 +47,18 @@ async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = 
     try:
         if mode != "control":
             bots = load_bots_from_file()
+            
+            # Собираем доступных ботов в список для массовой отправки
+            visible_bots = []
             for bid, data in bots.items():
                 if has_access(user, bid):
-                    await ws.send_bytes(pack_bot_command(bid, "DataScribe", json.dumps(data)))
+                    visible_bots.append(data)
+                    # Асинхронный пинг для проверки статуса (онлайн/офлайн)
                     asyncio.create_task(send_binary_to_bot(bid, pack_bot_command(bid, "DataScribe", "get_metadata")))
+            
+            # ОТПРАВЛЯЕМ ОДИМ МАССИВОМ: Фронтенд увидит Array и отрисует всех ботов
+            if visible_bots:
+                await ws.send_bytes(pack_bot_command("SYSTEM", "DataScribe", json.dumps(visible_bots)))
         
         while True:
             msg = await ws.receive()
