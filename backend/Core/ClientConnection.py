@@ -6,7 +6,6 @@ from logs import Log as logger
 from backend.Services import authorize_client, close_client
 from backend.BenchUtils import add_bytes
 from backend.Services.ClientManager import client
-# Импортируем менеджер здесь, так как он инициализируется при старте API
 from backend.API import manager
 
 async def read_full_packet(reader: asyncio.StreamReader):
@@ -53,4 +52,3 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
     finally:
         if client_id: client.pop(client_id, None)
         writer.close()
-        
