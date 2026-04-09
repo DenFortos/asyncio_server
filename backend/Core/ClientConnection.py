@@ -10,7 +10,9 @@ from backend.API import manager
 
 async def read_full_packet(reader: asyncio.StreamReader):
     try:
+        # Читаем заголовок (6 байт)
         tech = await reader.readexactly(6)
+        # Рассчитываем длину тела: ID_LEN + MOD_LEN + PAYLOAD_LEN
         body_len = tech[0] + tech[1] + int.from_bytes(tech[2:6], "big")
         body = await reader.readexactly(body_len)
         return tech + body
@@ -27,6 +29,7 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
         transport.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     try:
+        # Вызываем исправленную авторизацию
         auth = await authorize_client(reader, ip_addr)
         if not auth:
             writer.close()
@@ -44,7 +47,7 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             if not packet: break
 
             add_bytes(len(packet))
-            # Используем глобальный менеджер из API для рассылки на фронтенд
+            # Проброс на фронтенд через WebSocket
             manager.broadcast_packet_sync(packet)
 
     except Exception as e:

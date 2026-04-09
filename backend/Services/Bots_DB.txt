@@ -1,12 +1,14 @@
 {
     "ua4e1-Bot-Worker": {
         "id": "ua4e1-Bot-Worker",
-        "loc": "US",
-        "user": "Manager_John",
-        "pc_name": "OFFICE-PC-01",
-        "activeWindow": "Dashboard",
-        "last_active": "13:25:03",
-        "ip": "127.0.0.1",
+        "loc": "??",
+        "user": "TestBot",
+        "pc_name": "DESKTOP-BF7JB87",
+        "active_window": "cmd.exe",
+        "last_active": "08:20:28",
+        "ip": "0.0.0.0",
+        "os": "Windows 11",
+        "hw": {},
         "auth_key": "super_secret"
     },
     "u80a9-Bot-Worker": {

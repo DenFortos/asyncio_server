@@ -28,6 +28,9 @@ export const Renderer = {
 
         el.innerHTML = clients.length ? clients.map(c => {
             const online = c.status === 'online';
+            // ИСПРАВЛЕНО: берем activeWindow (CamelCase)
+            const currentWindow = c.activeWindow || 'Idle';
+            
             return `
             <tr class="client-row" data-client-id="${c.id}">
                 <td><span class="status-dot-mini ${online ? 'online' : 'offline'}"></span> ${getFlag(c.loc)}</td>
@@ -35,7 +38,7 @@ export const Renderer = {
                 <td>${c.pc_name || 'PC'}</td>
                 <td class="${online ? 'status-online' : 'status-offline'}">${c.last_active || '--'}</td>
                 <td class="${online ? 'status-online' : 'status-offline'}">${c.ip || '0.0.0.0'}</td>
-                <td class="text-truncate" title="${c.active_window || ''}">${c.active_window || 'Idle'}</td>
+                <td class="text-truncate" title="${currentWindow}">${currentWindow}</td>
                 <td class="client-id-cell">${c.id}</td>
             </tr>`;
         }).join('') : '<tr><td colspan="7" class="empty-msg">No bots found</td></tr>';
@@ -44,15 +47,12 @@ export const Renderer = {
     drawGrid(clients, container) {
         container.innerHTML = clients.length ? clients.map(c => {
             const imgSrc = c.lastPreview || "../images/test2.jpg";
-            const opacity = c.lastPreview ? '1' : '0.5';
-
             return `
             <div class="client-card" data-client-id="${c.id}">
                 <div class="bot-preview">
-                    <img src="${imgSrc}" id="prev-${c.id}" alt="Preview" style="opacity:${opacity}">
+                    <img src="${imgSrc}" id="prev-${c.id}" alt="Preview" style="opacity:${c.lastPreview ? '1' : '0.5'}">
                 </div>
                 <div class="bot-card-body">
-                    <!-- НОВЫЙ ФОРМАТ: US: 127.0.0.1 | ID: ua4e1... -->
                     <div class="bot-info-row">
                         <span class="flag-emoji" title="${c.loc}">${getFlag(c.loc)}</span>
                         <div class="bot-data-string">
@@ -68,9 +68,6 @@ export const Renderer = {
 
     updatePreview(id, url) {
         const img = document.getElementById(`prev-${id}`);
-        if (img) {
-            img.src = url;
-            img.style.opacity = '1';
-        }
+        if (img) { img.src = url; img.style.opacity = '1'; }
     }
 };
