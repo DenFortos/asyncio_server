@@ -1,7 +1,7 @@
-/* frontend/dashboard/js/modules/ui/renderer.js */
+// frontend/dashboard/js/modules/ui/renderer.js
 
 const getFlag = (loc) => {
-    if (!loc || loc.length !== 2) return '🏳️';
+    if (!loc || typeof loc !== 'string' || loc.length !== 2) return '🏳️';
     return loc.toUpperCase().replace(/./g, c => String.fromCodePoint(c.charCodeAt(0) + 127397));
 };
 
@@ -9,8 +9,7 @@ let isGridView = false;
 
 export const Renderer = {
     getIsGridView: () => isGridView,
-    toggleView: () => { isGridView = !isGridView; return isGridView; },
-
+    
     render(clients) {
         const tableCont = document.getElementById('table-container');
         const gridCont = document.getElementById('grid-view');
@@ -22,23 +21,28 @@ export const Renderer = {
         isGridView ? this.drawGrid(clients, gridCont) : this.drawTable(clients);
     },
 
-    drawTable(clients) {
+drawTable(clients) {
         const el = document.getElementById('clients-list');
         if (!el) return;
 
         el.innerHTML = clients.length ? clients.map(c => {
             const online = c.status === 'online';
-            // ИСПРАВЛЕНО: берем activeWindow (CamelCase)
-            const currentWindow = c.activeWindow || 'Idle';
             
+            // Используем "—" (длинное тире) для пустых полей
+            const user = c.user && c.user !== 'Unknown' ? c.user : '—';
+            const pc = c.pc_name || '—';
+            const ip = c.ip && c.ip !== '0.0.0.0' ? c.ip : '—';
+            const win = c.active_window || '—';
+            const last = c.last_active || '—';
+
             return `
             <tr class="client-row" data-client-id="${c.id}">
                 <td><span class="status-dot-mini ${online ? 'online' : 'offline'}"></span> ${getFlag(c.loc)}</td>
-                <td>${c.user || 'Anon'}</td>
-                <td>${c.pc_name || 'PC'}</td>
-                <td class="${online ? 'status-online' : 'status-offline'}">${c.last_active || '--'}</td>
-                <td class="${online ? 'status-online' : 'status-offline'}">${c.ip || '0.0.0.0'}</td>
-                <td class="text-truncate" title="${currentWindow}">${currentWindow}</td>
+                <td>${user}</td>
+                <td>${pc}</td>
+                <td class="${online ? 'status-online' : 'status-offline'}">${last}</td>
+                <td class="${online ? 'status-online' : 'status-offline'}">${ip}</td>
+                <td class="text-truncate" title="${win}">${win}</td>
                 <td class="client-id-cell">${c.id}</td>
             </tr>`;
         }).join('') : '<tr><td colspan="7" class="empty-msg">No bots found</td></tr>';
@@ -47,6 +51,8 @@ export const Renderer = {
     drawGrid(clients, container) {
         container.innerHTML = clients.length ? clients.map(c => {
             const imgSrc = c.lastPreview || "../images/test2.jpg";
+            const ip = c.ip && c.ip !== '0.0.0.0' ? c.ip : '—';
+            
             return `
             <div class="client-card" data-client-id="${c.id}">
                 <div class="bot-preview">
@@ -54,9 +60,9 @@ export const Renderer = {
                 </div>
                 <div class="bot-card-body">
                     <div class="bot-info-row">
-                        <span class="flag-emoji" title="${c.loc}">${getFlag(c.loc)}</span>
+                        <span class="flag-emoji" title="${c.loc || 'Unknown'}">${getFlag(c.loc)}</span>
                         <div class="bot-data-string">
-                            <span class="data-part-ip">${c.ip || '0.0.0.0'}</span>
+                            <span class="data-part-ip">${ip}</span>
                             <span class="data-separator"> | </span>
                             <span class="data-part-id" title="${c.id}">${c.id}</span>
                         </div>
@@ -64,10 +70,5 @@ export const Renderer = {
                 </div>
             </div>`;
         }).join('') : '<div class="empty-msg">No bots found</div>';
-    },
-
-    updatePreview(id, url) {
-        const img = document.getElementById(`prev-${id}`);
-        if (img) { img.src = url; img.style.opacity = '1'; }
     }
 };

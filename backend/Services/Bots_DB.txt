@@ -5,20 +5,9 @@
         "user": "TestBot",
         "pc_name": "DESKTOP-BF7JB87",
         "active_window": "cmd.exe",
-        "last_active": "08:20:28",
+        "last_active": "14:30:24",
         "ip": "0.0.0.0",
         "os": "Windows 11",
-        "hw": {},
-        "auth_key": "super_secret"
-    },
-    "u80a9-Bot-Worker": {
-        "id": "u80a9-Bot-Worker",
-        "loc": "US",
-        "user": "Manager_John",
-        "pc_name": "OFFICE-PC-01",
-        "activeWindow": "Dashboard",
-        "last_active": "04:16:05",
-        "ip": "127.0.0.1",
-        "auth_key": "super_secret"
+        "hw": {}
     }
 }

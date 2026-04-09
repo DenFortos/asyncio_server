@@ -28,10 +28,12 @@ export function connectWebSocket() {
         const pkg = decodePacket(data);
         if (!pkg || pkg.module === 'pong') return;
 
+        // 1. Простое подтверждение жизни (пинги)
         if (pkg.module === 'Heartbeat') {
-            return updateClient({ id: pkg.id }, true);
+            return updateClient({ id: pkg.id }, true); 
         }
 
+        // 2. Полноценные данные бота
         if (pkg.module === 'DataScribe') {
             try {
                 const raw = JSON.parse(decoder.decode(pkg.payload));
@@ -39,17 +41,14 @@ export function connectWebSocket() {
                     updateClients(raw);
                     setTimeout(() => raw.forEach(b => b.id && sendPing(b.id)), 100);
                 } else {
-                    updateClient({ ...raw, id: pkg.id || raw.id }, false);
+                    // ВАЖНО: передаем true, чтобы статус стал online при получении данных
+                    updateClient({ ...raw, id: pkg.id || raw.id }, true);
                 }
             } catch (e) {
-                // Обработка бинарного превью (JPEG)
+                // Логика превью остается без изменений
                 if (pkg.payload.byteLength > 100) {
                     const url = URL.createObjectURL(new Blob([pkg.payload], { type: 'image/jpeg' }));
-                    
-                    // 1. Сохраняем ссылку в данные (для перерисовки при переключении вкладок)
                     setClientPreview(pkg.id, url);
-                    
-                    // 2. Мгновенно обновляем картинку в DOM через Renderer
                     Renderer.updatePreview(pkg.id, url);
                 }
             }
