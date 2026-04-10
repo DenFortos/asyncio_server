@@ -17,18 +17,17 @@
     transition: transform 0.3s ease;
 }
 
-/* Состояние скрытого сайдбара */
 .sidebar-hidden .sidebar {
     transform: translateX(-80px);
 }
 
-/* Основная обертка контента */
 .main-wrapper {
     margin-left: 80px;
-    min-height: 100vh;
+    height: 100vh; /* МЕНЯЕМ min-height на height */
     display: flex;
     flex-direction: column;
     transition: margin-left 0.3s ease;
+    overflow: hidden; /* ЗАПРЕЩАЕМ скролл самого окна браузера */
 }
 
 .sidebar-hidden .main-wrapper {
@@ -81,50 +80,105 @@
 }
 
 /* ==========================================================================
-   3. РАБОЧАЯ ЗОНА (Content Viewport)
-   Прозрачная область с контентом
+    3. РАБОЧАЯ ЗОНА (Content Viewport)
 ========================================================================== */
 .content-viewport {
     flex: 1;
-    overflow-y: auto;
-    padding: 25px 30px;
-    margin: 15px 25px 25px 25px;
-    
-    /* Визуальное выделение зоны */
-    background: rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 10px 30px 20px 30px;
+    /* Ограничиваем высоту строго под вьюпорт */
+    height: calc(100vh - 140px); 
+    min-height: 0;
+    overflow: hidden; 
 }
 
 .content-section {
-    display: none;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; 
 }
 
-.content-section.active {
-    display: block;
+/* Общий контейнер-подложка */
+.data-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; 
+    background: rgba(15, 15, 20, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    /* Убираем внутренние отступы, чтобы таблица прилипала к скругленным краям */
+    padding: 0; 
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* Скролл будет внутри дочерних элементов */
 }
+
+/* --- ТАБЛИЦА: Скругляем углы и настраиваем скролл --- */
+.table-container {
+    flex: 1;
+    width: 100%;
+    overflow-y: auto !important; /* Явно включаем скролл */
+    overflow-x: hidden;
+    min-height: 0;
+    /* Скругляем саму коробку */
+    border-radius: 20px; 
+    position: relative;
+}
+
+/* Дополнительно скругляем саму шапку таблицы, чтобы она не вылезала за края контейнера */
+.clients-table th:first-child { border-top-left-radius: 20px; }
+.clients-table th:last-child { border-top-right-radius: 20px; }
 
 /* ==========================================================================
-   4. СЕТКИ (Grids)
-   Адаптивные сетки для ботов и файлов
+    4. СЕТКИ (Grids)
 ========================================================================== */
 .clients-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-auto-rows: min-content; 
     gap: 25px;
-    padding-bottom: 20px;
+    padding: 25px;
+    
+    flex: 1;
+    min-height: 0; /* Важно: разрешаем сжиматься для появления скролла */
+    overflow-y: auto !important;
+    
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    /* Чтобы скроллбар не обрезал скругление */
+    scrollbar-gutter: stable; 
 }
 
-.files-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+/* Универсальный скроллбар для всех контейнеров */
+.table-container::-webkit-scrollbar,
+.clients-grid::-webkit-scrollbar,
+#section-files .data-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.table-container::-webkit-scrollbar-track,
+.clients-grid::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 10px 0; /* Отступ, чтобы не упирался в скругления */
+}
+
+.table-container::-webkit-scrollbar-thumb,
+.clients-grid::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 255, 0.2);
+    border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover,
+.clients-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-blue);
 }
 
 /* ==========================================================================
-   5. МОДАЛЬНЫЕ ОКНА (Modal Structure)
+   5. МОДАЛЬНЫЕ ОКНА (Structure)
 ========================================================================== */
 .modal {
     position: fixed;
@@ -150,7 +204,6 @@
     background: rgba(15, 15, 20, 0.85);
 }
 
-/* Сетка выбора фонов */
 .bg-options-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

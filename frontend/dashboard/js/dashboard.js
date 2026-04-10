@@ -6,50 +6,49 @@ import { initializeSidebar } from './modules/ui/sidebar.js';
 import { initializeHeader, applyStatusFilter, setActiveFilterUI, updateHeaderContext } from './modules/ui/header.js';
 import { initializeSearch, applySearchFilter } from './modules/ui/search.js';
 import { Renderer } from './modules/ui/renderer.js';
+import { FilesManager } from './modules/sidebar/files.js';
 
 const state = { filter: 'all', search: '', tab: 'bots' };
 
 const syncUI = () => {
-    // Проверка вкладки (учитываем оба варианта именования)
-    if (state.tab !== 'bots' && state.tab !== 'section-bots') return;
+    if (state.tab !== 'bots') return;
     
     const all = getAllClients();
     setActiveFilterUI(state.filter, Renderer.getIsGridView());
-    
-    // Сначала фильтруем по статусу (online/offline/all)
     const filtered = applyStatusFilter(all, state.filter);
-    // Затем применяем поиск
     const searched = applySearchFilter(filtered, state.search);
     
     Renderer.render(searched);
 };
 
-const showTab = (name) => {
-    state.tab = name.toLowerCase().trim().replace('section-', '');
-    document.querySelectorAll('.content-section').forEach(s => {
-        const active = s.id === `section-${state.tab}` || s.id === state.tab;
-        s.classList.toggle('hidden', !active);
-        s.classList.toggle('active', active);
-    });
+const handleTabChange = (name) => {
+    state.tab = name.replace('section-', '');
     updateHeaderContext(state.tab);
-    syncUI();
+
+    const searchInput = document.getElementById('universal-search');
+    if (searchInput) { searchInput.value = ''; state.search = ''; }
+
+    if (state.tab === 'bots') {
+        syncUI();
+    } else if (state.tab === 'files') {
+        // Рендерим сетку файлов (пока пустую, она создаст 25 скелетов)
+        FilesManager.render([]); 
+    }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    const [t, l] = [localStorage.getItem('auth_token'), localStorage.getItem('user_login')];
-    if (!t || !l) return window.location.href = '/sidebar/auth/auth.html';
+    if (!localStorage.getItem('auth_token')) return window.location.href = '/sidebar/auth/auth.html';
 
-    initializeSidebar({ onTabChange: showTab });
+    initializeSidebar({ onTabChange: handleTabChange });
     initializeHeader({ 
         Renderer, 
-        onViewToggled: () => syncUI(),
+        onViewToggled: syncUI,
         onFilterChange: (f) => { state.filter = f; syncUI(); }
     });
 
     initializeSearch(); 
     connectWebSocket();
 
-    // Клики по строкам
     document.addEventListener('click', e => {
         const row = e.target.closest('.client-row, .client-card');
         if (row && !e.target.closest('button')) {
@@ -57,10 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Слушатели обновлений данных
     window.addEventListener('searchUpdated', e => { state.search = e.detail; syncUI(); });
     window.addEventListener('clientsUpdated', syncUI);
 
-    // Инициализация
-    showTab('section-bots');
+    handleTabChange('bots');
 });

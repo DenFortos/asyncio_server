@@ -1,10 +1,8 @@
-<!-- frontend\dashboard\dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>SpectralWeb C2 Dashboard</title>
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
@@ -16,9 +14,7 @@
 <body class="sidebar-hidden">
 
     <aside class="sidebar" id="sidebar">
-        <div class="menu-toggle-wrapper" id="menuToggle">
-            <i class="fas fa-bars"></i>
-        </div>
+        <div class="menu-toggle-wrapper" id="menuToggle"><i class="fas fa-bars"></i></div>
         <div class="sidebar-top">
             <nav class="sidebar-icons">
                 <div class="icon active" title="Bots" data-section="section-bots"><i class="fas fa-users"></i></div>
@@ -36,27 +32,16 @@
 
     <div class="main-wrapper">
         <header class="main-header">
-            <div class="header-left">
-                <h1 class="brand-title">SpectralWeb C2</h1>
-            </div>
+            <div class="header-left"><h1 class="brand-title">SpectralWeb C2</h1></div>
             <div class="header-right">
                 <div class="global-controls">
                     <button class="bg-btn" id="bgButton"><i class="fas fa-image"></i> <span>Background</span></button>
                     <button class="bg-btn" id="toggleView"><i class="fas fa-th"></i> <span>Grid View</span></button>
                 </div>
                 <div class="stats-filters">
-                    <div class="stat-box clickable" id="filter-online">
-                        <div class="stat-value" id="online-count">0</div>
-                        <div class="stat-label">Online</div>
-                    </div>
-                    <div class="stat-box clickable active" id="filter-all">
-                        <div class="stat-value" id="total-count">0</div>
-                        <div class="stat-label">Total</div>
-                    </div>
-                    <div class="stat-box clickable" id="filter-offline">
-                        <div class="stat-value" id="offline-count">0</div>
-                        <div class="stat-label">Offline</div>
-                    </div>
+                    <div class="stat-box clickable" id="filter-online"><div class="stat-value" id="online-count">0</div><div class="stat-label">Online</div></div>
+                    <div class="stat-box clickable active" id="filter-all"><div class="stat-value" id="total-count">0</div><div class="stat-label">Total</div></div>
+                    <div class="stat-box clickable" id="filter-offline"><div class="stat-value" id="offline-count">0</div><div class="stat-label">Offline</div></div>
                 </div>
             </div>
         </header>
@@ -74,10 +59,7 @@
                     <div class="table-container" id="table-container">
                         <table class="clients-table">
                             <thead>
-                                <tr>
-                                    <th>loc</th><th>user</th><th>pc-name</th><th>last active</th>
-                                    <th>ip</th><th>active window</th><th>id</th>
-                                </tr>
+                                <tr><th>loc</th><th>user</th><th>pc-name</th><th>last active</th><th>ip</th><th>active window</th><th>id</th></tr>
                             </thead>
                             <tbody id="clients-list"></tbody>
                         </table>
@@ -87,8 +69,11 @@
             </section>
 
             <section id="section-files" class="content-section hidden">
-                <div class="data-wrapper"><div class="files-grid" id="files-grid"></div></div>
+                <div class="data-wrapper">
+                    <div class="files-grid" id="files-grid"></div>
+                </div>
             </section>
+
             <section id="section-alerts" class="content-section hidden"><div class="data-wrapper"><h2>Alerts Monitoring</h2></div></section>
             <section id="section-stats" class="content-section hidden"><div class="data-wrapper"><h2>System Statistics</h2></div></section>
             <section id="section-settings" class="content-section hidden"><div class="data-wrapper"><h2>Panel Settings</h2></div></section>

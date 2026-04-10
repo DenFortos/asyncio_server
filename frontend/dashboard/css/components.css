@@ -67,7 +67,7 @@
     font-weight: 800;
     letter-spacing: 1.5px;
     background: linear-gradient(135deg, #fff, var(--accent-blue));
-    background-clip: text;             /* <-- ДОБАВЛЕНО ДЛЯ СОВМЕСТИМОСТИ */
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     cursor: pointer;
@@ -96,7 +96,6 @@
     color: var(--accent-blue);
 }
 
-/* Поиск */
 .search-bar i {
     position: absolute;
     left: 20px;
@@ -148,7 +147,6 @@
     color: #fff;
 }
 
-/* Активные состояния - Яркие */
 .stat-box.active {
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
@@ -194,75 +192,143 @@
 }
 
 /* ==========================================================================
-   4. ТАБЛИЦА (Clients Table)
+    4. ТАБЛИЦА (Clients Table)
 ========================================================================== */
-.table-container {
-    width: 100%;
-    border-radius: 16px;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--glass-border);
+.clients-table tbody tr.client-row {
+    cursor: pointer;
+}
+
+.clients-table tbody tr.skeleton-row {
+    cursor: default !important;
+    pointer-events: none !important;
+    background: transparent !important;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 .clients-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.clients-table thead tr {
+    cursor: default !important;
+    transform: none !important;
+    background: none !important;
 }
 
 .clients-table th {
-    padding: 16px;
-    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #0a0c10;
+    padding: 18px 10px;
     font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: #fff;
-    background: rgba(0, 212, 255, 0.15);
-    font-weight: 800;
+    color: var(--accent-blue);
     border-bottom: 2px solid var(--accent-blue);
+    font-weight: 900;
+    letter-spacing: 1px;
+    pointer-events: none;
 }
 
+/* Ширина колонок */
+.clients-table th:nth-child(1) { width: 65px; }
+.clients-table th:nth-child(2) { width: 14%; }
+.clients-table th:nth-child(3) { width: 17%; }
+.clients-table th:nth-child(4) { width: 100px; }
+.clients-table th:nth-child(5) { width: 125px; }
+.clients-table th:nth-child(6) { width: 26%; }
+.clients-table th:nth-child(7) { width: 12%; }
+
+/* Единый стиль для всех данных в таблице (Белый шрифт) */
 .clients-table td {
-    padding: 14px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     font-size: 0.95rem;
-    color: #eee;
-    font-weight: 500;
+    color: #ffffff; /* Все данные теперь чисто белые */
+    font-weight: 700;
+    height: 55px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    text-align: center;
 }
 
-.clients-table tr:hover {
-    background: rgba(255, 255, 255, 0.05);
+/* Убираем специфический цвет для ID, делаем его как все */
+.client-id-cell {
+    font-family: 'Consolas', monospace;
+    color: #ffffff !important; 
+    opacity: 1;
+}
+
+.clients-table tbody tr {
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.clients-table tbody tr:hover {
+    background-color: rgba(0, 212, 255, 0.15) !important;
+    transform: scale(1.002);
+    z-index: 5;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.cell-content {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* --- СТАТУСЫ --- */
+.status-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 55px;
 }
 
 .status-dot-mini {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    margin-right: 8px;
-    box-shadow: 0 0 5px currentColor;
+    display: inline-block;
+    flex-shrink: 0;
 }
 
 .status-dot-mini.online {
-    background: var(--accent-green);
-    color: var(--accent-green);
+    background-color: #00ff88;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
 }
 
 .status-dot-mini.offline {
-    background: var(--accent-red);
-    color: var(--accent-red);
+    background-color: #ff4b2b;
+    box-shadow: 0 0 10px rgba(255, 75, 43, 0.8);
+}
+
+/* --- ДОПОЛНИТЕЛЬНО: Блокировка кнопок статистики --- */
+.stat-box.disabled {
+    opacity: 0.3 !important;
+    pointer-events: none !important;
+    filter: grayscale(1);
+    cursor: not-allowed;
 }
 
 /* ==========================================================================
    5. КАРТОЧКИ БОТОВ (Bot Cards)
 ========================================================================== */
 .client-card {
+    /* Убираем жесткий min-height, позволяем aspect-ratio диктовать размеры */
+    min-height: auto; 
     background: rgba(15, 15, 20, 0.5);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
 }
 
 .client-card:hover {
@@ -271,10 +337,11 @@
     box-shadow: 0 15px 40px rgba(0, 212, 255, 0.15);
 }
 
-/* Превью экрана */
 .bot-preview {
     width: 100%;
-    height: 228px; /* Увеличено на 20% для лучшего обзора (идеально под 16:9) */
+    /* Авто-высота на основе ширины кадра */
+    aspect-ratio: 16 / 9; 
+    flex-shrink: 0;
     background: #000;
     display: flex;
     align-items: center;
@@ -285,8 +352,9 @@
 .bot-preview img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    opacity: 0.9;
+    /* Cover уберет полосы по бокам, если кадр чуть-чуть не совпадет */
+    object-fit: cover; 
+    object-position: top center;
 }
 
 .client-card:hover .bot-preview img {
@@ -294,14 +362,13 @@
     transform: scale(1.02);
 }
 
-/* Информация о боте */
 .bot-card-body {
     padding: 15px;
     background: rgba(0, 0, 0, 0.3);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+    min-width: 0;
 }
 
-/* Строка информации: Флаг + Данные */
 .bot-info-row {
     display: flex;
     align-items: center;
@@ -321,7 +388,6 @@
     flex-shrink: 0;
 }
 
-/* Строка данных: IP | ID */
 .bot-data-string {
     display: flex;
     align-items: center;
@@ -337,8 +403,14 @@
     overflow: hidden;
 }
 
-.data-part-ip {
-    font-weight: 700;
+.data-part-id {
+    color: var(--text-muted);
+    opacity: 0.9;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 400;
+    white-space: nowrap;
 }
 
 .data-separator {
@@ -347,17 +419,39 @@
     padding: 0 2px;
 }
 
-.data-part-id {
-    color: var(--text-muted);
-    opacity: 0.9;
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: 400;
+.client-card.offline {
+    opacity: 0.7;
+    filter: grayscale(0.4);
+}
+
+.client-card.offline .bot-preview {
+    position: relative;
+}
+
+.offline-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ff4b2b;
+    font-weight: 900;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(255, 75, 43, 0.5);
+}
+
+.client-card:not(.skeleton-card) {
+    cursor: pointer;
+}
+
+.client-card:not(.skeleton-card) .bot-preview {
+    cursor: pointer;
 }
 
 /* ==========================================================================
-   6. МОДАЛЬНОЕ ОКНО (Modal Details)
+   6. МОДАЛЬНОЕ ОКНО (Elements)
 ========================================================================== */
 .close-modal {
     position: absolute;
@@ -381,7 +475,6 @@
     color: #fff;
 }
 
-/* Опции фонов */
 .bg-option {
     border-radius: 12px;
     overflow: hidden;
@@ -395,7 +488,7 @@
 .bg-option:hover {
     border-color: var(--accent-blue);
     box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
-    transform: none; /* Отключено увеличение, чтобы не ломать скролл */
+    transform: none;
 }
 
 .bg-option img {
@@ -407,4 +500,233 @@
 
 .bg-option:hover img {
     opacity: 0.8;
+}
+
+/* ==========================================================================
+   7. SKELETON FLOW (Заглушки)
+========================================================================== */
+.skeleton-row td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.skeleton-line {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    width: 60%;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-dot {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
+.skeleton-card {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    pointer-events: none;
+    box-shadow: none !important;
+}
+
+.skeleton-pulse {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.02) 25%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0.02) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 2s infinite;
+}
+
+.skeleton-line::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    animation: skeleton-loading 2s infinite;
+}
+
+.bot-preview.skeleton-pulse {
+    aspect-ratio: 16 / 9;
+    height: auto;
+    flex-shrink: 0;
+}
+
+.client-card.skeleton-card {
+    cursor: default !important;
+    pointer-events: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ==========================================================================
+    8. ФАЙЛОВАЯ СЕТКА (Files Section)
+========================================================================== */
+
+/* Контейнер-подложка для сетки */
+#section-files .data-wrapper {
+    background: rgba(15, 15, 20, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 15px;
+    align-content: start; /* Карточки не растягиваются на весь экран, если их мало */
+}
+
+/* Стили карточки файла */
+.bot-file-card {
+    background: rgba(15, 15, 20, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.bot-file-card:not(.skeleton-card):hover {
+    transform: translateY(-3px);
+    border-color: var(--accent-blue);
+    background: rgba(0, 212, 255, 0.05);
+    box-shadow: 0 10px 25px rgba(0, 212, 255, 0.1);
+}
+
+/* Шапка карточки: LOC | IP | ID */
+.bot-file-header {
+    background: rgba(0, 212, 255, 0.08);
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--glass-border);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.bot-header-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Consolas', monospace;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.bot-header-info b {
+    color: var(--accent-blue);
+    font-weight: 700;
+}
+
+.header-sep {
+    opacity: 0.3;
+    color: #fff;
+}
+
+.bot-file-content {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Зона архивов: Скроллбара после 3-х элементов */
+.scroll-area {
+    max-height: 108px; /* Высота ровно под 3 zip-файла */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-right: 4px;
+}
+
+/* Тонкий скролл внутри карточки */
+.scroll-area::-webkit-scrollbar {
+    width: 3px;
+}
+.scroll-area::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 255, 0.3);
+    border-radius: 10px;
+}
+
+/* Элементы списка */
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid transparent;
+}
+
+.file-item.keylogger i { color: #ffca28; }
+.file-item.zip i { color: var(--accent-blue); }
+
+.file-action-btn {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: 0.2s;
+}
+
+.file-action-btn:hover {
+    color: #fff;
+    transform: scale(1.1);
+}
+
+/* Скелетоны (призраки) */
+.bot-file-card.skeleton-card {
+    min-height: 190px;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    pointer-events: none;
+    box-shadow: none !important;
+}
+
+.bot-file-card.skeleton-card .bot-file-header {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.bot-file-card.skeleton-card .skeleton-line {
+    background: rgba(255, 255, 255, 0.08);
+    margin: 0;
+}
+
+/* Общий скролл секции */
+#section-files .data-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+#section-files .data-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 255, 0.2);
+    border-radius: 10px;
+}
+#section-files .data-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-blue);
 }

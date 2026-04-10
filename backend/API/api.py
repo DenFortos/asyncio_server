@@ -1,5 +1,3 @@
-# backend/API/api.py
-
 import json
 import uvicorn
 from fastapi import FastAPI, WebSocket, Body
@@ -70,7 +68,7 @@ async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = 
     allowed_bots_cache = set()
 
     try:
-        # 1. Синхронизация списка ботов при входе
+        # 1. Синхронизация списка ботов и превью при входе
         if mode != "control":
             await _sync_initial_bots(ws, user)
 
@@ -84,10 +82,8 @@ async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = 
                 pkt = msg["bytes"]
                 if len(pkt) < 7: continue
                 
-                # Извлекаем ID цели из пакета
                 target_id = pkt[6:6 + pkt[0]].decode(errors='ignore').strip()
                 
-                # Проверка прав доступа (Кэшированная)
                 if target_id in allowed_bots_cache or has_access(user, target_id):
                     allowed_bots_cache.add(target_id)
                     await send_binary_to_bot(target_id, pkt)
@@ -100,19 +96,31 @@ async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = 
         manager.disconnect(ws, user_login)
 
 async def _sync_initial_bots(ws, user):
-    """Сборка и отправка админу списка ботов из БД с учетом онлайн-статуса"""
+    """Сборка списка ботов и ПУШ актуальных превью из RAM при входе админа"""
+    # Локальный импорт для предотвращения circular import
+    from backend.Core.ClientConnection import preview_cache 
+    
     bots = load_bots_from_file()
     visible_bots = []
     
+    # 1. Формируем список ботов для таблицы
     for bid, data in bots.items():
         if has_access(user, bid):
-            # Магия склейки: статус берем из RAM, данные из TXT
             data['status'] = 'online' if bid in active_clients else 'offline'
             visible_bots.append(data)
     
     if visible_bots:
+        # Отправляем данные для таблицы
         payload = pack_bot_command("SYSTEM", "DataScribe", json.dumps(visible_bots))
         await ws.send_bytes(payload)
+        
+        # 2. Сразу после списка шлем последние картинки из RAM
+        for bid, photo_packet in preview_cache.items():
+            if has_access(user, bid):
+                try:
+                    await ws.send_bytes(photo_packet)
+                except:
+                    break
 
 async def run_fastapi_server(host, port):
     """Публичный метод для инициализации API"""

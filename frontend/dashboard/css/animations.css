@@ -59,3 +59,9 @@
 .stat-box#filter-all.active {
     animation: pulse-blue 2s infinite;
 }
+
+/* Анимация загрузки скелетонов */
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

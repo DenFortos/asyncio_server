@@ -1,67 +1,11 @@
 {
-    "ua4e1-Bot-Stable": {
-        "id": "ua4e1-Bot-Stable",
-        "loc": "us",
-        "user": "JohnDoe",
-        "pc_name": "WORK-STATION-01",
-        "active_window": "Google Chrome",
-        "last_active": "12:10:05",
-        "ip": "92.45.112.33",
-        "os": "Windows 10 Enterprise",
-        "hw": {
-            "cpu": "i5-10400",
-            "ram": "16GB"
-        }
-    },
-    "de9k2-Bot-Home": {
-        "id": "de9k2-Bot-Home",
-        "loc": "de",
-        "user": "Hans",
-        "pc_name": "HANS-PC",
-        "active_window": "Steam",
-        "last_active": "23:55:12",
-        "ip": "45.12.88.10",
-        "os": "Windows 11 Home",
-        "hw": {
-            "cpu": "Ryzen 5 5600X",
-            "ram": "16GB"
-        }
-    },
-    "cn5x8-Bot-Office": {
-        "id": "cn5x8-Bot-Office",
-        "loc": "cn",
-        "user": "Admin",
-        "pc_name": "OFFICE-VIRT-05",
-        "active_window": "Excel",
-        "last_active": "09:30:00",
-        "ip": "103.55.12.44",
-        "os": "Windows Server 2022",
-        "hw": {
-            "cpu": "Xeon E5-2670",
-            "ram": "64GB"
-        }
-    },
-    "ua4e1-Bot-Laptop": {
-        "id": "ua4e1-Bot-Laptop",
-        "loc": "fr",
-        "user": "Pierre",
-        "pc_name": "LAPTOP-L021",
-        "active_window": "VLC Media Player",
-        "last_active": "18:20:15",
-        "ip": "176.31.55.99",
-        "os": "Windows 10 Home",
-        "hw": {
-            "cpu": "i3-1115G4",
-            "ram": "8GB"
-        }
-    },
     "ua4e1-Bot-Worker": {
         "id": "ua4e1-Bot-Worker",
         "loc": "ru",
         "user": "Данила",
         "pc_name": "DESKTOP-BF7JB87",
-        "active_window": "Server.py - rat_server - Visual Studio Code",
-        "last_active": "07:29:51",
+        "active_window": "components.css - rat_server - Visual Studio Code",
+        "last_active": "15:17:50",
         "ip": "188.190.156.120",
         "os": "Windows 11",
         "hw": {}
