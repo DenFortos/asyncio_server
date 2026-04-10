@@ -4,8 +4,8 @@
    1. ИМПОРТЫ И СОСТОЯНИЕ
 ========================================================================== */
 import { connectWebSocket } from './modules/websocket/connection.js';
-import { getAllClients, checkDeadClients } from './modules/data/clients.js';
-import { updateStats } from './modules/data/stats.js'; // <--- ВОЗВРАЩАЕМ ЭТУ СТРОКУ
+import { getAllClients } from './modules/data/clients.js'; // УДАЛЕН checkDeadClients
+import { updateStats } from './modules/data/stats.js'; 
 import { initializeSidebar } from './modules/ui/sidebar.js';
 import { initializeHeader, applyStatusFilter, setActiveFilterUI, updateHeaderContext } from './modules/ui/header.js';
 import { initializeSearch, applySearchFilter } from './modules/ui/search.js';
@@ -55,15 +55,21 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeSidebar({ onTabChange: showTab });
     initializeHeader({
         Renderer,
-        onViewToggled: (isGrid) => { if (isGrid) state.filter = 'online'; syncUI(); },
-        onFilterChange: (f) => { state.filter = f; syncUI(); }
+        onViewToggled: (isGrid) => { 
+            if (isGrid) state.filter = 'online'; 
+            syncUI(); 
+        },
+        onFilterChange: (f) => { 
+            state.filter = f; 
+            syncUI(); 
+        }
     });
 
     initializeSearch();
     connectWebSocket();
     
-    // Запуск Watchdog (проверка мертвых ботов)
-    setInterval(checkDeadClients, 1000);
+    // ВАЖНО: Интервал checkDeadClients удален. 
+    // Теперь статус бота — это зона ответственности сервера и БД.
 
     // Обработчики событий
     document.addEventListener('click', e => {
@@ -73,8 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    window.addEventListener('searchUpdated', e => { state.search = e.detail; syncUI(); });
-    ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => window.addEventListener(ev, syncUI));
+    window.addEventListener('searchUpdated', e => { 
+        state.search = e.detail; 
+        syncUI(); 
+    });
+
+    // Слушаем события обновления данных от сервера
+    ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => {
+        window.addEventListener(ev, syncUI);
+    });
 
     showTab('bots');
 });

