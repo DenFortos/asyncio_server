@@ -1,11 +1,7 @@
 /* frontend/dashboard/js/dashboard.js */
-
-/* ==========================================================================
-   1. ИМПОРТЫ И СОСТОЯНИЕ
-========================================================================== */
 import { connectWebSocket } from './modules/websocket/connection.js';
-import { getAllClients } from './modules/data/clients.js'; // УДАЛЕН checkDeadClients
-import { updateStats } from './modules/data/stats.js'; 
+import { getAllClients } from './modules/data/clients.js';
+import './modules/data/stats.js'; 
 import { initializeSidebar } from './modules/ui/sidebar.js';
 import { initializeHeader, applyStatusFilter, setActiveFilterUI, updateHeaderContext } from './modules/ui/header.js';
 import { initializeSearch, applySearchFilter } from './modules/ui/search.js';
@@ -13,65 +9,47 @@ import { Renderer } from './modules/ui/renderer.js';
 
 const state = { filter: 'all', search: '', tab: 'bots' };
 
-/* ==========================================================================
-   2. ЯДРО СИНХРОНИЗАЦИИ
-========================================================================== */
 const syncUI = () => {
-    if (state.tab !== 'bots' && state.tab !== 'files') return;
-    const isGrid = Renderer.getIsGridView();
-    setActiveFilterUI(state.filter, isGrid);
-    const rawData = getAllClients();
-    const filtered = applyStatusFilter(rawData, state.filter);
+    // Проверка вкладки (учитываем оба варианта именования)
+    if (state.tab !== 'bots' && state.tab !== 'section-bots') return;
+    
+    const all = getAllClients();
+    setActiveFilterUI(state.filter, Renderer.getIsGridView());
+    
+    // Сначала фильтруем по статусу (online/offline/all)
+    const filtered = applyStatusFilter(all, state.filter);
+    // Затем применяем поиск
     const searched = applySearchFilter(filtered, state.search);
+    
     Renderer.render(searched);
 };
 
-/* ==========================================================================
-   3. НАВИГАЦИЯ
-========================================================================== */
-function showTab(name) {
+const showTab = (name) => {
     state.tab = name.toLowerCase().trim().replace('section-', '');
     document.querySelectorAll('.content-section').forEach(s => {
-        const isTarget = s.id === `section-${state.tab}`;
-        s.classList.toggle('hidden', !isTarget);
-        s.classList.toggle('active', isTarget);
+        const active = s.id === `section-${state.tab}` || s.id === state.tab;
+        s.classList.toggle('hidden', !active);
+        s.classList.toggle('active', active);
     });
     updateHeaderContext(state.tab);
     syncUI();
-}
+};
 
-/* ==========================================================================
-   4. ИНИЦИАЛИЗАЦИЯ
-========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('auth_token');
-    const login = localStorage.getItem('user_login');
-
-    if (!token || !login) {
-        window.location.href = '/sidebar/auth/auth.html';
-        return;
-    }
+    const [t, l] = [localStorage.getItem('auth_token'), localStorage.getItem('user_login')];
+    if (!t || !l) return window.location.href = '/sidebar/auth/auth.html';
 
     initializeSidebar({ onTabChange: showTab });
-    initializeHeader({
-        Renderer,
-        onViewToggled: (isGrid) => { 
-            if (isGrid) state.filter = 'online'; 
-            syncUI(); 
-        },
-        onFilterChange: (f) => { 
-            state.filter = f; 
-            syncUI(); 
-        }
+    initializeHeader({ 
+        Renderer, 
+        onViewToggled: () => syncUI(),
+        onFilterChange: (f) => { state.filter = f; syncUI(); }
     });
 
-    initializeSearch();
+    initializeSearch(); 
     connectWebSocket();
-    
-    // ВАЖНО: Интервал checkDeadClients удален. 
-    // Теперь статус бота — это зона ответственности сервера и БД.
 
-    // Обработчики событий
+    // Клики по строкам
     document.addEventListener('click', e => {
         const row = e.target.closest('.client-row, .client-card');
         if (row && !e.target.closest('button')) {
@@ -79,15 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    window.addEventListener('searchUpdated', e => { 
-        state.search = e.detail; 
-        syncUI(); 
-    });
+    // Слушатели обновлений данных
+    window.addEventListener('searchUpdated', e => { state.search = e.detail; syncUI(); });
+    window.addEventListener('clientsUpdated', syncUI);
 
-    // Слушаем события обновления данных от сервера
-    ['clientsUpdated', 'clientUpdated', 'clientRemoved'].forEach(ev => {
-        window.addEventListener(ev, syncUI);
-    });
-
-    showTab('bots');
+    // Инициализация
+    showTab('section-bots');
 });
