@@ -58,10 +58,10 @@
     "ua4e1-Bot-Worker": {
         "id": "ua4e1-Bot-Worker",
         "loc": "ru",
-        "user": "TestBot",
+        "user": "Данила",
         "pc_name": "DESKTOP-BF7JB87",
-        "active_window": "cmd.exe",
-        "last_active": "05:27:56",
+        "active_window": "Server.py - rat_server - Visual Studio Code",
+        "last_active": "07:29:51",
         "ip": "188.190.156.120",
         "os": "Windows 11",
         "hw": {}

