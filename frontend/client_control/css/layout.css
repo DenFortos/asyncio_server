@@ -58,7 +58,7 @@
 
 .workspace {
     flex: 1;
-    position: relative;
+    position: relative; /* ВАЖНО: для привязки координат терминала */
     display: flex;
     overflow: hidden;
     background-color: #000;

@@ -1,7 +1,7 @@
 /* frontend/dashboard/css/components.css */
 
 /* ==========================================================================
-   1. НАВИГАЦИЯ (Sidebar & Icons) - ЕДИНЫЙ СТИЛЬ
+   1. НАВИГАЦИЯ (Sidebar & Icons)
 ========================================================================== */
 .sidebar {
     position: fixed;
@@ -15,11 +15,7 @@
     justify-content: space-between;
     padding: 20px 0;
     transition: transform 0.3s ease;
-    
-    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    border-right: 1px solid var(--glass-border);
+    /* Фон и блюр удалены — управляются в layout.css */
 }
 
 .menu-toggle-wrapper {
@@ -32,10 +28,7 @@
     justify-content: center;
     align-items: center;
     
-    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    border: 1px solid var(--glass-border);
+    /* Background и border удалены — уйдут в блок 10 */
     border-left: none;
     border-radius: 0 8px 8px 0;
     cursor: pointer;
@@ -44,10 +37,10 @@
     z-index: 1001;
 }
 
+/* Ховер оставляем здесь, так как это специфическое изменение цвета */
 .menu-toggle-wrapper:hover {
-    background: rgba(0, 212, 255, var(--btn-intensity));
+    background: rgba(0, 212, 255, var(--btn-intensity)) !important;
     color: var(--accent-blue);
-    box-shadow: 0 0 15px rgba(0, 212, 255, calc(var(--btn-intensity) * 1.5));
 }
 
 .sidebar-icons {
@@ -68,27 +61,23 @@
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Синхронизировано с интенсивностью */
-    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.3));
-    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.1));
+    /* Background и border удалены — уйдут в блок 10 */
 }
 
 .sidebar-icons .icon:hover {
     color: #fff;
-    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.6));
 }
 
 .sidebar-icons .icon.active {
     color: #fff;
-    background: rgba(0, 212, 255, var(--btn-intensity));
-    border: 1px solid rgba(0, 212, 255, calc(var(--btn-intensity) + 0.1));
+    background: rgba(0, 212, 255, var(--btn-intensity)) !important;
+    border: 1px solid rgba(0, 212, 255, calc(var(--btn-intensity) + 0.1)) !important;
     box-shadow: 0 0 20px rgba(0, 212, 255, calc(var(--btn-intensity) * 2));
     transform: scale(1.05);
 }
 
 /* ==========================================================================
-   2. ЭЛЕМЕНТЫ УПРАВЛЕНИЯ (Controls & Inputs)
+    2. ЭЛЕМЕНТЫ УПРАВЛЕНИЯ (Controls & Inputs)
 ========================================================================== */
 .brand-title {
     font-size: 1.4rem;
@@ -98,13 +87,9 @@
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    cursor: pointer;
 }
 
 .bg-btn {
-    /* Синхронизировано */
-    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.3));
-    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.1));
     color: #fff;
     padding: 10px 18px;
     border-radius: 10px;
@@ -116,52 +101,51 @@
     transition: all 0.3s ease;
 }
 
-.bg-btn:hover {
-    border-color: var(--accent-blue);
-    background: rgba(0, 212, 255, calc(var(--btn-intensity) * 0.6));
-    box-shadow: 0 0 15px rgba(0, 212, 255, calc(var(--btn-intensity) * 1.5));
-}
-
-.bg-btn i {
-    color: var(--accent-blue);
+/* Капсула поиска: теперь она стилистический близнец кнопок */
+.search-bar {
+    width: 100%;
+    max-width: 800px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    border-radius: 50px !important;
+    padding: 0 20px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    /* Убираем все тени, которые могут "грязнить" края */
+    box-shadow: none !important; 
 }
 
 .search-bar i {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    /* Цвет иконок теперь завязан на интенсивность */
-    color: rgba(0, 212, 255, calc(var(--btn-intensity) * 2));
-    filter: drop-shadow(0 0 5px rgba(0, 212, 255, var(--btn-intensity)));
+    color: var(--accent-blue);
+    font-size: 1rem;
+    filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.4));
+    z-index: 5;
+    margin-right: 15px;
 }
 
+/* Инпут: ПОЛНАЯ прозрачность, чтобы не конфликтовать с Блоком 10 */
 .search-input {
-    width: 100%;
-    /* Используем переменные прозрачности для "стеклянного" эффекта */
-    background: rgba(255, 255, 255, calc(var(--glass-opacity) * 0.15));
-    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.3));
-    padding: 12px 20px 12px 50px;
-    border-radius: 12px;
+    flex: 1;
+    height: 100%;
+    background: transparent !important; 
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
     color: #fff;
     font-size: 1rem;
     font-weight: 500;
-    transition: all 0.3s ease;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .search-input::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.search-input:focus {
-    /* Фокус теперь подсвечивается через интенсивность */
-    background: rgba(255, 255, 255, calc(var(--glass-opacity) * 0.25));
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 15px rgba(0, 212, 255, calc(var(--btn-intensity) * 0.5));
+    color: rgba(255, 255, 255, 0.25);
 }
 
 /* ==========================================================================
-   3. СТАТИСТИКА (Stats Filters) - СИНХРОНИЗИРОВАНО
+   3. СТАТИСТИКА (Stats Filters)
 ========================================================================== */
 .stat-box {
     padding: 8px 16px;
@@ -169,42 +153,40 @@
     text-align: center;
     min-width: 80px;
     cursor: pointer;
-    /* Базовая интенсивность: 0.3 */
-    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.3));
-    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.1));
     color: var(--text-muted);
     transition: all 0.3s ease;
+    
+    /* Background и border удалены — управляются в блоке 10 через --btn-intensity */
 }
 
 .stat-box:hover {
-    /* Ховер интенсивность: 0.6 */
-    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.6));
     color: #fff;
+    /* Усиление фона при наведении тоже в блоке 10 */
 }
 
 .stat-box.active {
-    /* Активное состояние: 0.9 */
-    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.9));
     color: #fff;
     font-weight: 800;
-    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) + 0.2));
+    /* Оставляем усиление рамки для активного фильтра */
+    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) + 0.2)) !important;
 }
 
+/* Специфические цвета для активных фильтров оставляем */
 #filter-online.active {
-    border-color: var(--accent-green);
-    background: rgba(0, 255, 136, calc(var(--btn-intensity) * 1.5));
+    border-color: var(--accent-green) !important;
+    background: rgba(0, 255, 136, calc(var(--btn-intensity) * 1.5)) !important;
     text-shadow: 0 0 10px var(--accent-green);
 }
 
 #filter-offline.active {
-    border-color: var(--accent-red);
-    background: rgba(255, 75, 43, calc(var(--btn-intensity) * 1.5));
+    border-color: var(--accent-red) !important;
+    background: rgba(255, 75, 43, calc(var(--btn-intensity) * 1.5)) !important;
     text-shadow: 0 0 10px var(--accent-red);
 }
 
 #filter-all.active {
-    border-color: var(--accent-blue);
-    background: rgba(0, 212, 255, calc(var(--btn-intensity) * 1.5));
+    border-color: var(--accent-blue) !important;
+    background: rgba(0, 212, 255, calc(var(--btn-intensity) * 1.5)) !important;
     text-shadow: 0 0 10px var(--accent-blue);
 }
 
@@ -225,154 +207,155 @@
 }
 
 /* ==========================================================================
-    4. ТАБЛИЦА (Clients Table)
+    4. ТАБЛИЦА (Clients Table) - МОНОЛИТНОСТЬ И ЧИСТОТА
 ========================================================================== */
-.clients-table tbody tr.client-row {
-    cursor: pointer;
-}
-
-.clients-table tbody tr.skeleton-row {
-    cursor: default !important;
-    pointer-events: none !important;
-    background: transparent !important;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
 .clients-table {
     width: 100%;
-    border-collapse: collapse;
+    /* Используем separate, чтобы border-radius на строках работал корректно */
+    border-collapse: separate; 
+    border-spacing: 0 4px;
     table-layout: fixed;
-}
-
-.clients-table thead tr {
-    cursor: default !important;
-    transform: none !important;
-    background: none !important;
 }
 
 .clients-table th {
     position: sticky;
     top: 0;
-    z-index: 10;
-    background: #0a0c10;
-    padding: 18px 10px;
-    font-size: 0.8rem;
+    z-index: 20;
+    background: transparent; 
+    padding: 15px 10px;
+    font-size: 0.75rem;
     text-transform: uppercase;
     color: var(--accent-blue);
     border-bottom: 2px solid var(--accent-blue);
     font-weight: 900;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
+    text-align: center;
     pointer-events: none;
 }
 
-/* Ширина колонок */
-.clients-table th:nth-child(1) { width: 65px; }
-.clients-table th:nth-child(2) { width: 14%; }
-.clients-table th:nth-child(3) { width: 17%; }
-.clients-table th:nth-child(4) { width: 100px; }
-.clients-table th:nth-child(5) { width: 125px; }
-.clients-table th:nth-child(6) { width: 26%; }
-.clients-table th:nth-child(7) { width: 12%; }
-
-/* Единый стиль для всех данных в таблице (Белый шрифт) */
 .clients-table td {
-    padding: 0 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 0.95rem;
-    color: #ffffff; /* Все данные теперь чисто белые */
-    font-weight: 700;
-    height: 55px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    padding: 12px;
+    font-size: 0.9rem;
+    color: #ffffff; 
+    font-weight: 600;
     text-align: center;
-}
-
-/* Убираем специфический цвет для ID, делаем его как все */
-.client-id-cell {
-    font-family: 'Consolas', monospace;
-    color: #ffffff !important; 
-    opacity: 1;
-}
-
-.clients-table tbody tr {
-    transition: transform 0.2s ease, background-color 0.2s ease;
-    cursor: pointer;
-}
-
-.clients-table tbody tr:hover {
-    background-color: rgba(0, 212, 255, 0.15) !important;
-    transform: scale(1.002);
-    z-index: 5;
+    /* Легкая разделительная линия */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease;
     position: relative;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
-.cell-content {
-    display: block;
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.clients-table tbody tr.client-row {
+    cursor: pointer;
+    background: transparent;
 }
 
-/* --- СТАТУСЫ --- */
+/* Эффект ховера: мягкая подсветка всей строки */
+.clients-table tbody tr.client-row:hover td {
+    /* Цвет берется из интенсивности, без перекрытия текста */
+    background-color: rgba(0, 212, 255, calc(var(--btn-intensity) * 0.35)) !important;
+    border-bottom-color: var(--accent-blue) !important;
+}
+
+/* Скругления углов для создания эффекта "карточки" строки */
+.clients-table tbody tr.client-row td:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.clients-table tbody tr.client-row td:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+/* Микро-анимация при наведении */
+.clients-table tbody tr.client-row:hover {
+    transform: translateY(-1px) scale(1.005);
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
+    z-index: 10;
+}
+
+/* --- СТАТУСЫ (Online/Offline) --- */
 .status-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    height: 55px;
+    height: 100%;
 }
 
 .status-dot-mini {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    display: inline-block;
     flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
 }
 
 .status-dot-mini.online {
-    background-color: #00ff88;
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+    background-color: #00ff88 !important;
+    color: #00ff88;
 }
 
 .status-dot-mini.offline {
-    background-color: #ff4b2b;
-    box-shadow: 0 0 10px rgba(255, 75, 43, 0.8);
+    background-color: #ff4b2b !important;
+    color: #ff4b2b;
 }
 
-/* --- ДОПОЛНИТЕЛЬНО: Блокировка кнопок статистики --- */
-.stat-box.disabled {
-    opacity: 0.3 !important;
+/* --- СКЕЛЕТОНЫ (Загрузка) --- */
+.clients-table tbody tr.skeleton-row td {
     pointer-events: none !important;
-    filter: grayscale(1);
-    cursor: not-allowed;
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+}
+
+.skeleton-line {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    width: 70%;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Анимация перелива для скелетонов */
+.skeleton-line::after {
+    content: "";
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    100% { left: 100%; }
 }
 
 /* ==========================================================================
-   5. КАРТОЧКИ БОТОВ (Bot Cards)
+    5. КАРТОЧКИ БОТОВ (Bot Cards) - TOTAL ROUNDED FIX
 ========================================================================== */
 .client-card {
-    /* Убираем жесткий min-height, позволяем aspect-ratio диктовать размеры */
     min-height: auto; 
-    background: rgba(15, 15, 20, 0.5);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden; /* Критично: обрезает всё под свой border-radius */
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Принудительное скругление для монолитности */
+    border-radius: 16px !important; 
 }
 
 .client-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--accent-blue);
-    box-shadow: 0 15px 40px rgba(0, 212, 255, 0.15);
+    transform: translateY(-8px) scale(1.02);
+    z-index: 10;
+    border-color: var(--accent-blue) !important;
 }
 
+/* Блок с превью (черный экранчик) */
 .bot-preview {
-    width: 100%;
-    /* Авто-высота на основе ширины кадра */
+    width: calc(100% - 8px); /* Зазор для видимости рамки карточки */
+    margin: 4px 4px 0 4px;
     aspect-ratio: 16 / 9; 
     flex-shrink: 0;
     background: #000;
@@ -380,112 +363,96 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    
+    /* Скругляем внутренний экранчик, чтобы он повторял форму карты */
+    border-radius: 13px 13px 0 0; 
 }
 
 .bot-preview img {
     width: 100%;
     height: 100%;
-    /* Cover уберет полосы по бокам, если кадр чуть-чуть не совпадет */
     object-fit: cover; 
     object-position: top center;
+    transition: transform 0.5s ease;
+    border-radius: 13px 13px 0 0; /* Дублируем для чистоты */
 }
 
 .client-card:hover .bot-preview img {
-    opacity: 1;
-    transform: scale(1.02);
+    transform: scale(1.1);
 }
 
 .bot-card-body {
-    padding: 15px;
-    background: rgba(0, 0, 0, 0.3);
+    padding: 12px 15px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     min-width: 0;
 }
 
-.bot-info-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-.flag-emoji {
-    font-size: 1.4rem;
-    line-height: 1;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-    flex-shrink: 0;
-}
-
+/* Капсульная плашка ID (в стиле поиска) */
 .bot-data-string {
     display: flex;
     align-items: center;
     gap: 8px;
     font-family: 'Consolas', monospace;
     color: var(--accent-blue);
-    background: rgba(0, 212, 255, 0.1);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.1)) !important;
+    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.05));
+    padding: 5px 14px;
+    border-radius: 30px; /* Чистый овал */
+    font-size: 0.8rem;
     flex: 1;
     min-width: 0;
     overflow: hidden;
 }
 
 .data-part-id {
-    color: var(--text-muted);
-    opacity: 0.9;
-    max-width: 140px;
+    color: #fff;
+    opacity: 0.8;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: 400;
     white-space: nowrap;
 }
 
-.data-separator {
-    opacity: 0.4;
-    font-weight: 300;
-    padding: 0 2px;
-}
-
+/* Оффлайн режим */
 .client-card.offline {
-    opacity: 0.7;
-    filter: grayscale(0.4);
-}
-
-.client-card.offline .bot-preview {
-    position: relative;
+    filter: grayscale(0.8) brightness(0.7);
+    opacity: 0.8;
 }
 
 .offline-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #ff4b2b;
+    color: var(--accent-red);
     font-weight: 900;
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    text-shadow: 0 0 15px rgba(255, 75, 43, 0.5);
-}
-
-.client-card:not(.skeleton-card) {
-    cursor: pointer;
-}
-
-.client-card:not(.skeleton-card) .bot-preview {
-    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    z-index: 5;
 }
 
 /* ==========================================================================
-   6. МОДАЛЬНОЕ ОКНО (Elements)
+    6. СЕТКА И МОДАЛЬНОЕ ОКНО (Grid & Modal)
 ========================================================================== */
+
+/* Сетка: Авто-заполнение, но максимум 6 колонок */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+}
+
+/* ФИКС: Ограничение до 6 штук на больших мониторах */
+@media (min-width: 1900px) {
+    .cards-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
 .close-modal {
     position: absolute;
     top: 15px;
@@ -494,6 +461,7 @@
     cursor: pointer;
     color: var(--text-muted);
     transition: 0.3s;
+    z-index: 10;
 }
 
 .close-modal:hover {
@@ -501,163 +469,119 @@
     transform: rotate(90deg);
 }
 
-.modal-content h2 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #fff;
-}
-
 .bg-option {
     border-radius: 12px;
     overflow: hidden;
-    border: 2px solid transparent;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.05);
     aspect-ratio: 16/9;
     transition: all 0.3s ease;
+    /* Стиль (glass/border) подтянется из Блока 10 */
 }
 
 .bg-option:hover {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
-    transform: none;
+    border-color: var(--accent-blue) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
 }
 
 .bg-option img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: opacity 0.3s;
+    transition: all 0.4s ease;
 }
 
 .bg-option:hover img {
-    opacity: 0.8;
+    transform: scale(1.1);
 }
 
 /* ==========================================================================
-   7. SKELETON FLOW (Заглушки)
+    7. SKELETON FLOW (Заглушки)
 ========================================================================== */
-.skeleton-row td {
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.skeleton-line {
-    height: 10px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 4px;
-    width: 60%;
-    margin: 0 auto;
-    position: relative;
-    overflow: hidden;
-}
-
-.skeleton-dot {
-    width: 12px;
-    height: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 50%;
-    margin: 0 auto;
-}
-
 .skeleton-card {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    pointer-events: none;
-    box-shadow: none !important;
+    pointer-events: none !important;
+    cursor: default !important;
 }
 
 .skeleton-pulse {
     background: linear-gradient(
         90deg,
-        rgba(255, 255, 255, 0.02) 25%,
-        rgba(255, 255, 255, 0.05) 50%,
-        rgba(255, 255, 255, 0.02) 75%
+        rgba(255, 255, 255, 0.03) 25%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.03) 75%
     );
     background-size: 200% 100%;
-    animation: skeleton-loading 2s infinite;
+    animation: skeleton-loading 2s infinite linear;
 }
 
-.skeleton-line::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-    animation: skeleton-loading 2s infinite;
-}
-
+/* Скругленное превью в скелетоне */
 .bot-preview.skeleton-pulse {
+    border-radius: 12px;
+    margin: 8px;
+    width: calc(100% - 16px);
     aspect-ratio: 16 / 9;
-    height: auto;
-    flex-shrink: 0;
 }
 
-.client-card.skeleton-card {
-    cursor: default !important;
-    pointer-events: none !important;
-    transform: none !important;
-    box-shadow: none !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+.skeleton-line {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px; /* Капсульные линии загрузки */
+    width: 80%;
+    margin: 10px 0;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 /* ==========================================================================
     8. ФАЙЛОВАЯ СЕТКА (Files Section)
 ========================================================================== */
 
-/* Контейнер-подложка для сетки */
+/* Контейнер-подложка */
 #section-files .data-wrapper {
-    /* Теперь используем переменные, как и везде */
-    background: rgba(15, 15, 20, var(--glass-opacity));
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 20px;
     height: 100%;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    padding: 20px;
+    border-radius: 20px;
     box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+    /* Убраны: background, backdrop-filter, border (в Блок 10) */
 }
 
 .files-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 15px;
-    align-content: start; /* Карточки не растягиваются на весь экран, если их мало */
+    align-content: start;
 }
 
 /* Стили карточки файла */
 .bot-file-card {
-    background: rgba(15, 15, 20, var(--glass-opacity));
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    /* Убраны: background, backdrop-filter, border (в Блок 10) */
 }
 
 .bot-file-card:not(.skeleton-card):hover {
-    border-color: var(--accent-blue);
-    background: rgba(0, 212, 255, 0.05);
-    box-shadow: 0 10px 25px rgba(0, 212, 255, 0.1);
+    transform: translateY(-3px);
+    /* border-color и background-color ховера синхронизируются в Блоке 10 */
 }
 
 /* Шапка карточки: LOC | IP | ID */
 .bot-file-header {
-    background: rgba(0, 212, 255, 0.08);
+    /* Фон шапки теперь привязан к интенсивности кнопок */
+    background: rgba(0, 212, 255, calc(var(--btn-intensity) * 0.4));
     padding: 10px 12px;
     display: flex;
     align-items: center;
     gap: 8px;
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     white-space: nowrap;
     overflow: hidden;
 }
@@ -678,7 +602,6 @@
 
 .header-sep {
     opacity: 0.3;
-    color: #fff;
 }
 
 .bot-file-content {
@@ -688,9 +611,9 @@
     gap: 10px;
 }
 
-/* Зона архивов: Скроллбара после 3-х элементов */
+/* Зона архивов */
 .scroll-area {
-    max-height: 108px; /* Высота ровно под 3 zip-файла */
+    max-height: 108px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -698,16 +621,7 @@
     padding-right: 4px;
 }
 
-/* Тонкий скролл внутри карточки */
-.scroll-area::-webkit-scrollbar {
-    width: 3px;
-}
-.scroll-area::-webkit-scrollbar-thumb {
-    background: rgba(0, 212, 255, 0.3);
-    border-radius: 10px;
-}
-
-/* Элементы списка */
+/* Элементы списка файлов */
 .file-item {
     display: flex;
     align-items: center;
@@ -738,99 +652,200 @@
     transform: scale(1.1);
 }
 
-/* Скелетоны (призраки) */
+/* Скелетоны файлов */
 .bot-file-card.skeleton-card {
     min-height: 190px;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     pointer-events: none;
-    box-shadow: none !important;
 }
 
 .bot-file-card.skeleton-card .bot-file-header {
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.bot-file-card.skeleton-card .skeleton-line {
-    background: rgba(255, 255, 255, 0.08);
-    margin: 0;
-}
-
-/* Общий скролл секции */
-#section-files .data-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
-#section-files .data-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(0, 212, 255, 0.2);
-    border-radius: 10px;
-}
-#section-files .data-wrapper::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-blue);
+    background: rgba(255, 255, 255, 0.03);
 }
 
 /* ==========================================================================
-   9. НАСТРОЙКИ (Settings Section) - СИНХРОНИЗИРОВАНО
+    9. НАСТРОЙКИ (Settings Section) - ФИКС ДЕРГАНИЯ И ВЫЛЕТОВ
 ========================================================================== */
-
-.settings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    padding: 20px;
+.settings-view {
+    padding: 60px !important;
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-.setting-card {
-    /* Теперь параметры такие же, как у .sidebar и .data-wrapper */
-    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    
-    /* Рамка теперь использует стандартную переменную glass-border для единообразия */
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 24px;
+.section-title {
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin-bottom: 40px;
+    color: var(--accent-blue);
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.compact-controls {
+    width: 100%;
+    max-width: 400px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    transition: all 0.3s ease;
+    gap: 35px;
 }
 
-.setting-card:hover {
-    /* При наведении делаем акцент, не ломая прозрачность */
-    background: rgba(var(--glass-base-rgb), calc(var(--glass-opacity) + 0.05));
-    border-color: rgba(255, 255, 255, 0.2);
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
 }
 
-.setting-item {
+.control-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
+    align-items: flex-end;
+    padding: 0 4px;
 }
 
-.setting-label {
-    font-size: 0.9rem;
-    color: var(--glass-text); /* Ярче, чтобы было читаемо */
-    font-weight: 500;
+.label-text {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 700;
 }
 
-/* Компактная кнопка Reset (слева) */
-.reset-btn {
-    padding: 8px 20px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
+.label-value {
+    font-family: 'Consolas', monospace;
+    font-size: 1rem;
+    color: var(--accent-blue);
+    min-width: 60px; /* ФИКС: предотвращает дергание ползунка */
+    text-align: right;
+    font-weight: 900;
+}
+
+/* Стилизация ползунка */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
     cursor: pointer;
-    width: fit-content;
-    margin-right: auto; 
-    
-    background: rgba(255, 75, 43, calc(var(--btn-intensity) * 0.6));
-    border: 1px solid rgba(255, 75, 43, calc(var(--btn-intensity) * 0.4));
-    color: #fff;
-    transition: all 0.3s ease;
 }
 
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border: 3px solid var(--accent-blue);
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.3);
+    background: var(--accent-blue);
+    border-color: #fff;
+}
+
+/* Кнопка сброса - только позиционирование */
+.reset-btn {
+    margin-top: 15px;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ==========================================================================
+    10. СИНХРОНИЗАТОР ГРАФИКИ (Smart Glass System) - FINAL CONTRAST
+========================================================================== */
+
+:root {
+    /* Вычисляем базовый тон (от 0 до 255) на основе ползунка */
+    --ui-tone: calc(255 * var(--btn-intensity));
+    --ui-border-tone: calc(255 * var(--btn-intensity) + 40);
+}
+
+/* 1. Базовые панели */
+.sidebar, 
+.header-container, 
+.data-wrapper, 
+.modal-content {
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity)) !important;
+    backdrop-filter: blur(var(--blur-amount)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-amount)) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* 2. Вложенные объекты */
+.client-card, .bot-file-card, .clients-table tbody tr, .skeleton-card {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(calc(var(--blur-amount) * 0.4)) brightness(1.1) !important;
+    -webkit-backdrop-filter: blur(calc(var(--blur-amount) * 0.4)) brightness(1.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 3. Интерактив (Обычное состояние) */
+.bg-btn, 
+.stat-box, 
+.sidebar .icon, 
+.bg-option, 
+.search-bar,
+.bot-data-string,
+.reset-btn {
+    background: rgba(var(--ui-tone), var(--ui-tone), var(--ui-tone), 0.15) !important;
+    border: 1px solid rgba(var(--ui-border-tone), var(--ui-border-tone), var(--ui-border-tone), 0.12) !important;
+    backdrop-filter: blur(calc(var(--blur-amount) * 0.5)) !important;
+    -webkit-backdrop-filter: blur(calc(var(--blur-amount) * 0.5)) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 4. АКТИВНОЕ СОСТОЯНИЕ (Sidebar Active & Buttons Active)
+   Делаем их заметными: увеличиваем плотность тона и добавляем акцент */
+.sidebar .icon.active, 
+.bg-btn.active {
+    /* Тон становится насыщеннее (0.4 вместо 0.15) */
+    background: rgba(var(--ui-tone), var(--ui-tone), var(--ui-tone), 0.4) !important;
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2), 
+                inset 0 0 10px rgba(var(--ui-tone), var(--ui-tone), var(--ui-tone), 0.2);
+    transform: scale(1.05);
+}
+
+/* Иконка в активной кнопке светится ярче */
+.sidebar .icon.active i, 
+.bg-btn.active i {
+    color: #fff !important;
+    filter: drop-shadow(0 0 8px var(--accent-blue));
+}
+
+/* 5. Ховер эффект */
+.bg-btn:hover, 
+.stat-box:hover, 
+.sidebar .icon:hover,
+.bg-option:hover,
+.search-bar:focus-within,
 .reset-btn:hover {
-    background: rgba(255, 75, 43, calc(var(--btn-intensity) * 0.9));
-    box-shadow: 0 0 15px rgba(255, 75, 43, 0.4);
+    background: rgba(var(--ui-tone), var(--ui-tone), var(--ui-tone), 0.25) !important;
+    border-color: var(--accent-blue) !important;
+}
+
+.reset-btn:hover { transform: translateX(8px); }
+
+/* 6. Адаптация текста и иконок */
+.bg-btn, .search-input, .stat-box span, .reset-btn {
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.bg-btn i, .sidebar .icon i, .search-bar i, .reset-btn i {
+    color: var(--accent-blue);
+    filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.3));
 }

@@ -1,7 +1,7 @@
 /* frontend/dashboard/css/layout.css */
 
 /* ==========================================================================
-   1. БОКОВАЯ ПАНЕЛЬ (Sidebar Layout) - СИНХРОНИЗИРОВАНО
+   1. БОКОВАЯ ПАНЕЛЬ (Sidebar Layout)
 ========================================================================== */
 .sidebar {
     position: fixed;
@@ -14,12 +14,8 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 20px 0;
+    /* transition вынесен в глобальный синхронизатор, здесь можно оставить transform */
     transition: transform 0.3s ease;
-    
-    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    border-right: 1px solid var(--glass-border);
 }
 
 .sidebar-hidden .sidebar {
@@ -40,18 +36,16 @@
 }
 
 /* ==========================================================================
-   2. ШАПКА И ПОИСК (Header & Search Geometry) - СИНХРОНИЗИРОВАНО
+   2. ШАПКА И ПОИСК (Header & Search Geometry)
 ========================================================================== */
 .header-container {
     margin: 20px 30px 15px 30px;
     padding: 10px 20px;
     border-radius: 20px; 
-    border: 1px solid var(--glass-border);
-    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
-    backdrop-filter: blur(var(--blur-amount));
     display: flex;
     flex-direction: column;
     gap: 10px;
+    /* Фон, блюр и бордер удалены - управляются синхронно */
 }
 
 .main-header {
@@ -86,13 +80,14 @@
     margin-right: 10px;
 }
 
-/* СИНХРОНИЗАЦИЯ СТАТИСТИКИ */
+/* СИНХРОНИЗАЦИЯ СТАТИСТИКИ (Кнопки-фильтры) */
 .stat-box {
     padding: 8px 16px;
     border-radius: 10px;
     text-align: center;
     min-width: 75px;
     cursor: pointer;
+    /* Эти стили оставляем, так как они зависят от --btn-intensity, а не от общего фона панелей */
     background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.3));
     border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.1));
     color: var(--text-muted);
@@ -132,7 +127,7 @@
 }
 
 /* ==========================================================================
-   3. РАБОЧАЯ ЗОНА (Content Viewport) - СИНХРОНИЗИРОВАНО
+   3. РАБОЧАЯ ЗОНА (Content Viewport)
 ========================================================================== */
 .content-viewport {
     flex: 1;
@@ -157,14 +152,11 @@
     flex-direction: column;
     min-height: 0; 
     
-    /* Синхронизация с глобальными настройками */
-    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
+    /* Стили фона, блюра и рамки удалены — управляются синхронно в конце файла */
     
-    border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 0; 
+    /* Внутреннюю тень оставляем здесь, если она нужна только для контентной части */
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
     overflow: hidden;
 }
@@ -180,7 +172,7 @@
 }
 
 /* ==========================================================================
-   4. СЕТКИ (Grids) - СИНХРОНИЗИРОВАНО
+   4. СЕТКИ (Grids)
 ========================================================================== */
 .clients-grid {
     display: grid;
@@ -193,19 +185,16 @@
     min-height: 0;
     overflow-y: auto !important;
     
-    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
+    /* Стили фона, блюра и рамки удалены — управляются синхронно */
     
     border-radius: 20px;
     scrollbar-gutter: stable; 
 }
 
-/* Скроллбары, реагирующие на переменные */
+/* Скроллбары (оставляем, так как у них свои настройки прозрачности) */
 .table-container::-webkit-scrollbar-thumb,
 .clients-grid::-webkit-scrollbar-thumb,
 #section-files .data-wrapper::-webkit-scrollbar-thumb {
-    /* Базовый цвет скролла зависит от прозрачности */
     background: rgba(255, 255, 255, calc(var(--glass-opacity) * 0.5));
     border-radius: 10px;
     transition: background 0.3s;
@@ -213,13 +202,12 @@
 
 .table-container::-webkit-scrollbar-thumb:hover,
 .clients-grid::-webkit-scrollbar-thumb:hover {
-    /* При наведении подсвечиваем акцентным цветом с учетом интенсивности */
     background: var(--accent-blue);
     box-shadow: 0 0 8px rgba(0, 212, 255, var(--btn-intensity));
 }
 
 /* ==========================================================================
-   5. МОДАЛЬНЫЕ ОКНА (Structure) - СИНХРОНИЗИРОВАНО
+   5. МОДАЛЬНЫЕ ОКНА (Structure)
 ========================================================================== */
 .modal {
     position: fixed;
@@ -229,7 +217,7 @@
     justify-content: center;
     align-items: center;
     
-    /* Затемнение фона динамически адаптируется */
+    /* Затемнение фона вокруг модалки — оставляем динамику */
     background: rgba(0, 0, 0, calc(var(--glass-opacity) * 1.5));
     backdrop-filter: blur(calc(var(--blur-amount) * 0.5));
     -webkit-backdrop-filter: blur(calc(var(--blur-amount) * 0.5));
@@ -244,15 +232,12 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    
     border-radius: 24px;
-    /* Рамка теперь реагирует на интенсивность кнопок для единства стиля */
-    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.5));
+
+    /* background, backdrop-filter и border удалены — 
+       теперь они управляются общим синхронизатором ниже */
     
-    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    
+    /* Оставляем внешнюю тень для объема модалки */
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
@@ -265,6 +250,38 @@
     max-height: 400px;
     padding-right: 5px;
     
-    /* Скроллбар в сетке вариантов фона тоже синхронизирован */
+    /* Скроллбар в сетке вариантов фона */
     scrollbar-color: rgba(255, 255, 255, var(--btn-intensity)) transparent;
+}
+
+/* ==========================================================================
+   ФИНАЛЬНЫЙ СИНХРОНИЗАТОР ТОНАЛЬНОСТИ
+   Этот блок заставляет ВСЕ панели дышать в унисон
+========================================================================== */
+
+.sidebar, 
+.header-container, 
+.data-wrapper, 
+.clients-grid, 
+.modal-content,
+#section-settings .data-wrapper,
+.settings-card { 
+    /* Используем !important, чтобы гарантированно перекрыть остатки стилей в других файлах */
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity)) !important;
+    backdrop-filter: blur(var(--blur-amount)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-amount)) !important;
+    
+    /* Единая граница */
+    border: 1px solid var(--glass-border) !important;
+    
+    /* Единая внутренняя тень для глубины */
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2) !important;
+    
+    /* Синхронная скорость анимации */
+    transition: all 0.3s ease-in-out !important;
+}
+
+/* Устранение наслоения (double-glass) во вкладке Settings */
+#section-settings .data-wrapper {
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity)) !important;
 }

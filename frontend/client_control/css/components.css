@@ -122,3 +122,83 @@
 
 .workspace:hover .fullscreen-btn { opacity: 1; }
 .fullscreen-btn:hover { transform: scale(1.05); color: var(--accent-green); }
+
+/* ==========================================================================
+   5. ПЛАВАЮЩИЙ ТЕРМИНАЛ (Terminal Floating Window)
+========================================================================== */
+.terminal-overlay {
+    position: absolute;
+    top: 50px; 
+    left: 50px;
+    width: 500px; 
+    height: 350px;
+    min-width: 300px;
+    min-height: 200px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid var(--accent-green);
+    border-radius: var(--radius);
+    z-index: 1000;
+    display: flex; 
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+    overflow: hidden;
+    resize: both; /* Позволяет пользователю менять размер окна */
+}
+
+.terminal-overlay.hidden { display: none !important; }
+
+.terminal-header {
+    background: var(--panel-dark);
+    padding: 8px 12px;
+    cursor: move;
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-bright);
+    font-size: 0.75rem;
+    color: var(--text-main);
+    user-select: none;
+}
+
+.terminal-body {
+    flex: 1;
+    padding: 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    overflow-y: auto;
+    color: var(--accent-green);
+    white-space: pre-wrap;
+    background: rgba(0,0,0,0.3);
+    word-break: break-all;
+}
+
+.terminal-input-area {
+    padding: 8px;
+    background: var(--panel-dark);
+    border-top: 1px solid var(--border-bright);
+    display: flex;
+    align-items: center;
+}
+
+/* Добавляем символ приглашения ввода */
+.terminal-input-area::before {
+    content: ">";
+    color: var(--accent-green);
+    margin-right: 8px;
+    font-family: var(--font-mono);
+}
+
+#terminal-cmd {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-main); /* Основной текст ввода белым */
+    font-family: var(--font-mono);
+    outline: none;
+    font-size: 12px;
+}
+
+/* Улучшение для полноэкранного режима (из прошлых правок) */
+.app-main:fullscreen .terminal-overlay {
+    z-index: 2005 !important;
+}

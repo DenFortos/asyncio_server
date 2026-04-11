@@ -42,6 +42,9 @@
                     <button id="btn-desktop-control" class="action-btn" title="Take Control">
                         <i class="fas fa-mouse-pointer"></i>
                     </button>
+                    <button id="btn-terminal-toggle" class="action-btn" title="PowerShell Terminal">
+                        <i class="fas fa-terminal"></i>
+                    </button>
                 </div>
 
                 <div class="control-group for-webcam">
@@ -80,18 +83,23 @@
         </header>
 
         <main class="workspace">
+            <div id="terminal-overlay" class="terminal-overlay hidden">
+                <div class="terminal-header">
+                    <span>PowerShell Remote</span>
+                </div>
+                <div id="terminal-body" class="terminal-body"></div>
+                <div class="terminal-input-area">
+                    <input type="text" id="terminal-cmd" placeholder="Enter command..." autocomplete="off">
+                </div>
+            </div>
+
             <div id="view-desktop" class="view-panel active">
                 <div class="canvas-wrapper" id="wrapper-desktop">
-
                     <video id="desktopVideo" autoplay muted playsinline></video>
-
-                    <!-- ← ВАЖНО: tabindex="1" для фокуса клавиатуры -->
                     <canvas id="desktopCanvas" tabindex="1"></canvas>
-
                     <button class="fullscreen-btn" title="Toggle Fullscreen" data-target="wrapper-desktop">
                         <i class="fas fa-expand"></i>
                     </button>
-
                     <div class="stream-overlay" id="desktopOverlay">
                         <i class="fas fa-ghost"></i>
                         <p>No Desktop Data</p>

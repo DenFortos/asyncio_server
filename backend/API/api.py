@@ -55,7 +55,7 @@ async def auth(action: str, data=Body(...)):
     return {"status": "error", "message": "Invalid credentials"}
 
 @app.websocket("/ws")
-async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = None):
+async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = None, target: str = None):
     """Центральный узел обмена данными между админом и ботами"""
     user_login = get_login_by_token(token)
     if not user_login or user_login != login:
@@ -68,8 +68,19 @@ async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = 
     allowed_bots_cache = set()
 
     try:
-        # 1. Синхронизация списка ботов и превью при входе
-        if mode != "control":
+        # --- ИСПРАВЛЕННАЯ ЛОГИКА СИНХРОНИЗАЦИИ ---
+        if mode == "control" and target:
+            # Режим управления: шлем данные только по конкретному боту
+            if has_access(user, target):
+                bots = load_bots_from_file()
+                data = bots.get(target)
+                if data:
+                    data['status'] = 'online' if target in active_clients else 'offline'
+                    # Отправляем данные конкретного бота
+                    payload = pack_bot_command(target, "DataScribe", json.dumps(data))
+                    await ws.send_bytes(payload)
+        else:
+            # Стандартный режим дашборда: шлем список всех доступных
             await _sync_initial_bots(ws, user)
 
         # 2. Основной цикл приема команд от фронтенда
@@ -82,7 +93,9 @@ async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = 
                 pkt = msg["bytes"]
                 if len(pkt) < 7: continue
                 
-                target_id = pkt[6:6 + pkt[0]].decode(errors='ignore').strip()
+                # Извлекаем ID из пакета
+                id_len = pkt[0]
+                target_id = pkt[6:6 + id_len].decode(errors='ignore').strip()
                 
                 if target_id in allowed_bots_cache or has_access(user, target_id):
                     allowed_bots_cache.add(target_id)
