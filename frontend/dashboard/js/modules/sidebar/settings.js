@@ -1,32 +1,32 @@
-/* frontend/dashboard/js/modules/sidebar/settings.js */
-
 export const SettingsManager = {
-    // Дефолтные настройки
-    defaults: {
-        blur: 10,
-        opacity: 0.4
+    // Устанавливаем значения согласно твоему скриншоту
+    defaults: { blur: 10, opacity: 0.1, intensity: 0.5 },
+
+    init() {
+        ['blur', 'opacity', 'intensity'].forEach(key => {
+            const saved = localStorage.getItem(`app_${key}`);
+            const val = saved !== null ? parseFloat(saved) : this.defaults[key];
+            this.applySetting(key, key === 'blur' ? val : val * 100);
+        });
     },
 
     render() {
         const container = document.querySelector('#section-settings .data-wrapper');
         if (!container) return;
 
-        const savedBlur = localStorage.getItem('app_blur') || this.defaults.blur;
-        const savedOpacity = localStorage.getItem('app_opacity') || this.defaults.opacity;
+        // Берем текущие значения для отображения в лейблах
+        const b = localStorage.getItem('app_blur') || this.defaults.blur;
+        const o = (localStorage.getItem('app_opacity') || this.defaults.opacity) * 100;
+        const i = (localStorage.getItem('app_intensity') || this.defaults.intensity) * 100;
 
         container.innerHTML = `
             <div class="settings-grid">
                 <div class="setting-card">
                     <h3>Visual Settings</h3>
-                    <div class="setting-item">
-                        <span class="setting-label">Blur Effect (${savedBlur}px)</span>
-                        <input type="range" class="setting-range" data-key="blur" min="0" max="30" value="${savedBlur}">
-                    </div>
-                    <div class="setting-item">
-                        <span class="setting-label">Opacity (${Math.round(savedOpacity * 100)}%)</span>
-                        <input type="range" class="setting-range" data-key="opacity" min="10" max="90" value="${savedOpacity * 100}">
-                    </div>
-                    <button id="reset-settings" class="bg-btn" style="margin-top:10px;">Reset to Default</button>
+                    <div class="setting-item"><span class="setting-label">Blur (${b}px)</span><input type="range" class="setting-range" data-key="blur" min="0" max="30" value="${b}"></div>
+                    <div class="setting-item"><span class="setting-label">Opacity (${Math.round(o)}%)</span><input type="range" class="setting-range" data-key="opacity" min="10" max="100" value="${o}"></div>
+                    <div class="setting-item"><span class="setting-label">Intensity (${Math.round(i)}%)</span><input type="range" class="setting-range" data-key="intensity" min="0" max="100" value="${i}"></div>
+                    <button id="reset-settings" class="reset-btn">Reset</button>
                 </div>
             </div>
         `;
@@ -34,31 +34,36 @@ export const SettingsManager = {
     },
 
     initEvents() {
-        // Слушаем изменение ползунков
-        document.querySelectorAll('.setting-range').forEach(input => {
-            input.addEventListener('input', (e) => {
-                const key = e.target.dataset.key;
-                const val = e.target.value;
-                this.applySetting(key, val);
-            });
+        const container = document.querySelector('#section-settings .data-wrapper');
+        if (!container) return;
+
+        container.addEventListener('input', (e) => {
+            if (!e.target.classList.contains('setting-range')) return;
+            
+            const key = e.target.dataset.key;
+            const val = e.target.value;
+            
+            this.applySetting(key, val);
+            
+            const label = e.target.previousElementSibling;
+            const baseText = label.textContent.split('(')[0];
+            const unit = key === 'blur' ? 'px' : '%';
+            label.textContent = `${baseText}(${val}${unit})`;
         });
 
-        // Сброс
         document.getElementById('reset-settings').addEventListener('click', () => {
-            this.applySetting('blur', this.defaults.blur);
-            this.applySetting('opacity', this.defaults.opacity);
-            this.render(); // Перерендерим, чтобы обновить значения в инпутах
+            Object.entries(this.defaults).forEach(([k, v]) => this.applySetting(k, k === 'blur' ? v : v * 100));
+            this.render();
         });
     },
 
-    applySetting(key, value) {
+    applySetting(key, val) {
         const root = document.documentElement.style;
-        if (key === 'blur') {
-            root.setProperty('--glass-blur', `${value}px`);
-            localStorage.setItem('app_blur', value);
-        } else if (key === 'opacity') {
-            root.setProperty('--glass-opacity', `${value / 100}`);
-            localStorage.setItem('app_opacity', value / 100);
-        }
+        const num = parseFloat(val);
+        const norm = key === 'blur' ? num : num / 100;
+        
+        const cssVar = key === 'blur' ? '--blur-amount' : (key === 'opacity' ? '--glass-opacity' : '--btn-intensity');
+        root.setProperty(cssVar, key === 'blur' ? `${norm}px` : norm);
+        localStorage.setItem(`app_${key}`, norm);
     }
 };

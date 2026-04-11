@@ -1,7 +1,7 @@
 /* frontend/dashboard/css/layout.css */
 
 /* ==========================================================================
-   1. БОКОВАЯ ПАНЕЛЬ (Sidebar Layout)
+   1. БОКОВАЯ ПАНЕЛЬ (Sidebar Layout) - СИНХРОНИЗИРОВАНО
 ========================================================================== */
 .sidebar {
     position: fixed;
@@ -15,6 +15,11 @@
     justify-content: space-between;
     padding: 20px 0;
     transition: transform 0.3s ease;
+    
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border-right: 1px solid var(--glass-border);
 }
 
 .sidebar-hidden .sidebar {
@@ -23,11 +28,11 @@
 
 .main-wrapper {
     margin-left: 80px;
-    height: 100vh; /* МЕНЯЕМ min-height на height */
+    height: 100vh;
     display: flex;
     flex-direction: column;
     transition: margin-left 0.3s ease;
-    overflow: hidden; /* ЗАПРЕЩАЕМ скролл самого окна браузера */
+    overflow: hidden;
 }
 
 .sidebar-hidden .main-wrapper {
@@ -35,41 +40,88 @@
 }
 
 /* ==========================================================================
-   2. ШАПКА И ПОИСК (Header & Search Geometry)
+   2. ШАПКА И ПОИСК (Header & Search Geometry) - СИНХРОНИЗИРОВАНО
 ========================================================================== */
+.header-container {
+    margin: 20px 30px 15px 30px;
+    padding: 10px 20px;
+    border-radius: 20px; 
+    border: 1px solid var(--glass-border);
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
+    backdrop-filter: blur(var(--blur-amount));
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .main-header {
-    height: 80px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 30px;
-    gap: 20px;
-    flex-shrink: 0;
+    padding: 0 10px;
+    background: transparent;
+    border: none;
 }
 
 .header-left {
-    padding-left: 100px;
+    padding-left: 20px;
     transition: padding-left 0.3s;
 }
 
 .sidebar-hidden .header-left {
-    padding-left: 40px;
+    padding-left: 10px;
 }
 
-.header-right, 
-.global-controls, 
-.stats-filters {
+.header-right {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
+
+.global-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 10px;
+}
+
+/* СИНХРОНИЗАЦИЯ СТАТИСТИКИ */
+.stat-box {
+    padding: 8px 16px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 75px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.3));
+    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.1));
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.6));
+    color: #fff;
+}
+
+.stat-box.active {
+    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.9));
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) + 0.2));
+}
+
+#filter-online.active { border-color: var(--accent-green); box-shadow: 0 0 10px rgba(0, 255, 136, calc(var(--btn-intensity) * 0.5)); }
+#filter-offline.active { border-color: var(--accent-red); box-shadow: 0 0 10px rgba(255, 75, 43, calc(var(--btn-intensity) * 0.5)); }
+#filter-all.active { border-color: var(--accent-blue); box-shadow: 0 0 10px rgba(0, 212, 255, calc(var(--btn-intensity) * 0.5)); }
+
+.stat-value { font-size: 1.1rem; font-weight: 900; display: block; line-height: 1.1; }
+.stat-label { font-size: 0.65rem; text-transform: uppercase; margin-top: 2px; }
 
 .global-search-container {
-    height: 60px;
+    height: 50px;
     display: flex;
     align-items: center;
-    padding: 0 30px;
-    flex-shrink: 0;
+    padding: 0 10px;
 }
 
 .search-bar {
@@ -80,15 +132,14 @@
 }
 
 /* ==========================================================================
-    3. РАБОЧАЯ ЗОНА (Content Viewport)
+   3. РАБОЧАЯ ЗОНА (Content Viewport) - СИНХРОНИЗИРОВАНО
 ========================================================================== */
 .content-viewport {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 10px 30px 20px 30px;
-    /* Ограничиваем высоту строго под вьюпорт */
-    height: calc(100vh - 140px); 
+    padding: 0 30px 20px 30px;
+    height: calc(100vh - 145px);
     min-height: 0;
     overflow: hidden; 
 }
@@ -100,56 +151,36 @@
     min-height: 0; 
 }
 
-/* Общий контейнер-подложка */
 .data-wrapper {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0; 
-    background: rgba(15, 15, 20, 0.4);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    
+    /* Синхронизация с глобальными настройками */
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 0; 
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
-    overflow: hidden; /* Контент внутри будет скроллиться отдельно */
-}
-
-.content-section .data-wrapper {
-    overflow-y: auto;
-}
-
-#section-bots .data-wrapper {
     overflow: hidden;
 }
 
-.table-container, .clients-grid {
-    flex: 1;
-    width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border-radius: 20px;
-}
-
-/* --- ТАБЛИЦА: Скругляем углы и настраиваем скролл --- */
 .table-container {
     flex: 1;
     width: 100%;
-    overflow-y: auto !important; /* Явно включаем скролл */
+    overflow-y: auto !important;
     overflow-x: hidden;
     min-height: 0;
-    /* Скругляем саму коробку */
-    border-radius: 20px; 
     position: relative;
+    background: transparent; 
 }
 
-/* Дополнительно скругляем саму шапку таблицы, чтобы она не вылезала за края контейнера */
-.clients-table th:first-child { border-top-left-radius: 20px; }
-.clients-table th:last-child { border-top-right-radius: 20px; }
-
 /* ==========================================================================
-    4. СЕТКИ (Grids)
+   4. СЕТКИ (Grids) - СИНХРОНИЗИРОВАНО
 ========================================================================== */
 .clients-grid {
     display: grid;
@@ -159,41 +190,36 @@
     padding: 25px;
     
     flex: 1;
-    min-height: 0; /* Важно: разрешаем сжиматься для появления скролла */
+    min-height: 0;
     overflow-y: auto !important;
     
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    
     border-radius: 20px;
-    /* Чтобы скроллбар не обрезал скругление */
     scrollbar-gutter: stable; 
 }
 
-/* Универсальный скроллбар для всех контейнеров */
-.table-container::-webkit-scrollbar,
-.clients-grid::-webkit-scrollbar,
-#section-files .data-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
-
-.table-container::-webkit-scrollbar-track,
-.clients-grid::-webkit-scrollbar-track {
-    background: transparent;
-    margin: 10px 0; /* Отступ, чтобы не упирался в скругления */
-}
-
+/* Скроллбары, реагирующие на переменные */
 .table-container::-webkit-scrollbar-thumb,
-.clients-grid::-webkit-scrollbar-thumb {
-    background: rgba(0, 212, 255, 0.2);
+.clients-grid::-webkit-scrollbar-thumb,
+#section-files .data-wrapper::-webkit-scrollbar-thumb {
+    /* Базовый цвет скролла зависит от прозрачности */
+    background: rgba(255, 255, 255, calc(var(--glass-opacity) * 0.5));
     border-radius: 10px;
+    transition: background 0.3s;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover,
 .clients-grid::-webkit-scrollbar-thumb:hover {
+    /* При наведении подсвечиваем акцентным цветом с учетом интенсивности */
     background: var(--accent-blue);
+    box-shadow: 0 0 8px rgba(0, 212, 255, var(--btn-intensity));
 }
 
 /* ==========================================================================
-   5. МОДАЛЬНЫЕ ОКНА (Structure)
+   5. МОДАЛЬНЫЕ ОКНА (Structure) - СИНХРОНИЗИРОВАНО
 ========================================================================== */
 .modal {
     position: fixed;
@@ -202,8 +228,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(8px);
+    
+    /* Затемнение фона динамически адаптируется */
+    background: rgba(0, 0, 0, calc(var(--glass-opacity) * 1.5));
+    backdrop-filter: blur(calc(var(--blur-amount) * 0.5));
+    -webkit-backdrop-filter: blur(calc(var(--blur-amount) * 0.5));
+    transition: all 0.3s ease;
 }
 
 .modal-content {
@@ -214,9 +244,16 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    
     border-radius: 24px;
-    border: 1px solid var(--glass-border);
-    background: rgba(15, 15, 20, 0.85);
+    /* Рамка теперь реагирует на интенсивность кнопок для единства стиля */
+    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.5));
+    
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
 .bg-options-grid {
@@ -227,4 +264,7 @@
     overflow-y: auto;
     max-height: 400px;
     padding-right: 5px;
+    
+    /* Скроллбар в сетке вариантов фона тоже синхронизирован */
+    scrollbar-color: rgba(255, 255, 255, var(--btn-intensity)) transparent;
 }

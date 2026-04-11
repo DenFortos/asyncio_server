@@ -31,25 +31,24 @@
     </aside>
 
     <div class="main-wrapper">
-        <header class="main-header">
-            <div class="header-left"><h1 class="brand-title">SpectralWeb C2</h1></div>
-            <div class="header-right">
-                <div class="global-controls">
+        <div class="header-container">
+            <header class="main-header">
+                <div class="header-left"><h1 class="brand-title">SpectralWeb C2</h1></div>
+                <div class="header-right">
                     <button class="bg-btn" id="bgButton"><i class="fas fa-image"></i> <span>Background</span></button>
                     <button class="bg-btn" id="toggleView"><i class="fas fa-th"></i> <span>Grid View</span></button>
-                </div>
-                <div class="stats-filters">
+
                     <div class="stat-box clickable" id="filter-online"><div class="stat-value" id="online-count">0</div><div class="stat-label">Online</div></div>
                     <div class="stat-box clickable active" id="filter-all"><div class="stat-value" id="total-count">0</div><div class="stat-label">Total</div></div>
                     <div class="stat-box clickable" id="filter-offline"><div class="stat-value" id="offline-count">0</div><div class="stat-label">Offline</div></div>
                 </div>
-            </div>
-        </header>
+            </header>
 
-        <div class="global-search-container">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" id="universal-search" class="search-input" placeholder="Search by name, IP, ID, or files...">
+            <div class="global-search-container">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="universal-search" class="search-input" placeholder="Search by name, IP, ID, or files...">
+                </div>
             </div>
         </div>
 

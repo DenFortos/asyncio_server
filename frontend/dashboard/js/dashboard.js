@@ -11,48 +11,31 @@ import { SettingsManager } from './modules/sidebar/settings.js';
 
 const state = { filter: 'all', search: '', tab: 'bots' };
 
-// --- 1. ПРИМЕНЕНИЕ НАСТРОЕК ---
-const applySavedSettings = () => {
-    const root = document.documentElement.style;
-    const blur = localStorage.getItem('app_blur') || '16px';
-    const opacity = localStorage.getItem('app_opacity') || '0.4';
-    
-    root.setProperty('--blur-amount', blur);
-    root.setProperty('--glass-opacity', opacity);
-};
-
 const syncUI = () => {
     if (state.tab !== 'bots') return;
-    
     const all = getAllClients();
     setActiveFilterUI(state.filter, Renderer.getIsGridView());
     const filtered = applyStatusFilter(all, state.filter);
     const searched = applySearchFilter(filtered, state.search);
-    
     Renderer.render(searched);
 };
 
 const handleTabChange = (name) => {
     state.tab = name.replace('section-', '');
     updateHeaderContext(state.tab);
-
     const searchInput = document.getElementById('universal-search');
     if (searchInput) { searchInput.value = ''; state.search = ''; }
 
-    if (state.tab === 'bots') {
-        syncUI();
-    } else if (state.tab === 'files') {
-        FilesManager.render([]); 
-    } else if (state.tab === 'settings') {
-        SettingsManager.render();
-    }
+    if (state.tab === 'bots') syncUI();
+    else if (state.tab === 'files') FilesManager.render([]);
+    else if (state.tab === 'settings') SettingsManager.render();
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem('auth_token')) return window.location.href = '/sidebar/auth/auth.html';
 
-    // Применяем сохраненные настройки сразу
-    applySavedSettings();
+    // Инициализация настроек из SettingsManager
+    SettingsManager.init();
 
     initializeSidebar({ onTabChange: handleTabChange });
     initializeHeader({ 

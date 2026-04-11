@@ -1,35 +1,53 @@
 /* frontend/dashboard/css/components.css */
 
 /* ==========================================================================
-   1. НАВИГАЦИЯ (Sidebar & Icons)
+   1. НАВИГАЦИЯ (Sidebar & Icons) - ЕДИНЫЙ СТИЛЬ
 ========================================================================== */
 .sidebar {
-    background: rgba(5, 5, 8, 0.3);
-    backdrop-filter: blur(20px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 100vh;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 0;
+    transition: transform 0.3s ease;
+    
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
     border-right: 1px solid var(--glass-border);
 }
 
 .menu-toggle-wrapper {
     position: absolute;
-    right: -45px;
-    top: 15px;
-    width: 45px;
-    height: 45px;
+    top: 35px; 
+    right: -30px;
+    width: 30px;
+    height: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(255, 255, 255, 0.05);
+    
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
     border: 1px solid var(--glass-border);
     border-left: none;
     border-radius: 0 8px 8px 0;
     cursor: pointer;
     color: #fff;
+    transition: all 0.3s ease;
+    z-index: 1001;
 }
 
 .menu-toggle-wrapper:hover {
-    background: rgba(0, 212, 255, 0.2);
+    background: rgba(0, 212, 255, var(--btn-intensity));
     color: var(--accent-blue);
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 212, 255, calc(var(--btn-intensity) * 1.5));
 }
 
 .sidebar-icons {
@@ -49,13 +67,23 @@
     color: var(--text-muted);
     border-radius: 12px;
     cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Синхронизировано с интенсивностью */
+    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.3));
+    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.1));
 }
 
-.sidebar-icons .icon.active,
 .sidebar-icons .icon:hover {
     color: #fff;
-    background: rgba(0, 212, 255, 0.15);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.6));
+}
+
+.sidebar-icons .icon.active {
+    color: #fff;
+    background: rgba(0, 212, 255, var(--btn-intensity));
+    border: 1px solid rgba(0, 212, 255, calc(var(--btn-intensity) + 0.1));
+    box-shadow: 0 0 20px rgba(0, 212, 255, calc(var(--btn-intensity) * 2));
     transform: scale(1.05);
 }
 
@@ -74,8 +102,9 @@
 }
 
 .bg-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid var(--glass-border);
+    /* Синхронизировано */
+    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.3));
+    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.1));
     color: #fff;
     padding: 10px 18px;
     border-radius: 10px;
@@ -84,12 +113,13 @@
     gap: 10px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .bg-btn:hover {
     border-color: var(--accent-blue);
-    background: rgba(0, 212, 255, 0.15);
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+    background: rgba(0, 212, 255, calc(var(--btn-intensity) * 0.6));
+    box-shadow: 0 0 15px rgba(0, 212, 255, calc(var(--btn-intensity) * 1.5));
 }
 
 .bg-btn i {
@@ -101,78 +131,81 @@
     left: 20px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--accent-blue);
-    filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.5));
+    /* Цвет иконок теперь завязан на интенсивность */
+    color: rgba(0, 212, 255, calc(var(--btn-intensity) * 2));
+    filter: drop-shadow(0 0 5px rgba(0, 212, 255, var(--btn-intensity)));
 }
 
 .search-input {
     width: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid var(--glass-border);
+    /* Используем переменные прозрачности для "стеклянного" эффекта */
+    background: rgba(255, 255, 255, calc(var(--glass-opacity) * 0.15));
+    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.3));
     padding: 12px 20px 12px 50px;
     border-radius: 12px;
     color: #fff;
     font-size: 1rem;
     font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
 }
 
 .search-input:focus {
+    /* Фокус теперь подсвечивается через интенсивность */
+    background: rgba(255, 255, 255, calc(var(--glass-opacity) * 0.25));
     border-color: var(--accent-blue);
-    background: rgba(0, 0, 0, 0.6);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+    box-shadow: 0 0 15px rgba(0, 212, 255, calc(var(--btn-intensity) * 0.5));
 }
 
 /* ==========================================================================
-   3. СТАТИСТИКА (Stats Filters)
+   3. СТАТИСТИКА (Stats Filters) - СИНХРОНИЗИРОВАНО
 ========================================================================== */
-.stats-filters {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 5px;
-    border-radius: 12px;
-    border: 1px solid var(--glass-border);
-}
-
 .stat-box {
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: 10px;
     text-align: center;
-    min-width: 90px;
+    min-width: 80px;
     cursor: pointer;
-    background: transparent;
+    /* Базовая интенсивность: 0.3 */
+    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.3));
+    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) * 0.1));
     color: var(--text-muted);
+    transition: all 0.3s ease;
 }
 
 .stat-box:hover {
-    background: rgba(255, 255, 255, 0.05);
+    /* Ховер интенсивность: 0.6 */
+    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.6));
     color: #fff;
 }
 
 .stat-box.active {
-    background: rgba(255, 255, 255, 0.1);
+    /* Активное состояние: 0.9 */
+    background: rgba(255, 255, 255, calc(var(--btn-intensity) * 0.9));
     color: #fff;
     font-weight: 800;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, calc(var(--btn-intensity) + 0.2));
 }
 
-.stat-box#filter-online.active {
-    color: #fff;
-    text-shadow: 0 0 15px var(--accent-green);
-    background: rgba(0, 255, 136, 0.2);
+#filter-online.active {
     border-color: var(--accent-green);
+    background: rgba(0, 255, 136, calc(var(--btn-intensity) * 1.5));
+    text-shadow: 0 0 10px var(--accent-green);
 }
 
-.stat-box#filter-offline.active {
-    color: #fff;
-    text-shadow: 0 0 15px var(--accent-red);
-    background: rgba(255, 75, 43, 0.2);
+#filter-offline.active {
     border-color: var(--accent-red);
+    background: rgba(255, 75, 43, calc(var(--btn-intensity) * 1.5));
+    text-shadow: 0 0 10px var(--accent-red);
 }
 
-.stat-box#filter-all.active {
-    color: #fff;
-    text-shadow: 0 0 15px var(--accent-blue);
-    background: rgba(0, 212, 255, 0.2);
+#filter-all.active {
     border-color: var(--accent-blue);
+    background: rgba(0, 212, 255, calc(var(--btn-intensity) * 1.5));
+    text-shadow: 0 0 10px var(--accent-blue);
 }
 
 .stat-value {
@@ -574,9 +607,11 @@
 
 /* Контейнер-подложка для сетки */
 #section-files .data-wrapper {
-    background: rgba(15, 15, 20, 0.4);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* Теперь используем переменные, как и везде */
+    background: rgba(15, 15, 20, var(--glass-opacity));
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 20px;
@@ -596,7 +631,10 @@
 
 /* Стили карточки файла */
 .bot-file-card {
-    background: rgba(15, 15, 20, 0.5);
+    background: rgba(15, 15, 20, var(--glass-opacity));
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     display: flex;
@@ -731,7 +769,7 @@
 }
 
 /* ==========================================================================
-   9. НАСТРОЙКИ (Settings Section)
+   9. НАСТРОЙКИ (Settings Section) - СИНХРОНИЗИРОВАНО
 ========================================================================== */
 
 .settings-grid {
@@ -742,18 +780,24 @@
 }
 
 .setting-card {
-    background: rgba(255, 255, 255, 0.03);
+    /* Теперь параметры такие же, как у .sidebar и .data-wrapper */
+    background: rgba(var(--glass-base-rgb), var(--glass-opacity));
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    
+    /* Рамка теперь использует стандартную переменную glass-border для единообразия */
     border: 1px solid var(--glass-border);
     border-radius: 16px;
-    padding: 20px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    transition: 0.3s;
+    gap: 20px;
+    transition: all 0.3s ease;
 }
 
 .setting-card:hover {
-    background: rgba(255, 255, 255, 0.05);
+    /* При наведении делаем акцент, не ломая прозрачность */
+    background: rgba(var(--glass-base-rgb), calc(var(--glass-opacity) + 0.05));
     border-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -766,44 +810,27 @@
 
 .setting-label {
     font-size: 0.9rem;
-    color: var(--text-muted);
+    color: var(--glass-text); /* Ярче, чтобы было читаемо */
+    font-weight: 500;
 }
 
-/* Переключатели (Toggles) */
-.toggle-switch {
-    width: 45px;
-    height: 22px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 11px;
-    position: relative;
+/* Компактная кнопка Reset (слева) */
+.reset-btn {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: 0.3s;
+    width: fit-content;
+    margin-right: auto; 
+    
+    background: rgba(255, 75, 43, calc(var(--btn-intensity) * 0.6));
+    border: 1px solid rgba(255, 75, 43, calc(var(--btn-intensity) * 0.4));
+    color: #fff;
+    transition: all 0.3s ease;
 }
 
-.toggle-switch::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 16px;
-    height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    transition: 0.3s;
-}
-
-.toggle-switch.active {
-    background: var(--accent-blue);
-    box-shadow: 0 0 10px var(--accent-blue);
-}
-
-.toggle-switch.active::after {
-    left: 26px;
-}
-
-/* Слайдеры для диапазонов */
-.setting-range {
-    width: 100px;
-    accent-color: var(--accent-blue);
-    cursor: pointer;
+.reset-btn:hover {
+    background: rgba(255, 75, 43, calc(var(--btn-intensity) * 0.9));
+    box-shadow: 0 0 15px rgba(255, 75, 43, 0.4);
 }
