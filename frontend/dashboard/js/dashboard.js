@@ -7,8 +7,19 @@ import { initializeHeader, applyStatusFilter, setActiveFilterUI, updateHeaderCon
 import { initializeSearch, applySearchFilter } from './modules/ui/search.js';
 import { Renderer } from './modules/ui/renderer.js';
 import { FilesManager } from './modules/sidebar/files.js';
+import { SettingsManager } from './modules/sidebar/settings.js';
 
 const state = { filter: 'all', search: '', tab: 'bots' };
+
+// --- 1. ПРИМЕНЕНИЕ НАСТРОЕК ---
+const applySavedSettings = () => {
+    const root = document.documentElement.style;
+    const blur = localStorage.getItem('app_blur') || '16px';
+    const opacity = localStorage.getItem('app_opacity') || '0.4';
+    
+    root.setProperty('--blur-amount', blur);
+    root.setProperty('--glass-opacity', opacity);
+};
 
 const syncUI = () => {
     if (state.tab !== 'bots') return;
@@ -31,13 +42,17 @@ const handleTabChange = (name) => {
     if (state.tab === 'bots') {
         syncUI();
     } else if (state.tab === 'files') {
-        // Рендерим сетку файлов (пока пустую, она создаст 25 скелетов)
         FilesManager.render([]); 
+    } else if (state.tab === 'settings') {
+        SettingsManager.render();
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem('auth_token')) return window.location.href = '/sidebar/auth/auth.html';
+
+    // Применяем сохраненные настройки сразу
+    applySavedSettings();
 
     initializeSidebar({ onTabChange: handleTabChange });
     initializeHeader({ 

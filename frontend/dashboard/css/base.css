@@ -7,7 +7,13 @@
 :root {
     /* Glassmorphism Colors */
     --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-panel: rgba(10, 10, 15, 0.4);
+    
+    /* Добавляем переменную для прозрачности (основа) */
+    --glass-opacity: 0.4; 
+    
+    /* Используем var(--glass-opacity) для всех панелей */
+    --glass-panel: rgba(10, 10, 15, var(--glass-opacity));
+    
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-text: #ffffff;
     --text-muted: rgba(255, 255, 255, 0.5);
@@ -17,8 +23,8 @@
     --accent-green: #00ff88;
     --accent-red: #ff4b2b;
     
-    /* Effects */
-    --blur: 16px;
+    /* Эффекты: теперь тоже используем переменные */
+    --blur-amount: 16px; /* Переименовал, чтобы было понятнее */
     --font-main: 'Inter', system-ui, sans-serif;
 }
 
@@ -55,23 +61,59 @@ body::before {
 }
 
 /* ==========================================================================
-   4. СКРОЛЛБАР (Custom Scrollbar)
-   Тонкий и ненавязчивый скроллбар
+   4. УНИВЕРСАЛЬНАЯ СИСТЕМА СКРОЛЛБАРОВ (Global Scrollbar System)
 ========================================================================== */
-::-webkit-scrollbar {
+
+/* Firefox */
+.custom-scroll,
+.table-container,
+.clients-grid,
+.files-grid,
+.bg-options-grid,
+.data-wrapper,
+.scroll-area {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 212, 255, 0.3) transparent;
+}
+
+/* Chrome, Safari, Edge */
+.custom-scroll::-webkit-scrollbar,
+.table-container::-webkit-scrollbar,
+.clients-grid::-webkit-scrollbar,
+.data-wrapper::-webkit-scrollbar,
+.bg-options-grid::-webkit-scrollbar,
+.scroll-area::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
 
-::-webkit-scrollbar-track {
+.custom-scroll::-webkit-scrollbar-track,
+.table-container::-webkit-scrollbar-track,
+.clients-grid::-webkit-scrollbar-track,
+.data-wrapper::-webkit-scrollbar-track,
+.bg-options-grid::-webkit-scrollbar-track,
+.scroll-area::-webkit-scrollbar-track {
     background: transparent;
+    margin: 8px; /* Отступы от краев панелей */
 }
 
-::-webkit-scrollbar-thumb {
+.custom-scroll::-webkit-scrollbar-thumb,
+.table-container::-webkit-scrollbar-thumb,
+.clients-grid::-webkit-scrollbar-thumb,
+.data-wrapper::-webkit-scrollbar-thumb,
+.bg-options-grid::-webkit-scrollbar-thumb,
+.scroll-area::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
+    border-radius: 10px;
+    transition: background 0.3s;
 }
 
-::-webkit-scrollbar-thumb:hover {
+.custom-scroll::-webkit-scrollbar-thumb:hover,
+.table-container::-webkit-scrollbar-thumb:hover,
+.clients-grid::-webkit-scrollbar-thumb:hover,
+.data-wrapper::-webkit-scrollbar-thumb:hover,
+.bg-options-grid::-webkit-scrollbar-thumb:hover,
+.scroll-area::-webkit-scrollbar-thumb:hover {
     background: var(--accent-blue);
 }
 

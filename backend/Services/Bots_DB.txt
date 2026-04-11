@@ -2,10 +2,10 @@
     "ua4e1-Bot-Worker": {
         "id": "ua4e1-Bot-Worker",
         "loc": "ru",
-        "user": "Данила",
+        "user": "TestBot",
         "pc_name": "DESKTOP-BF7JB87",
-        "active_window": "components.css - rat_server - Visual Studio Code",
-        "last_active": "15:17:50",
+        "active_window": "C:\\WINDOWS\\system32\\cmd.exe",
+        "last_active": "07:23:25",
         "ip": "188.190.156.120",
         "os": "Windows 11",
         "hw": {}

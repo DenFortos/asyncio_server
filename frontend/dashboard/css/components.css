@@ -607,7 +607,6 @@
 }
 
 .bot-file-card:not(.skeleton-card):hover {
-    transform: translateY(-3px);
     border-color: var(--accent-blue);
     background: rgba(0, 212, 255, 0.05);
     box-shadow: 0 10px 25px rgba(0, 212, 255, 0.1);
@@ -729,4 +728,82 @@
 }
 #section-files .data-wrapper::-webkit-scrollbar-thumb:hover {
     background: var(--accent-blue);
+}
+
+/* ==========================================================================
+   9. НАСТРОЙКИ (Settings Section)
+========================================================================== */
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.setting-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: 0.3s;
+}
+
+.setting-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.setting-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Переключатели (Toggles) */
+.toggle-switch {
+    width: 45px;
+    height: 22px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.toggle-switch.active {
+    background: var(--accent-blue);
+    box-shadow: 0 0 10px var(--accent-blue);
+}
+
+.toggle-switch.active::after {
+    left: 26px;
+}
+
+/* Слайдеры для диапазонов */
+.setting-range {
+    width: 100px;
+    accent-color: var(--accent-blue);
+    cursor: pointer;
 }

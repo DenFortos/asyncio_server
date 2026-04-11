@@ -111,10 +111,25 @@
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
-    /* Убираем внутренние отступы, чтобы таблица прилипала к скругленным краям */
     padding: 0; 
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
-    overflow: hidden; /* Скролл будет внутри дочерних элементов */
+    overflow: hidden; /* Контент внутри будет скроллиться отдельно */
+}
+
+.content-section .data-wrapper {
+    overflow-y: auto;
+}
+
+#section-bots .data-wrapper {
+    overflow: hidden;
+}
+
+.table-container, .clients-grid {
+    flex: 1;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 20px;
 }
 
 /* --- ТАБЛИЦА: Скругляем углы и настраиваем скролл --- */
