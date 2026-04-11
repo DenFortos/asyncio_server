@@ -4,8 +4,8 @@
         "loc": "ru",
         "user": "TestBot",
         "pc_name": "DESKTOP-BF7JB87",
-        "active_window": "Program Manager",
-        "last_active": "13:23:34",
+        "active_window": "skeler. - ＰＡＬＥ ＬＩＧＨＴ (Music Video) - YouTube - Google Chrome",
+        "last_active": "14:46:26",
         "ip": "188.190.156.120",
         "os": "Windows 11",
         "hw": {}
