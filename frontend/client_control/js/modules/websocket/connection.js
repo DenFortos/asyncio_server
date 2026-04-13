@@ -13,7 +13,12 @@ const updateUI = (id, val) => {
 };
 
 const setOnline = (isOnline) => {
-    $('status-indicator')?.classList.toggle('online', isOnline);
+    const el = $('status-indicator');
+    if (el) {
+        // Явно переключаем оба класса для корректного цвета
+        el.classList.toggle('online', isOnline);
+        el.classList.toggle('offline', !isOnline);
+    }
     updateUI('status-text', isOnline ? 'online' : 'offline');
 };
 
@@ -43,7 +48,8 @@ function handleIncomingData(buffer) {
         if (data) {
             data.ip && updateUI('display-ip', data.ip);
             data.id && updateUI('display-id', data.id);
-            setOnline(data.status === 'online' || !!data.id);
+            // ФИКС: Убрали !!data.id, теперь статус зависит только от сервера
+            setOnline(data.status === 'online');
         }
     } 
     else if (module === 'ScreenWatch') {

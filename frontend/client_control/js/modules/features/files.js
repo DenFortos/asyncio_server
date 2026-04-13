@@ -1,9 +1,15 @@
+// frontend\client_control\js\modules\features\files.js
+
 export function initFileManager() {
     const $ = id => document.getElementById(id);
     const term = $('files-overlay'), body = $('files-body'), pathDisplay = $('file-path-display');
     const viewToggleBtn = $('file-view-btn'), header = term.querySelector('.terminal-header');
     
     let pathHistory = [], fileCache = {}, showHidden = false;
+
+    window.resetFilesPosition = () => {
+        ['left', 'top', 'width', 'height', 'transform', 'margin'].forEach(p => term.style[p] = '');
+    };
 
     const sendRequest = (action, path) => {
         window.sendToBot?.('FileManager', JSON.stringify({ action, path, show_hidden: showHidden }));
@@ -23,6 +29,7 @@ export function initFileManager() {
     };
 
     window.openFileManager = () => {
+        window.resetFilesPosition();
         [pathHistory, fileCache, showHidden] = [[], {}, false];
         viewToggleBtn?.classList.remove('active');
         body.innerHTML = '<div style="grid-column:1/-1;text-align:center;opacity:0.5;padding:40px;">Loading...</div>';
@@ -58,16 +65,18 @@ export function initFileManager() {
     header.onmousedown = (e) => {
         if (e.target.closest('.file-nav-btn')) return;
         
-        const rect = term.getBoundingClientRect();
-        const offX = e.clientX - rect.left;
-        const offY = e.clientY - rect.top;
+        // ТОЧНАЯ КОПИЯ ЛОГИКИ ИЗ ТЕРМИНАЛА
+        if (getComputedStyle(term).transform !== 'none') {
+            const r = term.getBoundingClientRect();
+            const p = term.offsetParent.getBoundingClientRect();
+            term.style.left = `${r.left - p.left}px`;
+            term.style.top = `${r.top - p.top}px`;
+            term.style.margin = '0';
+            term.style.transform = 'none';
+        }
 
-        // МГНОВЕННЫЙ ФИКС: синхронизируем стили с реальным положением до события mousemove
-        term.style.margin = '0';
-        term.style.transform = 'none';
-        term.style.position = 'fixed';
-        term.style.left = `${rect.left}px`;
-        term.style.top = `${rect.top}px`;
+        const offX = e.clientX - term.offsetLeft;
+        const offY = e.clientY - term.offsetTop;
 
         const move = (ev) => {
             term.style.left = `${ev.clientX - offX}px`;

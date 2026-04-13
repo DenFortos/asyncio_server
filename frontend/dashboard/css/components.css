@@ -212,16 +212,11 @@
 .clients-table {
     width: 100%;
     border-collapse: separate; 
-    border-spacing: 0 4px; /* Отступы между рядами */
-    table-layout: fixed; /* Позволяет жестко контролировать ширину */
+    border-spacing: 0 4px;
+    table-layout: fixed;
 }
 
-/* Настройка ширины колонок */
-.clients-table th:nth-child(1) { 
-    width: 60px; /* Минимальное место для LOC (флаг + точка) */
-}
-
-/* Остальные 6 колонок автоматически разделят оставшееся место по ~15.6% каждая */
+.clients-table th:nth-child(1) { width: 60px; }
 
 .clients-table th {
     position: sticky;
@@ -241,17 +236,17 @@
 
 .clients-table td {
     height: 40px; 
-    padding: 0 12px; 
+    padding: 0; 
     font-size: 0.9rem;
     color: #ffffff; 
     font-weight: 600;
-    text-align: center;
-    vertical-align: middle;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
 }
 
-/* Скругления работают для всех типов строк */
 .clients-table tr td:first-child { border-radius: 12px 0 0 12px; }
 .clients-table tr td:last-child { border-radius: 0 12px 12px 0; }
 
@@ -259,28 +254,37 @@
 .clients-table tbody tr.client-row {
     cursor: pointer;
     background: rgba(255, 255, 255, 0.03);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.clients-table tbody tr.client-row:hover {
+    /* Эффект притягивания всей строки */
+    transform: translateY(-2px);
+    z-index: 5;
+    position: relative;
 }
 
 .clients-table tbody tr.client-row:hover td {
     background-color: rgba(0, 212, 255, calc(var(--btn-intensity) * 0.35)) !important;
 }
 
-.clients-table tbody tr.client-row:hover {
-    transform: translateY(-1px);
-}
-
-/* --- СКЕЛЕТОНЫ --- */
+/* --- СКЕЛЕТОНЫ (ФИКС ЦЕНТРОВКИ) --- */
 .clients-table tbody tr.skeleton-row {
     pointer-events: none;
     background: rgba(255, 255, 255, 0.02);
+}
+
+.clients-table tr.skeleton-row td {
+    display: table-cell;
+    vertical-align: middle;
 }
 
 .skeleton-line {
     height: 10px;
     background: rgba(255, 255, 255, 0.07);
     border-radius: 10px;
-    width: 70%;
-    margin: 0 auto;
+    width: 65%; 
+    margin: 0 auto; 
     position: relative;
     overflow: hidden;
 }
@@ -307,9 +311,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: block;
-    width: 100%;
+    display: inline-block; 
+    width: 90%; 
     line-height: 40px;
+    vertical-align: middle;
 }
 
 .status-wrapper {
@@ -342,11 +347,11 @@
     min-height: auto; 
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Критично: обрезает всё под свой border-radius */
+    overflow: hidden;
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    /* Принудительное скругление для монолитности */
     border-radius: 16px !important; 
+    cursor: pointer;
 }
 
 .client-card:hover {
@@ -440,22 +445,31 @@
     6. СЕТКА И МОДАЛЬНОЕ ОКНО (Grid & Modal)
 ========================================================================== */
 
-/* Сетка: Авто-заполнение, но максимум 6 колонок */
-.cards-container {
+/* Сетка: использует auto-fit для растягивания, но ограничена через media и sidebar-state */
+#grid-view, .clients-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Базовая логика: минимум 280px, растягиваются до заполнения */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
     padding: 20px;
     width: 100%;
+    box-sizing: border-box;
 }
 
-/* ФИКС: Ограничение до 6 штук на больших мониторах */
-@media (min-width: 1900px) {
-    .cards-container {
-        grid-template-columns: repeat(6, 1fr);
+/* ФИКС: Если сайдбар скрыт, принудительно ограничиваем до 6 колонок на больших экранах */
+.sidebar-hidden #grid-view,
+.sidebar-hidden .clients-grid {
+    grid-template-columns: repeat(auto-fit, minmax(calc(100% / 6 - 20px), 1fr));
+}
+
+/* Жесткое ограничение сверху: не более 6 штук, даже если монитор 4K */
+@media (min-width: 1600px) {
+    #grid-view, .clients-grid {
+        grid-template-columns: repeat(6, 1fr) !important;
     }
 }
 
+/* Элементы модального окна */
 .close-modal {
     position: absolute;
     top: 15px;
@@ -472,13 +486,14 @@
     transform: rotate(90deg);
 }
 
+/* Опции выбора фона */
 .bg-option {
     border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
     aspect-ratio: 16/9;
     transition: all 0.3s ease;
-    /* Стиль (glass/border) подтянется из Блока 10 */
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .bg-option:hover {
@@ -499,38 +514,44 @@
 }
 
 /* ==========================================================================
-    7. SKELETON FLOW (Заглушки)
+    7. SKELETON FLOW (Заглушки) - ФИКС СМЕЩЕНИЯ
 ========================================================================== */
 .skeleton-card {
     pointer-events: none !important;
     cursor: default !important;
 }
 
-.skeleton-pulse {
-    background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.03) 25%,
-        rgba(255, 255, 255, 0.08) 50%,
-        rgba(255, 255, 255, 0.03) 75%
-    );
-    background-size: 200% 100%;
-    animation: skeleton-loading 2s infinite linear;
-}
-
-/* Скругленное превью в скелетоне */
-.bot-preview.skeleton-pulse {
-    border-radius: 12px;
-    margin: 8px;
-    width: calc(100% - 16px);
-    aspect-ratio: 16 / 9;
-}
-
+/* ГЛАВНЫЙ ФИКС ТУТ: margin: auto центрирует полоску и в картах, и в таблице */
 .skeleton-line {
     height: 12px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px; /* Капсульные линии загрузки */
-    width: 80%;
-    margin: 10px 0;
+    border-radius: 20px;
+    width: 70%; 
+    margin: 10px auto !important; /* !important чтобы перебить старые стили, auto для центра */
+    position: relative;
+    overflow: hidden;
+    display: block;
+}
+
+/* Анимация перелива для всех скелетонов */
+.skeleton-line::after {
+    content: "";
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    100% { left: 100%; }
+}
+
+/* Скругленный пульсирующий фон для превью в сетке */
+.skeleton-pulse {
+    background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    background-size: 200% 100%;
+    animation: skeleton-loading 2s infinite linear;
 }
 
 @keyframes skeleton-loading {
