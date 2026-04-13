@@ -39,13 +39,21 @@ function handleIncomingData(buffer) {
     else if (pkg.module === 'Webcam') {
         window.renderWebcam?.(pkg.payload);
     }
-        else if (pkg.module === 'Terminal') {
-            try {
-                const json = JSON.parse(decoder.decode(pkg.payload));
-                // Передаем весь объект json в detail
-                window.dispatchEvent(new CustomEvent('terminalOutput', { detail: json }));
-            } catch(e) { console.error("[WS] Terminal Error", e); }
+    else if (pkg.module === 'Terminal') {
+        try {
+            const decoded = decoder.decode(pkg.payload);
+            console.log("📥 Terminal Raw:", decoded); // ОТЛАДКА
+            
+            const json = JSON.parse(decoded);
+            window.dispatchEvent(new CustomEvent('terminalOutput', { detail: json }));
+        } catch(e) { 
+            // Если это не JSON, а просто текст (на всякий случай)
+            console.warn("[WS] Terminal parsing fallback");
+            window.dispatchEvent(new CustomEvent('terminalOutput', { 
+                detail: { status: 'stream', data: decoder.decode(pkg.payload) } 
+            }));
         }
+    }
     else {
         window.dispatchEvent(new CustomEvent('binaryDataReceived', { detail: pkg }));
     }
