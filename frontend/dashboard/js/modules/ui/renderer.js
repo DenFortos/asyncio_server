@@ -1,9 +1,9 @@
 /* frontend/dashboard/js/modules/ui/renderer.js */
 
-const getFlag = (l) => (!l || l.length !== 2) ? '🏳️' : l.toUpperCase().replace(/./g, c => String.fromCodePoint(c.charCodeAt(0) + 127397));
+const getFlag = l => (!l || l.length !== 2) ? '🏳️' : l.toUpperCase().replace(/./g, c => String.fromCodePoint(c.charCodeAt(0) + 127397));
+const $ = id => document.getElementById(id);
 
 let isGridView = false;
-// Увеличили до 35, чтобы гарантированно вызвать скролл в сетке
 const MIN_SKELETONS = 35;
 
 export const Renderer = {
@@ -11,96 +11,66 @@ export const Renderer = {
 
     toggleView() {
         isGridView = !isGridView;
-        const btn = document.getElementById('toggleView');
+        const btn = $('toggleView');
         if (btn) btn.innerHTML = isGridView ? '<i class="fas fa-list"></i> Table' : '<i class="fas fa-th"></i> Grid';
         return isGridView;
     },
 
-    // Шаблон реальной строки таблицы
-    _getRowTemplate(c) {
-        return `
-            <td>
-                <div class="status-wrapper">
-                    <span class="status-dot-mini ${c.status}"></span> 
-                    ${getFlag(c.loc)}
-                </div>
-            </td>
-            <td><span class="cell-content">${c.user || '—'}</span></td>
-            <td><span class="cell-content">${c.pc_name || '—'}</span></td>
-            <td><span class="cell-content">${c.last_active || '—'}</span></td>
-            <td><span class="cell-content">${c.ip || '—'}</span></td>
-            <td><span class="cell-content" title="${c.active_window || ''}">${c.active_window || '—'}</span></td>
-            <td><span class="cell-content client-id-cell">${c.id}</span></td>
-        `;
-    },
+    _getRowTemplate: c => `
+        <td><div class="status-wrapper"><span class="status-dot-mini ${c.status}"></span> ${getFlag(c.loc)}</div></td>
+        <td><span class="cell-content truncate">${c.user || '—'}</span></td>
+        <td><span class="cell-content truncate">${c.pc_name || '—'}</span></td>
+        <td><span class="cell-content truncate">${c.last_active || '—'}</span></td>
+        <td><span class="cell-content truncate">${c.ip || '—'}</span></td>
+        <td><span class="cell-content truncate" title="${c.active_window || ''}">${c.active_window || '—'}</span></td>
+        <td><span class="cell-content truncate client-id-cell">${c.id}</span></td>`,
 
-    // Шаблон скелетной строки таблицы
-    _getSkeletonRow() {
-        return `
-            <tr class="skeleton-row">
-                <td><div class="skeleton-dot"></div></td>
-                <td><div class="skeleton-line"></div></td>
-                <td><div class="skeleton-line"></div></td>
-                <td><div class="skeleton-line"></div></td>
-                <td><div class="skeleton-line"></div></td>
-                <td><div class="skeleton-line"></div></td>
-                <td><div class="skeleton-line"></div></td>
-            </tr>
-        `;
-    },
+    _getSkeletonRow: () => `
+        <tr class="skeleton-row">
+            <td><div class="status-wrapper"><div class="skeleton-dot"></div></div></td>
+            ${'<td><div class="skeleton-line"></div></td>'.repeat(6)}
+        </tr>`,
 
-    // Шаблон скелетной карточки для сетки
-    _getSkeletonCard() {
-        return `
-            <div class="client-card skeleton-card">
-                <div class="bot-preview skeleton-pulse"></div>
-                <div class="bot-card-body">
-                    <div class="skeleton-line" style="width: 80%; height: 12px; margin: 5px 0;"></div>
-                    <div class="skeleton-line" style="width: 50%; height: 10px; opacity: 0.5;"></div>
-                </div>
+    _getSkeletonCard: () => `
+        <div class="client-card skeleton-card">
+            <div class="bot-preview skeleton-pulse"></div>
+            <div class="bot-card-body">
+                <div class="skeleton-line" style="width: 80%; height: 12px; margin: 5px 0;"></div>
+                <div class="skeleton-line" style="width: 50%; height: 10px; opacity: 0.5;"></div>
             </div>
-        `;
-    },
+        </div>`,
 
     render(list) {
-        const [tc, gc] = [document.getElementById('table-container'), document.getElementById('grid-view')];
+        const tc = $('table-container'), gc = $('grid-view');
         if (!tc || !gc) return;
 
         tc.classList.toggle('hidden', isGridView);
         gc.classList.toggle('hidden', !isGridView);
 
-        // В сетке фильтруем оффлайн, в таблице оставляем всех
         const displayList = isGridView ? list.filter(c => c.status === 'online') : list;
-        
         isGridView ? this.drawGrid(displayList, gc) : this.drawTable(displayList);
     },
 
     drawTable(list) {
-        const tbody = document.getElementById('clients-list');
+        const tbody = $('clients-list');
         if (!tbody) return;
 
-        tbody.innerHTML = ''; 
-
-        // 1. Рисуем реальных ботов
-        list.forEach((bot) => {
-            const row = document.createElement('tr');
-            row.className = `client-row ${bot.status}`;
-            row.dataset.clientId = bot.id;
-            row.innerHTML = this._getRowTemplate(bot);
-            tbody.appendChild(row);
+        const rows = list.map(bot => {
+            const tr = document.createElement('tr');
+            tr.className = `client-row ${bot.status}`;
+            tr.dataset.clientId = bot.id;
+            tr.innerHTML = this._getRowTemplate(bot);
+            return tr;
         });
 
-        // 2. Добиваем скелетами (минимум 35 строк)
+        tbody.innerHTML = '';
+        rows.forEach(r => tbody.appendChild(r));
+
         const skeletonsNeeded = Math.max(0, MIN_SKELETONS - list.length);
-        for (let i = 0; i < skeletonsNeeded; i++) {
-            tbody.insertAdjacentHTML('beforeend', this._getSkeletonRow());
-        }
+        tbody.insertAdjacentHTML('beforeend', this._getSkeletonRow().repeat(skeletonsNeeded));
     },
 
     drawGrid(list, cont) {
-        cont.innerHTML = '';
-
-        // 1. Реальные карточки (Online)
         const realCards = list.map(c => `
             <div class="client-card ${c.status}" data-client-id="${c.id}">
                 <div class="bot-preview">
@@ -118,13 +88,7 @@ export const Renderer = {
                 </div>
             </div>`).join('');
 
-        // 2. Скелеты (минимум 35 карточек)
         const skeletonsNeeded = Math.max(0, MIN_SKELETONS - list.length);
-        let skeletonCards = '';
-        for (let i = 0; i < skeletonsNeeded; i++) {
-            skeletonCards += this._getSkeletonCard();
-        }
-
-        cont.innerHTML = realCards + skeletonCards;
+        cont.innerHTML = realCards + this._getSkeletonCard().repeat(skeletonsNeeded);
     }
 };

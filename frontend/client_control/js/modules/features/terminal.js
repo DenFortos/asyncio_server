@@ -1,46 +1,52 @@
-// frontend\client_control\js\modules\features\terminal.js
-
+// frontend/client_control/js/modules/features/terminal.js
 export function initTerminal() {
-    const term = document.getElementById('terminal-overlay');
-    const body = document.getElementById('terminal-body');
-    const input = document.getElementById('terminal-cmd');
+    const $ = id => document.getElementById(id);
+    const term = $('terminal-overlay'), body = $('terminal-body'), input = $('terminal-cmd');
     const header = term.querySelector('.terminal-header');
 
-    // Перетаскивание
-    header.onmousedown = (e) => {
-        const offsetX = e.clientX - term.offsetLeft;
-        const offsetY = e.clientY - term.offsetTop;
-        const onMouseMove = (ev) => {
-            term.style.left = (ev.pageX - offsetX) + 'px';
-            term.style.top = (ev.pageY - offsetY) + 'px';
-        };
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', () => document.removeEventListener('mousemove', onMouseMove), { once: true });
+    window.resetTerminalPosition = () => {
+        ['left', 'top', 'width', 'height', 'transform'].forEach(p => term.style[p] = '');
     };
 
-    // Ввод команд
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-            
-            if (cmd.toLowerCase() === 'clear') {
-                body.textContent = '';
-                // Обязательно JSON.stringify, чтобы бэкенд получил строку, а не [object Object]
-                window.sendToBot('Terminal', JSON.stringify({ command: 'clear_process' }));
-            } else {
-                body.textContent += `> ${cmd}\n`;
-                // Обязательно JSON.stringify здесь тоже
-                window.sendToBot('Terminal', JSON.stringify({ command: cmd }));
-            }
-            input.value = '';
-            body.scrollTop = body.scrollHeight;
+    header.onmousedown = (e) => {
+        if (getComputedStyle(term).transform !== 'none') {
+            const r = term.getBoundingClientRect();
+            const p = term.offsetParent.getBoundingClientRect();
+            term.style.left = `${r.left - p.left}px`;
+            term.style.top = `${r.top - p.top}px`;
+            term.style.transform = 'none';
         }
-    });
 
-    // Вывод данных
-    window.addEventListener('terminalOutput', (e) => {
-        const pkg = e.detail;
+        const offX = e.clientX - term.offsetLeft;
+        const offY = e.clientY - term.offsetTop;
+
+        const move = (ev) => {
+            term.style.left = `${ev.clientX - offX}px`;
+            term.style.top = `${ev.clientY - offY}px`;
+        };
+
+        const stop = () => document.removeEventListener('mousemove', move);
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', stop, { once: true });
+    };
+
+    input.onkeydown = (e) => {
+        if (e.key !== 'Enter') return;
+        const cmd = input.value.trim();
+        if (!cmd) return;
+
+        if (cmd.toLowerCase() === 'clear') {
+            body.textContent = '';
+            window.sendToBot?.('Terminal', JSON.stringify({ command: 'clear_process' }));
+        } else {
+            body.textContent += `> ${cmd}\n`;
+            window.sendToBot?.('Terminal', JSON.stringify({ command: cmd }));
+        }
+        input.value = '';
+        body.scrollTop = body.scrollHeight;
+    };
+
+    window.addEventListener('terminalOutput', ({ detail: pkg }) => {
         if (pkg.status === 'clear') body.textContent = '';
         else if (pkg.data) {
             body.textContent += pkg.data;

@@ -42,8 +42,11 @@
                     <button id="btn-desktop-control" class="action-btn" title="Take Control">
                         <i class="fas fa-mouse-pointer"></i>
                     </button>
-                    <button id="btn-terminal-toggle" class="action-btn" title="PowerShell Terminal">
+                    <button id="btn-terminal-toggle" class="action-btn" title="PowerShell Remote">
                         <i class="fas fa-terminal"></i>
+                    </button>
+                    <button id="btn-files-toggle" class="action-btn" title="File Manager">
+                        <i class="fas fa-folder-open"></i>
                     </button>
                 </div>
 
@@ -83,9 +86,10 @@
         </header>
 
         <main class="workspace">
+            
             <div id="terminal-overlay" class="terminal-overlay hidden">
                 <div class="terminal-header">
-                    <span>PowerShell Remote</span>
+                    <span><i class="fas fa-terminal" style="margin-right: 8px; opacity: 0.7;"></i> PowerShell Remote</span>
                 </div>
                 <div id="terminal-body" class="terminal-body"></div>
                 <div class="terminal-input-area">
@@ -93,19 +97,46 @@
                 </div>
             </div>
 
+            <div id="files-overlay" class="terminal-overlay hidden">
+                <div class="terminal-header">
+                    <span><i class="fas fa-folder-open" style="margin-right: 8px; opacity: 0.7;"></i> File Explorer</span>
+                </div>
+                
+                <div class="file-nav-bar">
+                    <div class="file-nav-controls">
+                        <button id="file-back-btn" class="file-nav-btn" title="Go Back">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <button id="file-home-btn" class="file-nav-btn" title="Root Drives">
+                            <i class="fas fa-home"></i>
+                        </button>
+                        <button id="file-view-btn" class="file-nav-btn" title="Toggle Hidden Files">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div id="file-path-display">Computer</div>
+                </div>
+
+                <div id="files-body" class="files-grid">
+                    </div>
+            </div>
+
             <div id="view-desktop" class="view-panel active">
                 <div class="canvas-wrapper" id="wrapper-desktop">
                     <video id="desktopVideo" autoplay muted playsinline></video>
                     <canvas id="desktopCanvas" tabindex="1"></canvas>
+                    
                     <button class="fullscreen-btn" title="Toggle Fullscreen" data-target="wrapper-desktop">
                         <i class="fas fa-expand"></i>
                     </button>
+
                     <div class="stream-overlay" id="desktopOverlay">
                         <i class="fas fa-ghost"></i>
                         <p>No Desktop Data</p>
                     </div>
                 </div>
             </div>
+            
         </main>
     </div>
 

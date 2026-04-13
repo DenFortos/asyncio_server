@@ -14,9 +14,10 @@ export const updateClient = (data) => {
 };
 
 export const setClientPreview = (id, url) => {
-    if (!clients[id]) return;
-    if (clients[id].lastPreview?.startsWith('blob:')) URL.revokeObjectURL(clients[id].lastPreview);
-    clients[id].lastPreview = url;
+    const c = clients[id];
+    if (!c) return;
+    if (c.lastPreview?.startsWith('blob:')) URL.revokeObjectURL(c.lastPreview);
+    c.lastPreview = url;
 };
 
 export const getAllClients = () => Object.values(clients).sort((a, b) => 

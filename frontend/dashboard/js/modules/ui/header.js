@@ -10,49 +10,31 @@ const setBackground = (path) => {
 const savedBg = localStorage.getItem('selectedBackground');
 if (savedBg) setBackground(savedBg);
 
-/**
- * Обновляет состояние кнопок управления: блокирует их и сбрасывает стили, если не вкладка ботов
- */
-export const updateHeaderContext = (tabName) => {
-    const isBots = tabName === 'bots';
-    const controls = document.querySelectorAll('#toggleView, .stat-box.clickable');
-    
-    controls.forEach(el => {
+export const updateHeaderContext = (tab) => {
+    const isBots = tab === 'bots';
+    document.querySelectorAll('#toggleView, .stat-box.clickable').forEach(el => {
         el.classList.toggle('disabled', !isBots);
-        
-        if (!isBots) {
-            el.classList.remove('active');
-            el.style.opacity = '0.3';
-            el.style.pointerEvents = 'none';
-        } else {
-            el.style.opacity = '1';
-            el.style.pointerEvents = 'auto';
-        }
+        el.style.opacity = isBots ? '1' : '0.3';
+        el.style.pointerEvents = isBots ? 'auto' : 'none';
+        if (!isBots) el.classList.remove('active');
     });
 };
 
 export const applyStatusFilter = (clients, filter) => 
     (!filter || filter === 'all') ? clients : clients.filter(i => i.status === filter);
 
-/**
- * Обновляет визуальное состояние фильтров
- */
 export const setActiveFilterUI = (filter, isGrid) => {
     document.querySelectorAll('.stat-box.clickable').forEach(el => {
         const type = el.id.replace('filter-', '');
+        const isOnline = type === 'online';
         
-        if (isGrid) {
-            const isOnline = type === 'online';
-            el.classList.toggle('active', isOnline);
-            el.classList.toggle('disabled', !isOnline);
-            el.style.opacity = isOnline ? '1' : '0.3';
-            el.style.pointerEvents = isOnline ? 'auto' : 'none';
-        } else {
-            el.classList.toggle('active', type === filter);
-            el.classList.remove('disabled');
-            el.style.opacity = '1';
-            el.style.pointerEvents = 'auto';
-        }
+        const active = isGrid ? isOnline : type === filter;
+        const disabled = isGrid && !isOnline;
+
+        el.classList.toggle('active', active);
+        el.classList.toggle('disabled', disabled);
+        el.style.opacity = disabled ? '0.3' : '1';
+        el.style.pointerEvents = disabled ? 'none' : 'auto';
     });
 };
 
@@ -68,26 +50,24 @@ export function initializeHeader(callbacks) {
             </div>`).join('');
     }
 
-    document.addEventListener('click', e => {
+    document.onclick = (e) => {
         const btn = e.target.closest('#bgButton, .close-modal, .bg-option, #toggleView, .stat-box.clickable');
-        if (!btn) return;
+        if (!btn || btn.classList.contains('disabled')) return;
 
         if (btn.id === 'bgButton') return modal?.classList.remove('hidden');
         if (btn.classList.contains('close-modal') || e.target === modal) return modal?.classList.add('hidden');
+        
         if (btn.classList.contains('bg-option')) {
             setBackground(btn.dataset.bg);
             return modal?.classList.add('hidden');
         }
 
-        if (btn.classList.contains('disabled')) return;
-
         if (btn.id === 'toggleView') {
-            const isGridNow = callbacks.Renderer.toggleView();
-            return callbacks.onViewToggled(isGridNow);
+            return callbacks.onViewToggled(callbacks.Renderer.toggleView());
         }
 
         if (btn.classList.contains('stat-box')) {
             callbacks.onFilterChange(btn.id.replace('filter-', ''));
         }
-    });
+    };
 }
