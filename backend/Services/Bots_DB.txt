@@ -2,10 +2,10 @@
     "ua4e1-Bot-Worker": {
         "id": "ua4e1-Bot-Worker",
         "loc": "ru",
-        "user": "TestBot",
+        "user": "Данила",
         "pc_name": "DESKTOP-BF7JB87",
-        "active_window": "C:\\WINDOWS\\System32\\cmd.exe",
-        "last_active": "22:08:48",
+        "active_window": "decrypted_cookies.txt — Блокнот",
+        "last_active": "02:42:49",
         "ip": "188.190.156.120",
         "os": "Windows 11",
         "hw": {}
