@@ -1,12 +1,10 @@
-import json
-import uvicorn
+# backend\API\api.py
+import json, uvicorn, logs.LoggerWrapper as logger
 from fastapi import FastAPI, WebSocket, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse, JSONResponse
 from starlette.websockets import WebSocketDisconnect
-
-from logs import Log as logger
-from backend.Services.ClientManager import client as active_clients
+from backend.Services import client as active_clients
 from backend.Services import send_binary_to_bot
 from .config import FRONTEND_PATH
 from .database import load_user_db, load_bots_from_file
@@ -14,127 +12,68 @@ from .auth_service import verify_user, register_user, get_login_by_token, genera
 from .protocols import pack_bot_command, has_access
 from .connection_manager import ConnectionManager
 
-manager = ConnectionManager()
-app = FastAPI()
-
-class APIServer:
-    """Управление HTTP и WebSocket интерфейсами управления"""
-
-    @staticmethod
-    async def run(host, port):
-        """Запуск сервера uvicorn"""
-        config = uvicorn.Config(app, host=host, port=port, log_level="warning")
-        await uvicorn.Server(config).serve()
-
-# Настройка статики и базовых путей
+manager, app = ConnectionManager(), FastAPI()
 app.mount("/sidebar", StaticFiles(directory=FRONTEND_PATH, html=True), name="static")
 
 @app.get("/")
-async def root():
-    return RedirectResponse("/sidebar/auth/auth.html")
+async def root(): return RedirectResponse("/sidebar/auth/auth.html")
 
 @app.get("/verify_token")
 async def verify(token: str = None):
-    login = get_login_by_token(token)
-    return {"status": "ok", "login": login} if login else JSONResponse(status_code=401, content={"status": "err"})
+    return {"status": "ok", "login": login} if (login := get_login_by_token(token)) else JSONResponse(401, {"status": "err"})
 
 @app.post("/{action}")
 async def auth(action: str, data=Body(...)):
-    login, pwd = data.get("login"), data.get("password")
-    if action == "register":
-        return {"status": "ok"} if register_user(login, pwd) else {"status": "error"}
-    
-    user = verify_user(login, pwd)
-    if user:
-        return {
-            "status": "ok",
-            "token": generate_token(login),
-            "role": user["role"],
-            "prefix": user["prefix"]
-        }
+    login, password = data.get("login"), data.get("password")
+    if action == "register": return {"status": "ok" if register_user(login, password) else "error"}
+    if (user := verify_user(login, password)):
+        return {"status": "ok", "token": generate_token(login), "role": user["role"], "prefix": user["prefix"]}
     return {"status": "error", "message": "Invalid credentials"}
 
 @app.websocket("/ws")
-async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = None, target: str = None):
-    """Центральный узел обмена данными между админом и ботами"""
-    user_login = get_login_by_token(token)
-    if not user_login or user_login != login:
-        await ws.accept()
-        await ws.close(code=1008)
-        return
+async def websocket_endpoint(websocket: WebSocket, token: str, login: str, mode: str = None, target: str = None):
+    if not (user_login := get_login_by_token(token)) or user_login != login:
+        await websocket.accept()
+        return await websocket.close(1008)
 
     user = load_user_db().get(user_login)
-    await manager.connect(ws, user_login, user)
-    allowed_bots_cache = set()
+    if not await manager.connect(websocket, user_login, user): return
 
+    allowed_cache = set()
     try:
-        # --- ИСПРАВЛЕННАЯ ЛОГИКА СИНХРОНИЗАЦИИ ---
-        if mode == "control" and target:
-            # Режим управления: шлем данные только по конкретному боту
-            if has_access(user, target):
-                bots = load_bots_from_file()
-                data = bots.get(target)
-                if data:
-                    data['status'] = 'online' if target in active_clients else 'offline'
-                    # Отправляем данные конкретного бота
-                    payload = pack_bot_command(target, "DataScribe", json.dumps(data))
-                    await ws.send_bytes(payload)
-        else:
-            # Стандартный режим дашборда: шлем список всех доступных
-            await _sync_initial_bots(ws, user)
+        if mode == "control" and target and has_access(user, target):
+            if (bot_data := load_bots_from_file().get(target)):
+                bot_data['status'] = 'online' if target in active_clients else 'offline'
+                await websocket.send_bytes(pack_bot_command(target, "DataScribe", json.dumps(bot_data)))
+        else: await sync_initial_state(websocket, user)
 
-        # 2. Основной цикл приема команд от фронтенда
         while True:
-            msg = await ws.receive()
-            if msg.get("type") == "websocket.disconnect":
-                break
+            message = await websocket.receive()
+            if message.get("type") == "websocket.disconnect": break
+            if "bytes" in message and len(packet := message["bytes"]) >= 7:
+                target_id = packet[6:6 + packet[0]].decode(errors='ignore').strip()
+                if target_id in allowed_cache or has_access(user, target_id):
+                    allowed_cache.add(target_id)
+                    await send_binary_to_bot(target_id, packet)
+    except (WebSocketDisconnect, RuntimeError): pass
+    except Exception as error: logger.Log.error(f"[API WS] Error for {user_login}: {error}")
+    finally: manager.disconnect(websocket, user_login)
 
-            if "bytes" in msg:
-                pkt = msg["bytes"]
-                if len(pkt) < 7: continue
-                
-                # Извлекаем ID из пакета
-                id_len = pkt[0]
-                target_id = pkt[6:6 + id_len].decode(errors='ignore').strip()
-                
-                if target_id in allowed_bots_cache or has_access(user, target_id):
-                    allowed_bots_cache.add(target_id)
-                    await send_binary_to_bot(target_id, pkt)
-
-    except (WebSocketDisconnect, RuntimeError):
-        pass
-    except Exception as e:
-        logger.error(f"[API WS] Error for {user_login}: {e}")
-    finally:
-        manager.disconnect(ws, user_login)
-
-async def _sync_initial_bots(ws, user):
-    """Сборка списка ботов и ПУШ актуальных превью из RAM при входе админа"""
-    # Локальный импорт для предотвращения circular import
-    from backend.Core.ClientConnection import preview_cache 
+async def sync_initial_state(websocket, user):
+    from backend.Core.ClientConnection import preview_cache
+    bots_db, visible = load_bots_from_file(), []
+    for bot_id, data in bots_db.items():
+        if has_access(user, bot_id):
+            data['status'] = 'online' if bot_id in active_clients else 'offline'
+            visible.append(data)
     
-    bots = load_bots_from_file()
-    visible_bots = []
-    
-    # 1. Формируем список ботов для таблицы
-    for bid, data in bots.items():
-        if has_access(user, bid):
-            data['status'] = 'online' if bid in active_clients else 'offline'
-            visible_bots.append(data)
-    
-    if visible_bots:
-        # Отправляем данные для таблицы
-        payload = pack_bot_command("SYSTEM", "DataScribe", json.dumps(visible_bots))
-        await ws.send_bytes(payload)
-        
-        # 2. Сразу после списка шлем последние картинки из RAM
-        for bid, photo_packet in preview_cache.items():
-            if has_access(user, bid):
-                try:
-                    await ws.send_bytes(photo_packet)
-                except:
-                    break
+    if visible:
+        await websocket.send_bytes(pack_bot_command("SYSTEM", "DataScribe", json.dumps(visible)))
+        for bot_id, photo in preview_cache.items():
+            if has_access(user, bot_id):
+                try: await websocket.send_bytes(photo)
+                except: break
 
 async def run_fastapi_server(host, port):
-    """Публичный метод для инициализации API"""
-    await APIServer.run(host, port)
+    config = uvicorn.Config(app, host=host, port=port, log_level="warning")
+    await uvicorn.Server(config).serve()

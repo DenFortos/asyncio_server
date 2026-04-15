@@ -1,3 +1,5 @@
 {
-    "ca5095337ff013f76848652026e3f813f75c94066fe2b1ba": "admin"
+    "fc29a89a7f9959105e56f13f5bae205b9fc592274698f9a1": "manager_alpha",
+    "35f719a3b2b3b9325176f9109cb6d9f9b94c657999e49a8b": "manager_beta",
+    "ff5bb90cacba9ed46d86008ac3719d0a8969c89e3da5f020": "admin"
 }

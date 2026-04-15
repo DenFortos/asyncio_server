@@ -20,9 +20,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initControlConnection();
 
     initInputHandlers((mod, pay) => window.sendToBot?.(mod, pay));
-
-    window.addEventListener('beforeunload', () => {
-        const { clientId } = AppState;
-        window.sendToBot && clientId && window.sendToBot("Heartbeat", "session_stop");
-    });
 });

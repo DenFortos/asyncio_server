@@ -3,11 +3,40 @@
         "id": "ua4e1-Bot-Worker",
         "loc": "ru",
         "user": "Данила",
-        "pc_name": "DESKTOP-BF7JB87",
-        "active_window": "decrypted_cookies.txt — Блокнот",
-        "last_active": "02:42:49",
+        "pc_name": "DESKTOP-DANILA",
         "ip": "188.190.156.120",
-        "os": "Windows 11",
-        "hw": {}
+        "os": "Windows 11"
+    },
+    "alpha-Bot-01": {
+        "id": "alpha-Bot-01",
+        "loc": "us",
+        "user": "Office-1",
+        "pc_name": "ALPHA-STATION-1",
+        "ip": "92.10.45.11",
+        "os": "Windows 10"
+    },
+    "alpha-Bot-02": {
+        "id": "alpha-Bot-02",
+        "loc": "us",
+        "user": "Office-2",
+        "pc_name": "ALPHA-STATION-2",
+        "ip": "92.10.45.12",
+        "os": "Windows 10"
+    },
+    "beta-Server": {
+        "id": "beta-Server",
+        "loc": "de",
+        "user": "Admin",
+        "pc_name": "BETA-SRV-PROD",
+        "ip": "45.120.3.55",
+        "os": "Windows Server 2022"
+    },
+    "test-Temporary": {
+        "id": "test-Temporary",
+        "loc": "fr",
+        "user": "Tester",
+        "pc_name": "TEST-LAB",
+        "ip": "127.0.0.1",
+        "os": "Windows 7"
     }
 }

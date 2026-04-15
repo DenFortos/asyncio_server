@@ -1,48 +1,22 @@
-import asyncio
-import time
-from logs.LoggerWrapper import Log as logger
+# backend\BenchUtils.py
+import asyncio, time, logs.LoggerWrapper as logger
 
-_total_bytes = 0
+_total = 0
 
+def add_bytes(n): 
+    global _total; _total += n
 
-def add_bytes(n: int):
-    global _total_bytes
-    _total_bytes += n
-
-
-async def _print_stats(interval: int = 1):
-    global _total_bytes
-    prev_bytes = 0
-    # Фиксируем время ровно перед началом цикла
-    last_check_time = time.perf_counter()
-
+async def _print_stats(interval=1):
+    global _total
+    prev, last = 0, time.perf_counter()
     while True:
         await asyncio.sleep(interval)
+        elapsed = (now := time.perf_counter()) - last
+        if (new := _total - prev) > 0:
+            mbps = (new * 8) / (elapsed * 1024 * 1024)
+            size = f"{new} B" if new < 1024 else f"{new/1024:.1f} KB" if new < 1048576 else f"{new/1048576:.2f} MB"
+            logger.Log.info(f"[BENCH] {size} | {elapsed:.2f}s | {mbps:.2f} Mbit/s")
+        prev, last = _total, now
 
-        # Используем perf_counter для сверхточных замеров времени
-        now = time.perf_counter()
-        elapsed = now - last_check_time
-
-        current_total = _total_bytes
-        new_bytes = current_total - prev_bytes
-
-        if new_bytes > 0:
-            # (Байты * 8 бит) / (секунды * 1024 * 1024) = Mbit/s
-            mbps = (new_bytes * 8) / (elapsed * 1024 * 1024)
-
-            # Если байт мало (меньше 1 КБ), пишем в байтах, если много — в КБ или МБ
-            if new_bytes < 1024:
-                size_str = f"{new_bytes} B"
-            elif new_bytes < 1024 * 1024:
-                size_str = f"{new_bytes / 1024:.1f} KB"
-            else:
-                size_str = f"{new_bytes / (1024 * 1024):.2f} MB"
-
-            logger.info(f"[BENCH] {size_str} in {elapsed:.2f}s -> {mbps:.2f} Mbit/s")
-
-        prev_bytes = current_total
-        last_check_time = now
-
-
-def start_benchmark(loop: asyncio.AbstractEventLoop, interval: int = 1):
+def start_benchmark(loop, interval=1): 
     loop.create_task(_print_stats(interval))
