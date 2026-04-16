@@ -3,9 +3,12 @@
         "id": "ua4e1-Bot-Worker",
         "loc": "ru",
         "user": "Данила",
-        "pc_name": "DESKTOP-DANILA",
+        "pc_name": "DESKTOP-BF7JB87",
         "ip": "188.190.156.120",
-        "os": "Windows 11"
+        "os": "Windows 11",
+        "active_window": "Idle",
+        "last_active": "16:13:11",
+        "hw": {}
     },
     "alpha-Bot-01": {
         "id": "alpha-Bot-01",
