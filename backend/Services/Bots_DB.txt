@@ -36,9 +36,9 @@
         "loc": "??",
         "user": "TestBot",
         "pc_name": "DESKTOP-BF7JB87",
-        "active_window": "Idle",
-        "last_active": "06:07:53",
-        "ip": "0.0.0.0",
+        "active_window": "Program Manager",
+        "last_active": "19:32:35",
+        "ip": "127.0.0.1",
         "os": "Windows 11",
         "hw": {}
     }
