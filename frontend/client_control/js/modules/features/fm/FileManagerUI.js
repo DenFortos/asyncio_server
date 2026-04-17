@@ -10,9 +10,17 @@ export const FileManagerUI = {
     
     items?.forEach(item => {
       const { type, name, size, is_hidden } = item;
-      const icon = type === 'drive' ? 'fa-hard-drive' : (type === 'directory' ? 'fa-folder' : 'fa-file');
+      
+      // Определяем: папка это или файл, учитывая разные варианты ответа бота
+      const isDir = type === 'directory' || type === 'dir';
+      const isDrive = type === 'drive';
+      
+      // Подбираем иконку и CSS класс
+      const icon = isDrive ? 'fa-hard-drive' : (isDir ? 'fa-folder' : 'fa-file');
+      const itemClass = isDrive ? 'drive' : (isDir ? 'directory' : 'file');
+
       const el = FileManagerUI.$el('div', {
-        className: `file-item ${type} ${is_hidden ? 'file-hidden' : ''}`,
+        className: `file-item ${itemClass} ${is_hidden ? 'file-hidden' : ''}`,
         innerHTML: `
           <i class="fas ${icon}"></i>
           <div class="file-name" title="${name}">${name}</div>
@@ -50,6 +58,7 @@ export const FileManagerUI = {
       ev.stopPropagation();
     };
 
+    // Содержимое меню в зависимости от цели (файл или пустое место)
     menu.innerHTML = isItem ? 
       `<div class="ctx-item" onclick="fm_cmd('download')"><i class="fas fa-download"></i> Скачать (.zip)</div>
        <div class="ctx-item" onclick="fm_cmd('run')"><i class="fas fa-play"></i> Запустить</div>

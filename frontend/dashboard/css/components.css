@@ -445,72 +445,54 @@
     6. СЕТКА И МОДАЛЬНОЕ ОКНО (Grid & Modal)
 ========================================================================== */
 
-/* Сетка: использует auto-fit для растягивания, но ограничена через media и sidebar-state */
 #grid-view, .clients-grid {
     display: grid;
-    /* Базовая логика: минимум 280px, растягиваются до заполнения */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    /* auto-fill: создает столько колонок, сколько влезет.
+       minmax(300px, 1fr): карточка не будет меньше 300px, 
+       но растянется, чтобы заполнить пустоту.
+    */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
     padding: 20px;
     width: 100%;
+    max-width: 2200px; /* Ограничиваем общую ширину, чтобы на 4К не разъезжалось */
+    margin: 0 auto;    /* Центрируем сетку */
     box-sizing: border-box;
 }
 
-/* ФИКС: Если сайдбар скрыт, принудительно ограничиваем до 6 колонок на больших экранах */
-.sidebar-hidden #grid-view,
-.sidebar-hidden .clients-grid {
-    grid-template-columns: repeat(auto-fit, minmax(calc(100% / 6 - 20px), 1fr));
-}
-
-/* Жесткое ограничение сверху: не более 6 штук, даже если монитор 4K */
-@media (min-width: 1600px) {
+/* ГЛАВНЫЙ ФИКС: Ограничение "Максимум 6 в ряд".
+   Если экран очень широкий, мы просто запрещаем сетке 
+   создавать больше 6 колонок.
+*/
+@media (min-width: 1921px) {
     #grid-view, .clients-grid {
-        grid-template-columns: repeat(6, 1fr) !important;
+        grid-template-columns: repeat(6, 1fr);
     }
 }
 
-/* Элементы модального окна */
-.close-modal {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 1.8rem;
-    cursor: pointer;
-    color: var(--text-muted);
-    transition: 0.3s;
-    z-index: 10;
+/* Если браузер открыт "на половину" или экран меньше (например, планшет),
+   медиа-запросы ниже помогут контролировать, чтобы карточки оставались читаемыми.
+*/
+
+@media (max-width: 1800px) {
+    #grid-view, .clients-grid {
+        /* На средних экранах максимум 4 или 5 */
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
 }
 
-.close-modal:hover {
-    color: #fff;
-    transform: rotate(90deg);
+@media (max-width: 1200px) {
+    #grid-view, .clients-grid {
+        /* На маленьких экранах (половина монитора) */
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
 }
 
-/* Опции выбора фона */
-.bg-option {
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    aspect-ratio: 16/9;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.bg-option:hover {
-    border-color: var(--accent-blue) !important;
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
-}
-
-.bg-option img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: all 0.4s ease;
-}
-
-.bg-option:hover img {
-    transform: scale(1.1);
+/* Убираем специфичные фиксы sidebar-hidden, так как новая логика auto-fill 
+   сама подстроится под доступную ширину основного контейнера */
+.sidebar-hidden #grid-view,
+.sidebar-hidden .clients-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 /* ==========================================================================

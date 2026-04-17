@@ -1,16 +1,17 @@
-/* frontend/dashboard/js/modules/websocket/connection.js */
+// frontend/dashboard/js/modules/websocket/connection.js
 import { updateClient, updateClients, setClientPreview } from '../data/clients.js';
 import { decodePacket, encodePacket } from './protocol.js';
 
 let ws;
 const dec = new TextDecoder();
 
-export function connectWebSocket() {
-    const auth = { t: localStorage.getItem('auth_token'), l: localStorage.getItem('user_login') };
-    if (!auth.t || !auth.l) return;
+// Установка WebSocket соединения с обработкой входящих данных и автореконнектом
+export const connectWebSocket = () => {
+    const t = localStorage.getItem('auth_token'), l = localStorage.getItem('user_login');
+    if (!t || !l) return;
 
-    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    ws = new WebSocket(`${protocol}//${location.host}/ws?login=${encodeURIComponent(auth.l)}&token=${auth.t}`);
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${proto}//${location.host}/ws?login=${encodeURIComponent(l)}&token=${t}`);
     ws.binaryType = 'arraybuffer';
 
     ws.onmessage = ({ data }) => {
@@ -25,12 +26,13 @@ export function connectWebSocket() {
                 Array.isArray(raw) ? updateClients(raw) : updateClient({ ...raw, id });
             } catch (e) { console.error("[WS] Parse Error", e); }
         } 
-        else if (module === 'Preview') {
+        
+        if (module === 'Preview') {
             const url = URL.createObjectURL(new Blob([payload], { type: 'image/jpeg' }));
             const img = document.getElementById(`prev-${id}`);
             
             setClientPreview(id, url);
-            if (img) { img.src = url; img.style.opacity = "1"; }
+            img && (img.src = url, img.style.opacity = "1");
         }
     };
 
@@ -45,4 +47,4 @@ export function connectWebSocket() {
     window.c2WebSocket = { 
         send: (id, mod, pay) => ws?.readyState === 1 && ws.send(encodePacket(id, mod, pay)) 
     };
-}
+};

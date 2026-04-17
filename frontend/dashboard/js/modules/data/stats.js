@@ -1,21 +1,22 @@
-/* frontend/dashboard/js/modules/data/stats.js */
+// frontend/dashboard/js/modules/data/stats.js
 import { getAllClients } from './clients.js';
 
+// Обновление счетчиков статистики (online, offline, total) в шапке при изменении данных
 window.addEventListener('clientsUpdated', () => {
     const list = getAllClients();
-    const counts = list.reduce((acc, c) => {
-        acc[c.status === 'online' ? 'online' : 'offline']++;
+    const stats = list.reduce((acc, { status }) => {
+        acc[status === 'online' ? 'online' : 'offline']++;
         return acc;
     }, { online: 0, offline: 0 });
     
-    const map = {
-        'online-count': counts.online,
-        'offline-count': counts.offline,
+    const counts = {
+        'online-count': stats.online,
+        'offline-count': stats.offline,
         'total-count': list.length
     };
 
-    Object.entries(map).forEach(([id, val]) => {
+    Object.entries(counts).forEach(([id, val]) => {
         const el = document.getElementById(id);
-        if (el) el.textContent = val;
+        el && (el.textContent = val);
     });
 });

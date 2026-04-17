@@ -1,7 +1,5 @@
 /* frontend/client_control/css/components.css
 
-/* frontend/client_control/css/components.css */
-
 /* ==========================================================================
    1. SIDEBAR & NAVIGATION (Левая панель)
    ========================================================================== */
@@ -15,7 +13,6 @@
     background: var(--panel-dark);
     border-right: 1px solid var(--border-dim);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 2000;
 }
 
 .sidebar.hidden {
@@ -71,7 +68,6 @@
     border-radius: 0 8px 8px 0;
     color: var(--text-main);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 2001;
 }
 
 .sidebar.hidden + .sidebar-tab { left: 0; }
@@ -192,7 +188,6 @@
     background: rgba(0, 0, 0, 0.95);
     border: 1px solid var(--accent-green);
     border-radius: var(--radius);
-    z-index: 1000;
     display: flex; 
     flex-direction: column;
     box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
@@ -256,11 +251,6 @@
     font-family: var(--font-mono);
     outline: none;
     font-size: 12px;
-}
-
-/* Слой выше для полноэкранного режима */
-.app-main:fullscreen .terminal-overlay {
-    z-index: 2005 !important;
 }
 
 /* ==========================================================================
@@ -389,7 +379,6 @@
     position: fixed;
     background: #121212;
     border: 1px solid var(--border-dim);
-    z-index: 10000;
     padding: 5px 0;
     min-width: 170px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);

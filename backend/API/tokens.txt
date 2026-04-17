@@ -1,5 +1,5 @@
 {
     "fc29a89a7f9959105e56f13f5bae205b9fc592274698f9a1": "manager_alpha",
     "35f719a3b2b3b9325176f9109cb6d9f9b94c657999e49a8b": "manager_beta",
-    "ff5bb90cacba9ed46d86008ac3719d0a8969c89e3da5f020": "admin"
+    "932002c8899d4e8cdeb6ea824c008c06a3b0d55d67aac580": "admin"
 }

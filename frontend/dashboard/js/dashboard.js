@@ -1,3 +1,4 @@
+// frontend/dashboard/js/dashboard.js
 import { connectWebSocket } from './modules/websocket/connection.js';
 import { getAllClients } from './modules/data/clients.js';
 import './modules/data/stats.js';
@@ -8,35 +9,42 @@ import { Renderer } from './modules/ui/renderer.js';
 import { FilesManager } from './modules/sidebar/files.js';
 import { SettingsManager } from './modules/sidebar/settings.js';
 
+const $ = id => document.getElementById(id);
 const state = { filter: 'all', search: '', tab: 'bots' };
 
+// Синхронизация интерфейса: фильтрация, поиск и рендер списка клиентов
 const syncUI = () => {
     if (state.tab !== 'bots') return;
-    
+
+    const { filter, search } = state;
     const all = getAllClients();
-    setActiveFilterUI(state.filter, Renderer.getIsGridView());
     
-    const filtered = applyStatusFilter(all, state.filter);
-    const searched = applySearchFilter(filtered, state.search);
-    
+    setActiveFilterUI(filter, Renderer.getIsGridView());
+
+    const filtered = applyStatusFilter(all, filter);
+    const searched = applySearchFilter(filtered, search);
+
     Renderer.render(searched);
 };
 
+// Переключение вкладок дашборда и очистка контекста поиска
 const handleTabChange = (name) => {
-    const searchInput = document.getElementById('universal-search');
+    const input = $('universal-search');
     state.tab = name.replace('section-', '');
-    
+
     updateHeaderContext(state.tab);
-    if (searchInput) {
-        searchInput.value = '';
+    
+    if (input) {
+        input.value = '';
         state.search = '';
     }
 
-    if (state.tab === 'bots') syncUI();
-    else if (state.tab === 'files') FilesManager.render([]);
-    else if (state.tab === 'settings') SettingsManager.render();
+    state.tab === 'bots' && syncUI();
+    state.tab === 'files' && FilesManager.render([]);
+    state.tab === 'settings' && SettingsManager.render();
 };
 
+// Инициализация приложения, проверка авторизации и установка слушателей событий
 document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem('auth_token')) {
         return window.location.href = '/sidebar/auth/auth.html';
@@ -56,20 +64,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeSearch();
     connectWebSocket();
 
-    document.addEventListener('click', e => {
-        const row = e.target.closest('.client-row, .client-card');
-        const btn = e.target.closest('button');
-        
-        if (row && !btn) {
-            window.location.href = `../client_control/client_control.html?id=${row.dataset.clientId}`;
-        }
+    document.addEventListener('click', ({ target }) => {
+        const row = target.closest('.client-row, .client-card');
+        const btn = target.closest('button');
+
+        (row && !btn) && (window.location.href = `../client_control/client_control.html?id=${row.dataset.clientId}`);
     });
 
     window.addEventListener('searchUpdated', e => {
         state.search = e.detail;
         syncUI();
     });
-    
+
     window.addEventListener('clientsUpdated', syncUI);
     handleTabChange('bots');
 });
