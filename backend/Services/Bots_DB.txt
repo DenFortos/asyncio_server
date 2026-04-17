@@ -37,7 +37,7 @@
         "user": "TestBot",
         "pc_name": "DESKTOP-BF7JB87",
         "active_window": "Program Manager",
-        "last_active": "19:32:35",
+        "last_active": "19:32:47",
         "ip": "127.0.0.1",
         "os": "Windows 11",
         "hw": {}
