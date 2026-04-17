@@ -1,67 +1,81 @@
 // frontend/client_control/js/modules/features/screen_renderer.js
-let jmuxer = null, isJpegMode = null, visibilityTimeout = null;
-const video = document.getElementById('desktopVideo'), canvas = document.getElementById('desktopCanvas');
-const overlay = document.getElementById('desktopOverlay'), streamBtn = document.getElementById('btn-desktop-stream');
 
-const handleVisibilityChange = () => {
-    if (document.hidden) {
-        visibilityTimeout = setTimeout(() => {
-            if (streamBtn?.classList.contains('active')) {
-                if (window.AppState?.desktop) window.AppState.desktop.observe = false;
-                window.sendToBot?.("ScreenWatch", "stop_stream");
-                streamBtn.classList.remove('active');
-                [streamBtn.dataset.paused, streamBtn.title] = ['true', 'Стрим на паузе. Кликни для запуска'];
-            }
-        }, 120000);
-    } else {
-        clearTimeout(visibilityTimeout);
-        if (streamBtn?.dataset.paused === 'true') [streamBtn.dataset.paused, streamBtn.title] = ['false', 'Start/Stop Stream'];
-    }
+let jmuxer = null, isJpegMode = null, visTimer = null;
+const vid = document.getElementById('desktopVideo'), cvs = document.getElementById('desktopCanvas');
+const ovl = document.getElementById('desktopOverlay'), btn = document.getElementById('btn-desktop-stream');
+
+// Принудительная остановка стрима и уведомление бота
+const stopStreaming = () => {
+  if (window.AppState?.desktop) window.AppState.desktop.observe = false;
+  window.sendToBot?.("ScreenWatch", "stop_stream");
+  btn?.classList.remove('active');
 };
 
-document.addEventListener('visibilitychange', handleVisibilityChange);
+// Управление паузой при скрытии вкладки
+const handleVisibility = () => {
+  if (document.hidden) {
+    visTimer = setTimeout(() => {
+      btn?.classList.contains('active') && stopStreaming();
+      btn && ([btn.dataset.paused, btn.title] = ['true', 'Стрим на паузе. Кликни для запуска']);
+    }, 120000);
+  } else {
+    clearTimeout(visTimer);
+    if (btn?.dataset.paused === 'true') [btn.dataset.paused, btn.title] = ['false', 'Start/Stop Stream'];
+  }
+};
 
-export function resetRenderer() {
-    if (jmuxer) { try { jmuxer.destroy(); } catch(e){} jmuxer = null; }
-    if (video) {
-        video.pause();
-        [video.src, video.style.display] = ["", 'none'];
-        video.load();
-    }
-    overlay?.classList.remove('hidden');
-    isJpegMode = null;
-}
+document.addEventListener('visibilitychange', handleVisibility);
+window.addEventListener('beforeunload', stopStreaming);
 
+// Сброс рендерера и очистка памяти
+export const resetRenderer = () => {
+  if (jmuxer) { try { jmuxer.destroy(); } catch(e){} jmuxer = null; }
+  if (vid) {
+    vid.pause();
+    [vid.src, vid.style.display] = ["", 'none'];
+    vid.load();
+  }
+  ovl?.classList.remove('hidden');
+  isJpegMode = null;
+};
+
+// Основной цикл рендеринга потока
 export async function renderScreenRGBA(payload) {
-    if (document.hidden || !payload || payload.byteLength < 10) return;
-    const videoData = new Uint8Array(payload);
+  if (document.hidden || !payload || payload.byteLength < 10) return;
+  const videoData = new Uint8Array(payload);
 
-    if (isJpegMode === null) isJpegMode = (videoData[0] === 0xFF && videoData[1] === 0xD8);
+  // Определяем тип потока (H264 или JPEG) по первому пакету
+  if (isJpegMode === null) isJpegMode = (videoData[0] === 0xFF && videoData[1] === 0xD8);
 
-    if (!isJpegMode && !jmuxer) {
-        jmuxer = new window.JMuxer({
-            node: video, mode: 'video', fps: 60, flushingTime: 10, clearBuffer: true,
-            onError: (err) => { console.error("JMuxer:", err); resetRenderer(); }
-        });
+  // Инициализация JMuxer только для видеопотока
+  if (!isJpegMode && !jmuxer) {
+    jmuxer = new window.JMuxer({
+      node: vid, mode: 'video', fps: 60, flushingTime: 10, clearBuffer: true,
+      onError: (err) => { console.error("JMuxer:", err); resetRenderer(); }
+    });
+  }
+
+  // Проверка отображения видео-элемента
+  if (!vid.style.display || vid.style.display === 'none') {
+    vid.style.display = 'block';
+    ovl?.classList.add('hidden');
+  }
+
+  // Подгонка размера холста
+  if (vid.videoWidth > 0 && cvs && (cvs.width !== vid.videoWidth || cvs.height !== vid.videoHeight)) {
+    [cvs.width, cvs.height] = [vid.videoWidth, vid.videoHeight];
+  }
+
+  // Подача данных в муксер
+  if (!isJpegMode && jmuxer) {
+    jmuxer.feed({ video: videoData });
+    
+    if (vid.paused && vid.readyState >= 1) vid.play().catch(() => {});
+    
+    // Синхронизация времени для минимизации задержки
+    if (vid.buffered.length > 0) {
+      const end = vid.buffered.end(vid.buffered.length - 1);
+      if (end - vid.currentTime > 0.3) vid.currentTime = end - 0.05;
     }
-
-    if (!video.style.display || video.style.display === 'none') {
-        video.style.display = 'block';
-        overlay?.classList.add('hidden');
-    }
-
-    if (video.videoWidth > 0 && canvas && (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight)) {
-        [canvas.width, canvas.height] = [video.videoWidth, video.videoHeight];
-    }
-
-    if (!isJpegMode && jmuxer) {
-        jmuxer.feed({ video: videoData });
-        video.paused && video.readyState >= 1 && video.play().catch(() => {});
-        
-        if (video.buffered.length > 0) {
-            const end = video.buffered.end(video.buffered.length - 1);
-            if (end - video.currentTime > 0.3) video.currentTime = end - 0.05;
-            video.playbackRate = 1.0;
-        }
-    }
+  }
 }

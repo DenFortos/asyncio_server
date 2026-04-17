@@ -1,43 +1,35 @@
-/* frontend/client_control/js/modules/core/states.js */
+// frontend/client_control/js/modules/core/states.js
 
-/* ==========================================================================
-   1. ОБЪЕКТ СОСТОЯНИЯ (Application State)
-========================================================================== */
-
+// Глобальный объект состояния приложения и методы его сброса
 export const AppState = {
-    // Извлекаем ID бота напрямую из URL при загрузке
-    clientId: new URLSearchParams(window.location.search).get('id'),
+  // Извлечение ID целевого клиента из параметров URL
+  clientId: new URLSearchParams(window.location.search).get('id'),
 
-    desktop: { observe: false, control: false },
-    webcam: { active: false },
-    audio: { input: false, output: false },
+  desktop: { observe: false, control: false },
+  webcam: { active: false },
+  audio: { input: false, output: false },
 
-    /* ==========================================================================
-       2. МЕТОДЫ УПРАВЛЕНИЯ (State Management)
-    ========================================================================== */
+  // Полный сброс всех флагов состояния и очистка UI индикаторов
+  reset() {
+    const $ = id => document.getElementById(id);
+    const [dot, txt] = [$('status-indicator'), $('status-text')];
 
-    /** Сброс всех активных сессий и визуальных индикаторов */
-    reset() {
-        this.desktop = { observe: false, control: false };
-        this.webcam.active = false;
-        this.audio = { input: false, output: false };
+    // Сброс логических состояний
+    this.desktop = { observe: false, control: false };
+    this.webcam.active = false;
+    this.audio = { input: false, output: false };
 
-        // Визуальная очистка: кнопки
-        document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
+    // Массовая очистка визуальных компонентов
+    document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.stream-overlay').forEach(o => o.style.display = 'flex');
 
-        // Визуальная очистка: оверлеи заглушки
-        document.querySelectorAll('.stream-overlay').forEach(o => o.style.display = 'flex');
+    // Обновление статуса подключения в шапке
+    dot?.classList.remove('online');
+    txt && (txt.textContent = 'offline');
 
-        // Сброс индикатора статуса в шапке
-        const dot = document.getElementById('status-indicator');
-        const txt = document.getElementById('status-text');
-
-        if (dot) dot.classList.remove('online');
-        if (txt) txt.textContent = 'offline';
-
-        console.log("[State] Cleared for:", this.clientId);
-    }
+    console.log("[State] Cleared for:", this.clientId);
+  }
 };
 
-// Глобальный доступ для отладки из консоли
+// Регистрация в глобальном пространстве имен для отладки
 window.AppState = AppState;

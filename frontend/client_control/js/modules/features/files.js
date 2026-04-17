@@ -1,90 +1,113 @@
-// frontend\client_control\js\modules\features\files.js
+// frontend/client_control/js/modules/features/files.js
+import { FileManagerAPI as API } from './fm/FileManagerAPI.js';
+import { FileManagerUI as UI } from './fm/FileManagerUI.js';
 
-export function initFileManager() {
-    const $ = id => document.getElementById(id);
-    const term = $('files-overlay'), body = $('files-body'), pathDisplay = $('file-path-display');
-    const viewToggleBtn = $('file-view-btn'), header = term.querySelector('.terminal-header');
+// Инициализация файлового менеджера: управление файлами, навигация и контекстное меню
+export const initFileManager = () => {
+  const $ = id => document.getElementById(id);
+  const body = $('files-body'), pathDisp = $('file-path-display'), term = $('files-overlay');
+  const head = term?.querySelector('.terminal-header'), container = document.querySelector('.app-main') || document.body;
+  const ctx = UI.$el('div', { className: 'file-context-menu hidden' }), upInput = UI.$el('input', { type: 'file', multiple: true, style: 'display:none' });
+  let state = { history: [], selected: null, dlBuffer: [], dlName: '' };
+  
+  [ctx, upInput].forEach(el => container.append(el));
+  Object.assign(pathDisp, { contentEditable: "true", spellcheck: false });
+
+  // Глобальная блокировка событий для предотвращения проброса на видео-стрим
+  ['mousedown', 'mouseup', 'click', 'wheel'].forEach(t => term.addEventListener(t, e => e.stopPropagation(), { passive: false }));
+
+  // Сброс позиции окна в исходное состояние
+  window.resetFilesPosition = () => ['left', 'top', 'width', 'height', 'transform'].forEach(p => term.style[p] = '');
+
+  // Выполнение команд файлового менеджера (удаление, загрузка, запуск)
+  window.fm_cmd = (act) => {
+    const target = state.selected?.path || pathDisp.textContent;
+    ctx.classList.add('hidden');
     
-    let pathHistory = [], fileCache = {}, showHidden = false;
-
-    window.resetFilesPosition = () => {
-        ['left', 'top', 'width', 'height', 'transform', 'margin'].forEach(p => term.style[p] = '');
-    };
-
-    const sendRequest = (action, path) => {
-        window.sendToBot?.('FileManager', JSON.stringify({ action, path, show_hidden: showHidden }));
-    };
-
-    const updateView = (pathKey, items) => {
-        body.innerHTML = items?.length ? '' : '<div style="grid-column:1/-1;text-align:center;opacity:0.3;padding:40px;">Empty</div>';
-        pathDisplay.textContent = pathKey;
-        items?.forEach(item => {
-            const isDir = item.type === 'directory', icon = item.type === 'drive' ? 'fa-hard-drive' : (isDir ? 'fa-folder' : 'fa-file');
-            const div = document.createElement('div');
-            div.className = `file-item ${item.type} ${item.is_hidden ? 'file-hidden' : ''}`;
-            div.innerHTML = `<i class="fas ${icon}"></i><div class="file-name" title="${item.name}">${item.name}</div>${item.size ? `<span class="file-size-tag">${item.size}</span>` : ''}`;
-            div.onclick = () => item.type !== 'file' && (pathHistory.push(pathDisplay.textContent), sendRequest('open', item.path));
-            body.appendChild(div);
-        });
-    };
-
-    window.openFileManager = () => {
-        window.resetFilesPosition();
-        [pathHistory, fileCache, showHidden] = [[], {}, false];
-        viewToggleBtn?.classList.remove('active');
-        body.innerHTML = '<div style="grid-column:1/-1;text-align:center;opacity:0.5;padding:40px;">Loading...</div>';
-        pathDisplay.textContent = 'Computer';
-        sendRequest('list_drives');
-    };
-
-    if (viewToggleBtn) {
-        viewToggleBtn.onclick = () => {
-            showHidden = !showHidden;
-            viewToggleBtn.classList.toggle('active', showHidden);
-            const cur = pathDisplay.textContent;
-            cur !== 'Computer' && sendRequest('open', cur);
-        };
+    if (act === 'download') API.send('download', target);
+    if (act === 'upload') upInput.click();
+    if (act === 'run') API.send('execute', target);
+    if (act === 'mkdir') {
+      const n = prompt("Имя папки:");
+      n && API.send('mkdir', pathDisp.textContent, { name: n });
     }
+    if (act === 'delete' && confirm('Удалить?')) API.send('delete', target);
+  };
 
-    window.renderFileSystem = (data) => {
-        if (!data) return;
-        const { current_path, items, show_hidden } = data, key = current_path || "Computer";
-        if (show_hidden !== undefined) viewToggleBtn?.classList.toggle('active', showHidden = show_hidden);
-        fileCache[key] = data;
-        updateView(key, items);
+  // Обработка и рендеринг данных файловой системы от бота
+  window.renderFileSystem = (data) => {
+    const { type, items, current_path, name, status, refresh } = data;
+
+    if (type === "download_start") [state.dlBuffer, state.dlName] = [[], name];
+    else if (type === "download_finish") {
+      const a = UI.$el('a', { href: URL.createObjectURL(new Blob(state.dlBuffer)), download: state.dlName });
+      a.click();
+      state.dlBuffer = [];
+    }
+    else if (type === "list") {
+      pathDisp.textContent = current_path || "Computer";
+      UI.renderItems(body, items, {
+        onOpen: (i) => i.type !== 'file' && (state.history.push(pathDisp.textContent), API.send('open', i.path)),
+        onContext: (e, i) => { state.selected = i; UI.showMenu(ctx, e, container, true); }
+      });
+    }
+    (type === "status" && status === "success" && refresh) && API.send('open', refresh);
+  };
+
+  // Обработка перехода по пути при нажатии Enter
+  pathDisp.onkeydown = (e) => {
+    e.stopPropagation(); 
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const path = pathDisp.textContent.trim();
+      path && API.send('open', path);
+      pathDisp.blur();
+    }
+  };
+
+  window.addEventListener('FileManager_Stream', e => state.dlBuffer.push(e.detail));
+
+  // Загрузка выбранных файлов на сервер
+  upInput.onchange = async () => {
+    for (const f of upInput.files) await API.upload(f, pathDisp.textContent);
+    API.send('open', pathDisp.textContent);
+    upInput.value = '';
+  };
+
+  // Перетаскивание окна файлового менеджера
+  head.onmousedown = (e) => {
+    if (e.target.closest('.file-nav-btn')) return;
+    e.stopPropagation();
+
+    const [offX, offY] = [e.clientX - term.offsetLeft, e.clientY - term.offsetTop];
+    
+    const move = (ev) => {
+      ev.stopPropagation();
+      [term.style.left, term.style.top] = [`${ev.clientX - offX}px`, `${ev.clientY - offY}px`];
     };
 
-    $('file-back-btn').onclick = () => {
-        if (!pathHistory.length) return;
-        const prev = pathHistory.pop();
-        sendRequest(prev === "Computer" ? "list_drives" : "open", prev);
-    };
+    const stop = () => document.removeEventListener('mousemove', move, true);
 
-    $('file-home-btn').onclick = window.openFileManager;
+    document.addEventListener('mousemove', move, true);
+    document.addEventListener('mouseup', stop, { once: true, capture: true });
+  };
 
-    header.onmousedown = (e) => {
-        if (e.target.closest('.file-nav-btn')) return;
-        
-        // ТОЧНАЯ КОПИЯ ЛОГИКИ ИЗ ТЕРМИНАЛА
-        if (getComputedStyle(term).transform !== 'none') {
-            const r = term.getBoundingClientRect();
-            const p = term.offsetParent.getBoundingClientRect();
-            term.style.left = `${r.left - p.left}px`;
-            term.style.top = `${r.top - p.top}px`;
-            term.style.margin = '0';
-            term.style.transform = 'none';
-        }
+  // Контекстное меню для пустого пространства
+  body.oncontextmenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.target === body || e.target.classList.contains('empty-notice')) {
+      state.selected = null;
+      UI.showMenu(ctx, e, container, false);
+    }
+  };
 
-        const offX = e.clientX - term.offsetLeft;
-        const offY = e.clientY - term.offsetTop;
+  document.addEventListener('mousedown', e => !ctx.contains(e.target) && ctx.classList.add('hidden'), { capture: true });
 
-        const move = (ev) => {
-            term.style.left = `${ev.clientX - offX}px`;
-            term.style.top = `${ev.clientY - offY}px`;
-        };
-
-        const stop = () => document.removeEventListener('mousemove', move);
-        document.addEventListener('mousemove', move);
-        document.addEventListener('mouseup', stop, { once: true });
-    };
-}
+  // Кнопки навигации: Назад, Домой, Обновить
+  $('file-back-btn').onclick = (e) => { e.stopPropagation(); state.history.length && API.send('open', state.history.pop()); };
+  $('file-home-btn').onclick = (e) => { e.stopPropagation(); state.history = []; API.send('list_drives'); };
+  $('file-view-btn').onclick = (e) => { e.stopPropagation(); API.send('open', pathDisp.textContent); };
+  
+  window.openFileManager = () => { window.resetFilesPosition(); state.history = []; API.send('list_drives'); };
+};

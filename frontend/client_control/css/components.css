@@ -1,29 +1,35 @@
 /* frontend/client_control/css/components.css
 
+/* frontend/client_control/css/components.css */
+
 /* ==========================================================================
-   1. КНОПКИ И НАВИГАЦИЯ
-========================================================================== */
+   1. SIDEBAR & NAVIGATION (Левая панель)
+   ========================================================================== */
 
-.action-btn {
-    width: 38px; height: 38px;
+.sidebar {
+    width: 80px; 
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
     background: var(--panel-dark);
-    border: 1px solid var(--border-bright);
-    border-radius: var(--radius);
-    color: var(--text-main);
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
-    cursor: pointer;
+    border-right: 1px solid var(--border-dim);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2000;
 }
 
-.action-btn:hover { border-color: var(--text-main); }
-
-.action-btn.active {
-    color: var(--accent-green);
-    border-color: var(--accent-green);
-    background: var(--accent-green-dim);
-    box-shadow: 0 0 10px var(--accent-green-dim);
+.sidebar.hidden {
+    transform: translateX(-80px); 
 }
 
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-top: 20px;
+}
+
+/* Элементы меню внутри сайдбара */
 .nav-item {
     width: 60px; height: 60px;
     margin: 10px auto;
@@ -47,21 +53,65 @@
     text-transform: uppercase; letter-spacing: 1px;
 }
 
-/* ==========================================================================
-   2. ПАНЕЛИ И ВКЛАДКИ
-========================================================================== */
+/* Триггер (Язычок) сайдбара */
+.sidebar-tab {
+    position: fixed;
+    left: 80px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 60px;
+    background: var(--panel-dark);
+    border: 1px solid var(--border-bright);
+    border-left: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+    color: var(--text-main);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2001;
+}
+
+.sidebar.hidden + .sidebar-tab { left: 0; }
 
 .sidebar-tab i {
-    transition: transform var(--transition) ease;
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
 }
 
-.sidebar.hidden .sidebar-tab i {
-    transform: rotate(180deg);
-}
+.sidebar.hidden + .sidebar-tab i { transform: rotate(180deg); }
 
 .sidebar-tab:hover {
     color: var(--accent-green);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--panel-light);
+}
+
+
+/* ==========================================================================
+   2. HEADER & CONTROLS (Верхняя панель)
+   ========================================================================== */
+
+/* Кнопки действий в шапке */
+.action-btn {
+    width: 38px; height: 38px;
+    background: var(--panel-dark);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius);
+    color: var(--text-main);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.action-btn:hover { border-color: var(--text-main); }
+
+.action-btn.active {
+    color: var(--accent-green);
+    border-color: var(--accent-green);
+    background: var(--accent-green-dim);
+    box-shadow: 0 0 10px var(--accent-green-dim);
 }
 
 .divider {
@@ -70,10 +120,7 @@
     margin: 0 5px;
 }
 
-/* ==========================================================================
-   3. ИНФОРМАЦИЯ И СТАТУСЫ
-========================================================================== */
-
+/* Блоки статуса и мета-информации */
 .status-capsule {
     display: flex; align-items: center; gap: 10px;
     padding: 6px 14px;
@@ -97,9 +144,10 @@
 .meta-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; }
 .meta-value { font-size: 0.85rem; font-weight: 600; }
 
+
 /* ==========================================================================
-   4. СПЕЦИАЛЬНЫЕ КОМПОНЕНТЫ
-========================================================================== */
+   3. WORKSPACE COMPONENTS (Стрих, Fullscreen и прочее)
+   ========================================================================== */
 
 .stream-overlay {
     background: #0a0a0a;
@@ -124,7 +172,7 @@
 .fullscreen-btn:hover { transform: scale(1.05); color: var(--accent-green); }
 
 /* ==========================================================================
-   5. ПЛАВАЮЩИЙ ТЕРМИНАЛ (Terminal Floating Window)
+   4. ПЛАВАЮЩИЙ ТЕРМИНАЛ (Terminal Floating Window)
 ========================================================================== */
 .terminal-overlay {
     position: absolute;
@@ -216,7 +264,7 @@
 }
 
 /* ==========================================================================
-   6. ФАЙЛОВЫЙ МЕНЕДЖЕР (File Explorer)
+   5. ФАЙЛОВЫЙ МЕНЕДЖЕР (File Explorer)
 ========================================================================== */
 
 /* Навигационная панель внутри окна */
@@ -235,30 +283,47 @@
     color: var(--text-muted);
     cursor: pointer;
     font-size: 0.9rem;
+    transition: all 0.2s;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.file-nav-btn:hover { color: var(--accent-green); }
+.file-nav-btn:hover { 
+    color: var(--accent-green); 
+    background: rgba(0, 255, 65, 0.1);
+}
+
+.file-nav-btn.active {
+    color: var(--accent-green);
+    background: rgba(0, 255, 65, 0.15);
+    box-shadow: inset 0 0 5px rgba(0, 255, 65, 0.2);
+}
 
 #file-path-display {
     flex: 1;
     font-size: 0.75rem;
     color: var(--text-muted);
-    background: rgba(0, 0, 0, 0.2);
-    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 5px 12px;
     border-radius: 4px;
     font-family: var(--font-mono);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    border: 1px solid var(--border-dim);
 }
 
 /* Сетка файлов */
 .files-grid {
     flex: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
     grid-auto-rows: max-content;
-    gap: 8px;
+    gap: 10px;
     padding: 15px;
     overflow-y: auto;
     background: rgba(0, 0, 0, 0.2);
@@ -268,23 +333,29 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px 5px;
+    padding: 12px 5px;
     border-radius: var(--radius);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     text-align: center;
     border: 1px solid transparent;
+    position: relative;
+    user-select: none;
 }
 
 .file-item:hover {
-    background: rgba(0, 255, 65, 0.05);
+    background: rgba(0, 255, 65, 0.07);
     border-color: rgba(0, 255, 65, 0.2);
 }
 
 .file-item i {
-    font-size: 1.8rem;
+    font-size: 2rem;
     margin-bottom: 8px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
+
+/* Состояния файлов */
+.file-item.file-hidden { opacity: 0.4; filter: grayscale(0.5); }
 
 /* Цвета для разных типов */
 .file-item.drive i { color: var(--accent-green); }
@@ -292,7 +363,7 @@
 .file-item.file i { color: #bdc3c7; }
 
 .file-name {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     color: var(--text-main);
     word-break: break-all;
     display: -webkit-box;
@@ -300,22 +371,78 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     line-height: 1.2;
+    padding: 0 4px;
 }
 
 .file-size-tag {
-    font-size: 0.55rem;
-    opacity: 0.5;
-    background: rgba(255,255,255,0.05);
-    padding: 1px 4px;
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1px 5px;
     border-radius: 3px;
-    margin-top: 2px;
+    margin-top: 4px;
+    font-family: var(--font-mono);
 }
 
-.file-nav-btn.active {
-    color: #00ff00; /* Зеленый цвет, когда режим включен */
-    background: rgba(0, 255, 0, 0.1);
+/* Контекстное меню */
+.file-context-menu {
+    position: fixed;
+    background: #121212;
+    border: 1px solid var(--border-dim);
+    z-index: 10000;
+    padding: 5px 0;
+    min-width: 170px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+    border-radius: 4px;
+    backdrop-filter: blur(5px);
+}
+
+.ctx-item {
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    transition: all 0.15s;
+}
+
+.ctx-item i {
+    margin-right: 12px;
+    width: 14px;
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.ctx-item:hover {
+    background: var(--accent-green);
+    color: #000;
+}
+
+.ctx-item:hover i {
+    opacity: 1;
+    color: inherit;
+}
+
+.ctx-separator {
+    height: 1px;
+    background: var(--border-dim);
+    margin: 5px 0;
+}
+
+.ctx-item.danger:hover {
+    background: #ff4d4d;
+    color: #fff;
 }
 
 /* Кастомный скроллбар для сетки */
-.files-grid::-webkit-scrollbar { width: 4px; }
-.files-grid::-webkit-scrollbar-thumb { background: var(--border-dim); border-radius: 10px; }
+.files-grid::-webkit-scrollbar { width: 5px; }
+.files-grid::-webkit-scrollbar-track { background: transparent; }
+.files-grid::-webkit-scrollbar-thumb { 
+    background: var(--border-dim); 
+    border-radius: 10px; 
+}
+.files-grid::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+.hidden { display: none !important; }

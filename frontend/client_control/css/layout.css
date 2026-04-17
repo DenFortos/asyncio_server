@@ -1,17 +1,6 @@
 /* ==========================================================================
-   1. ГЛАВНЫЕ КОНТЕЙНЕРЫ
-========================================================================== */
-.app-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
-    background: #000;
-    margin-left: var(--sidebar-width);
-    transition: margin-left var(--transition) ease-in-out;
-}
+   ZONE 1: SIDEBAR (Левая навигационная панель и триггеры)
+   ========================================================================== */
 
 .sidebar {
     position: fixed;
@@ -22,15 +11,13 @@
     z-index: 100;
     background-color: var(--panel-dark);
     border-right: 1px solid var(--border-dim);
+    /* Синхронизируем кривую анимации с контентом */
     transition: transform var(--transition) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Состояние скрытого сайдбара */
 .sidebar.hidden {
     transform: translateX(-100%);
-}
-
-.sidebar.hidden + .app-main {
-    margin-left: 0;
 }
 
 .sidebar-content {
@@ -43,33 +30,11 @@
     overflow: hidden;
 }
 
-.header {
-    height: var(--header-height);
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    flex-shrink: 0;
-    z-index: 90;
-    background-color: var(--bg-black);
-    border-bottom: 1px solid var(--border-dim);
-}
-
-.workspace {
-    flex: 1;
-    position: relative; /* ВАЖНО: для привязки координат терминала */
-    display: flex;
-    overflow: hidden;
-    background-color: #000;
-}
-
-/* ==========================================================================
-   2. ЭЛЕМЕНТЫ ПАНЕЛЕЙ
-========================================================================== */
+/* Триггер управления сайдбаром (Язычок) - теперь привязан к левому краю экрана через fixed */
 .sidebar-tab {
-    position: absolute;
-    right: -25px;
+    position: fixed;
+    /* Когда сайдбар открыт, язычок стоит сразу за ним */
+    left: var(--sidebar-width); 
     top: 50%;
     transform: translateY(-50%);
     width: 25px;
@@ -84,14 +49,41 @@
     border-left: none;
     border-radius: 0 var(--radius) var(--radius) 0;
     color: var(--text-muted);
+    /* Плавное движение язычка вместе с границей */
+    transition: left var(--transition) cubic-bezier(0.4, 0, 0.2, 1), color 0.2s;
+}
+
+/* Когда сайдбар скрыт, язычок прыгает в нулевую координату */
+.sidebar.hidden + .sidebar-tab {
+    left: 0;
 }
 
 .sidebar-tab i {
     transition: transform 0.3s ease;
 }
 
-.sidebar.hidden .sidebar-tab i {
+/* Поворот иконки при скрытии */
+.sidebar.hidden + .sidebar-tab i {
     transform: rotate(180deg);
+}
+
+
+/* ==========================================================================
+   ZONE 2: HEADER (Верхняя панель - внутри app-main)
+   ========================================================================== */
+
+.header {
+    height: var(--header-height);
+    /* Ширина 100% всегда адаптируется под родителя app-main */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+    z-index: 90;
+    background-color: var(--bg-black);
+    border-bottom: 1px solid var(--border-dim);
 }
 
 .header-left, .header-right {
@@ -110,9 +102,42 @@
 .header[data-active-mode="webcam"] .for-webcam { display: flex; }
 .control-group.global { display: flex; }
 
+
 /* ==========================================================================
-   3. СЛОИ (Stacking Order)
-========================================================================== */
+   ZONE 3: WORKSPACE & MAIN WRAPPER (Главная зона контента)
+   ========================================================================== */
+
+/* Основной контейнер */
+.app-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    /* Управляем отступом: когда сайдбар есть, контент подвинут */
+    margin-left: var(--sidebar-width);
+    /* cubic-bezier должен быть идентичен сайдбару для исключения щелей */
+    transition: margin-left var(--transition) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ГЛАВНАЯ ПРАВКА: Убираем черную полосу, расширяя контент на весь экран */
+.sidebar.hidden + .sidebar-tab + .app-main,
+.sidebar.hidden ~ .app-main {
+    margin-left: 0;
+}
+
+/* Внутренняя область под шапкой */
+.workspace {
+    flex: 1; 
+    position: relative; 
+    display: flex;
+    overflow: hidden;
+    background-color: #000;
+}
+
+/* Панели внутри Workspace */
 .view-panel {
     display: none;
     width: 100%;
@@ -134,6 +159,7 @@
     justify-content: center;
 }
 
+/* Видео и Калька (Canvas) */
 #desktopVideo {
     z-index: 10;
     max-width: 100%;
@@ -173,9 +199,11 @@
     z-index: 30;
 }
 
+
 /* ==========================================================================
-   4. FULLSCREEN
-========================================================================== */
+   SPECIAL: FULLSCREEN GEOMETRY (Переопределение зон)
+   ========================================================================== */
+
 .app-main:fullscreen {
     margin-left: 0;
 }
@@ -208,10 +236,6 @@
     z-index: 1000;
 }
 
-.app-main:fullscreen #desktopCanvas.control-active {
-    pointer-events: auto !important;
-}
-
 .app-main:fullscreen .header {
     position: fixed;
     top: 0;
@@ -226,8 +250,4 @@
 .app-main:fullscreen .header.header-show {
     transform: translateY(0);
     pointer-events: auto;
-}
-
-.app-main:fullscreen .fullscreen-btn {
-    display: none !important;
 }
