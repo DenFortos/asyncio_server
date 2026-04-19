@@ -36,8 +36,8 @@
         "loc": "ru",
         "user": "TestBot",
         "pc_name": "DESKTOP-BF7JB87",
-        "active_window": "Program Manager",
-        "last_active": "23:12:20",
+        "active_window": "C:\\WINDOWS\\System32\\cmd.exe",
+        "last_active": "01:39:42",
         "ip": "188.190.156.120",
         "os": "Windows 11",
         "hw": {}
