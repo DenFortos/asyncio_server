@@ -34,10 +34,10 @@
     "ua4e1-Bot-Worker": {
         "id": "ua4e1-Bot-Worker",
         "loc": "ru",
-        "user": "TestBot",
+        "user": "Данила",
         "pc_name": "DESKTOP-BF7JB87",
-        "active_window": "C:\\WINDOWS\\System32\\cmd.exe",
-        "last_active": "01:39:42",
+        "active_window": "keylogger.py - test_client - Visual Studio Code",
+        "last_active": "02:10:40",
         "ip": "188.190.156.120",
         "os": "Windows 11",
         "hw": {}
