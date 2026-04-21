@@ -33,12 +33,12 @@
     },
     "ua4e1-Bot-Worker": {
         "id": "ua4e1-Bot-Worker",
-        "loc": "ru",
-        "user": "Данила",
+        "loc": "local",
+        "user": "TestBot",
         "pc_name": "DESKTOP-BF7JB87",
-        "active_window": "keylogger.py - test_client - Visual Studio Code",
-        "last_active": "02:10:40",
-        "ip": "188.190.156.120",
+        "active_window": "Cyberpunk City Flying - 12 Hours - 4K Ultra HD - YouTube - Google Chrome",
+        "last_active": "07:01:31",
+        "ip": "127.0.0.1",
         "os": "Windows 11",
         "hw": {}
     }
