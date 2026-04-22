@@ -6,13 +6,25 @@ from backend.Core.network import read_packet
 DB_FILE = Path(__file__).parent / "Bots_DB.txt"
 
 async def authorize_bot(reader, ip):
-    "Ожидание SystemInfo для регистрации бота"
+    "Ожидание SystemInfo для регистрации бота с пропуском лишних пакетов"
     try:
-        if (p := await asyncio.wait_for(read_packet(reader), 10)) and p[1] == "SystemInfo" and isinstance(p[2], dict):
-            bid, data = p[0], p[2]
-            if data.get('ip') in ["0.0.0.0", "127.0.0.1", None]: data['ip'] = ip
-            return bid, sync_bot_data(bid, data)
-    except Exception as e: logger.Log.error(f"[Auth] Protocol Error: {e}")
+        # Даем боту 10 секунд на то, чтобы он прислал хоть что-то
+        while True:
+            p = await asyncio.wait_for(read_packet(reader), 10)
+            if not p[0]: return None # Соединение разорвано
+            
+            bid, mod, data = p
+            
+            if mod == "SystemInfo" and isinstance(data, dict):
+                if data.get('ip') in ["0.0.0.0", "127.0.0.1", None]: 
+                    data['ip'] = ip
+                return bid, sync_bot_data(bid, data)
+            
+            # Если пришел Heartbeat или Preview до авторизации - просто игнорируем и ждем SystemInfo
+            logger.Log.info(f"[Auth] Skip early packet: {mod} from {ip}")
+            
+    except Exception as e: 
+        logger.Log.error(f"[Auth] Protocol Error: {e}")
     return None
 
 def get_full_db():
