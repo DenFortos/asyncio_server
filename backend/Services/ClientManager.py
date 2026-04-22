@@ -1,5 +1,7 @@
 # backend/Services/ClientManager.py
 import asyncio, logs.LoggerWrapper as logger
+from backend.Core.network import pack_packet
+
 active_clients = {}
 
 async def close_client(bot_id, send_sleep=True):

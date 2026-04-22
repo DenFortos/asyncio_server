@@ -7,7 +7,7 @@ const ovl = document.getElementById('desktopOverlay'), btn = document.getElement
 // Принудительная остановка стрима и уведомление бота
 const stopStreaming = () => {
   if (window.AppState?.desktop) window.AppState.desktop.observe = false;
-  window.sendToBot?.("ScreenWatch", "stop_stream");
+  window.sendToBot?.("ScreenView", "stop_stream");
   btn?.classList.remove('active');
 };
 

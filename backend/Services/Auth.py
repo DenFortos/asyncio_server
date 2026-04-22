@@ -1,28 +1,54 @@
 # backend/Services/Auth.py
-import asyncio, json, logs.LoggerWrapper as logger, backend as cfg
+import asyncio, json, logs.LoggerWrapper as logger
 from pathlib import Path
+from backend.Core.network import read_packet
 
-BOTS_FILE, REQUIRED = Path(__file__).parent / "Bots_DB.txt", ['id', 'loc', 'user', 'pc_name', 'active_window', 'last_active', 'ip', 'auth_key']
+DB_FILE = Path(__file__).parent / "Bots_DB.txt"
 
-async def authorize_client(reader, ip_address):
-    "Валидация пакета авторизации и синхронизация с БД"
+async def authorize_bot(reader, ip):
+    """Ожидание первого пакета SystemInfo для авторизации по ID"""
     try:
-        if not (0 < (p_len := int.from_bytes(await asyncio.wait_for(reader.readexactly(4), 10), "big")) <= 65536): return None
-        data = json.loads((await asyncio.wait_for(reader.readexactly(p_len), 10)).decode())
-        if any(f not in data for f in REQUIRED) or data.get('auth_key') != cfg.AUTH_KEY: return None
-        if data.get('ip') == "0.0.0.0": data['ip'] = ip_address
-        return (bid := data.get('id')), sync_bot_data(bid, data)
-    except Exception as error: logger.Log.info(f"[!] Auth Error {ip_address}: {error}")
+        # Читаем первый пакет через сетевой слой
+        bid, mod, data = await asyncio.wait_for(read_packet(reader), timeout=10)
+        
+        if bid and mod == "SystemInfo" and isinstance(data, dict):
+            if data.get('ip') in ["0.0.0.0", "127.0.0.1", None]: 
+                data['ip'] = ip
+            return bid, sync_bot_data(bid, data)
+            
+    except Exception as e:
+        logger.Log.error(f"Auth Protocol Error: {e}")
+    return None
+
+def get_full_db():
+    """Получение всех данных из файла БД"""
+    if not DB_FILE.exists() or DB_FILE.stat().st_size == 0:
+        return {}
+    try:
+        return json.loads(DB_FILE.read_text(encoding="utf-8"))
+    except:
+        return {}
 
 def sync_bot_data(bot_id, payload):
-    "Обновление локальной БД ботов с фильтрацией пустых значений"
+    """Синхронизация данных бота с Bots_DB.txt"""
     try:
-        db = json.loads(BOTS_FILE.read_text(encoding="utf-8")) if BOTS_FILE.exists() else {}
-        clean = {k: v for k, v in payload.items() if k != 'auth_key'}
-        if bot_id not in db: db[bot_id] = clean
+        db = get_full_db()
+        bot_info = db.get(bot_id, {"id": bot_id})
+        
+        # Обновляем поля, если они не пустые
+        for k, v in payload.items():
+            if v not in [None, "", "??", "Loading...", "Idle"]: 
+                bot_info[k] = v
+        
+        # Если payload пришел пустой или с оффлайном, статус обновится корректно
+        if payload.get('status') == 'offline':
+            bot_info['status'] = 'offline'
         else:
-            for k, v in clean.items():
-                if db[bot_id].get(k) in [None, "", "??", "0.0.0.0", "Loading...", "Idle"] or v not in [None, "??", "0.0.0.0"]: db[bot_id][k] = v
-        BOTS_FILE.write_text(json.dumps(db, ensure_ascii=False), encoding="utf-8")
-        return db[bot_id]
-    except Exception as error: logger.Log.error(f"DB Sync Error: {error}"); return payload
+            bot_info['status'] = 'online'
+            
+        db[bot_id] = bot_info
+        DB_FILE.write_text(json.dumps(db, ensure_ascii=False, indent=2), encoding="utf-8")
+        return bot_info
+    except Exception as e: 
+        logger.Log.error(f"DB Error: {e}")
+        return payload

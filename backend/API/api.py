@@ -4,8 +4,7 @@ from fastapi import FastAPI, WebSocket, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse, JSONResponse
 from starlette.websockets import WebSocketDisconnect
-from backend.Services import client as active_clients
-from backend.Services import send_binary_to_bot
+from backend.Services.ClientManager import active_clients, send_binary_to_bot
 from .config import FRONTEND_PATH
 from .database import load_user_db, load_bots_from_file
 from .auth_service import verify_user, register_user, get_login_by_token, generate_token
@@ -44,17 +43,26 @@ async def websocket_endpoint(websocket: WebSocket, token: str, login: str, mode:
         if mode == "control" and target and has_access(user, target):
             if (bot_data := load_bots_from_file().get(target)):
                 bot_data['status'] = 'online' if target in active_clients else 'offline'
+                bot_data['id'] = target
+                # Для режима контроля используем старый добрый DataScribe для инициализации UI
                 await websocket.send_bytes(pack_bot_command(target, "DataScribe", json.dumps(bot_data)))
-        else: await sync_initial_state(websocket, user)
+        else: 
+            await sync_initial_state(websocket, user)
 
         while True:
             message = await websocket.receive()
             if message.get("type") == "websocket.disconnect": break
+            
+            # Обработка команд ОТ АДМИНА К БОТУ
             if "bytes" in message and len(packet := message["bytes"]) >= 7:
-                target_id = packet[6:6 + packet[0]].decode(errors='ignore').strip()
+                id_len = packet[0]
+                target_id = packet[6:6 + id_len].decode(errors='ignore').strip()
+                
                 if target_id in allowed_cache or has_access(user, target_id):
                     allowed_cache.add(target_id)
+                    # Пробрасываем байты боту БЕЗ изменений
                     await send_binary_to_bot(target_id, packet)
+                    
     except (WebSocketDisconnect, RuntimeError): pass
     except Exception as error: logger.Log.error(f"[API WS] Error for {user_login}: {error}")
     finally: manager.disconnect(websocket, user_login)
@@ -62,16 +70,22 @@ async def websocket_endpoint(websocket: WebSocket, token: str, login: str, mode:
 async def sync_initial_state(websocket, user):
     from backend.Core.ClientConnection import preview_cache
     bots_db, visible = load_bots_from_file(), []
+    
     for bot_id, data in bots_db.items():
         if has_access(user, bot_id):
             data['status'] = 'online' if bot_id in active_clients else 'offline'
+            data['id'] = bot_id
             visible.append(data)
     
     if visible:
-        await websocket.send_bytes(pack_bot_command("SYSTEM", "DataScribe", json.dumps(visible)))
-        for bot_id, photo in preview_cache.items():
+        # Отправка всей БД при входе
+        payload = json.dumps(visible, ensure_ascii=False)
+        await websocket.send_bytes(pack_bot_command("SYSTEM", "SystemInfo", payload))
+        
+        # Отправка накопленных превью
+        for bot_id, photo_packet in preview_cache.items():
             if has_access(user, bot_id):
-                try: await websocket.send_bytes(photo)
+                try: await websocket.send_bytes(photo_packet)
                 except: break
 
 async def run_fastapi_server(host, port):

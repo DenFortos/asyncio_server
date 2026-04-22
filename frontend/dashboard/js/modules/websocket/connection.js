@@ -20,19 +20,26 @@ export const connectWebSocket = () => {
 
         const { id, module, payload } = pkg;
 
-        if (module === 'DataScribe') {
+        // РАЗРЕШАЕМ ОБА МОДУЛЯ: старый DataScribe и новый SystemInfo
+        if (module === 'DataScribe' || module === 'SystemInfo') {
             try {
-                const raw = JSON.parse(dec.decode(payload));
+                const decoded = dec.decode(payload);
+                const raw = JSON.parse(decoded);
+                // Если пришел массив (весь список) — обновляем всех, если объект — одного
                 Array.isArray(raw) ? updateClients(raw) : updateClient({ ...raw, id });
-            } catch (e) { console.error("[WS] Parse Error", e); }
+            } catch (e) { 
+                console.error("[WS] Data Parse Error", e, "Module:", module); 
+            }
         } 
         
         if (module === 'Preview') {
             const url = URL.createObjectURL(new Blob([payload], { type: 'image/jpeg' }));
             const img = document.getElementById(`prev-${id}`);
-            
             setClientPreview(id, url);
-            img && (img.src = url, img.style.opacity = "1");
+            if (img) {
+                img.src = url;
+                img.style.opacity = "1";
+            }
         }
     };
 

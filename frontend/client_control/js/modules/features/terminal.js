@@ -60,7 +60,7 @@ export const initTerminal = () => {
     const payload = isClear ? { command: 'clear_process' } : { command: cmd };
 
     isClear ? (body.textContent = '') : (body.textContent += `> ${cmd}\n`);
-    window.sendToBot?.('Terminal', JSON.stringify(payload));
+    window.sendToBot?.('Powershell', JSON.stringify(payload));
     
     input.value = '';
     body.scrollTop = body.scrollHeight;

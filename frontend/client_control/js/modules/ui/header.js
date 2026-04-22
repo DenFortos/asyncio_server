@@ -5,8 +5,8 @@ import { AppState } from '../core/states.js';
 export const initHeaderControls = () => {
   const $ = id => document.getElementById(id);
   const actions = [
-    { id: 'btn-desktop-stream', ref: AppState.desktop, key: 'observe', mod: 'ScreenWatch', cmds: ['start_stream', 'stop_stream'] },
-    { id: 'btn-desktop-control', ref: AppState.desktop, key: 'control', mod: 'InputForge', cmds: ['start_control', 'stop_control'] },
+    { id: 'btn-desktop-stream', ref: AppState.desktop, key: 'observe', mod: 'ScreenView', cmds: ['start_stream', 'stop_stream'] },
+    { id: 'btn-desktop-control', ref: AppState.desktop, key: 'control', mod: 'RemoteControl', cmds: ['start_control', 'stop_control'] },
     { id: 'btn-webcam-stream', ref: AppState.webcam, key: 'active', mod: 'CamGaze', cmds: ['start', 'stop'] },
     { id: 'btn-audio-pc', ref: AppState.audio, key: 'output', mod: 'AudioPulse', cmds: ['listen_pc_on', 'listen_pc_off'] },
     { id: 'btn-audio-mic', ref: AppState.audio, key: 'input', mod: 'AudioPulse', cmds: ['listen_mic_on', 'listen_mic_off'] }

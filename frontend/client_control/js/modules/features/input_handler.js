@@ -47,7 +47,7 @@ const initKeyboard = (send) => {
       
       e.preventDefault();
       e.stopPropagation();
-      send("InputForge", `${type}:${e.code}`);
+      send("RemoteControl", `${type}:${e.code}`);
     }
   };
 
@@ -64,14 +64,14 @@ const initMouse = (send) => {
     if (!AppState.desktop.control || Date.now() - lastMove < 10) return;
     lastMove = Date.now();
     const pts = getCoords(e);
-    pts && send("InputForge", `m:${pts.x.toFixed(4)}:${pts.y.toFixed(4)}`);
+    pts && send("RemoteControl", `m:${pts.x.toFixed(4)}:${pts.y.toFixed(4)}`);
   });
 
   const handleBtn = (e, type) => {
     if (!AppState.desktop.control) return;
     type === 'd' && focus();
     const btn = e.button === 0 ? 'l' : (e.button === 2 ? 'r' : 'm');
-    send("InputForge", `${type}:${btn}`);
+    send("RemoteControl", `${type}:${btn}`);
     e.button === 2 && e.preventDefault();
   };
 
@@ -80,7 +80,7 @@ const initMouse = (send) => {
   canvas.addEventListener('wheel', e => {
     if (!AppState.desktop.control) return;
     e.preventDefault();
-    send("InputForge", `s:${e.deltaY > 0 ? 'down' : 'up'}`);
+    send("RemoteControl", `s:${e.deltaY > 0 ? 'down' : 'up'}`);
   }, { passive: false });
 };
 
