@@ -4,4 +4,3 @@
 IP = "127.0.0.1"
 PORT = 50001
 API_PORT = 8001
-AUTH_KEY = "super_secret"
