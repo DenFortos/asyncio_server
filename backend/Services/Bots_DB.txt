@@ -1,15 +1,1 @@
-{
-  "ua4e1-Bot-Worker": {
-    "id": "ua4e1-Bot-Worker",
-    "loc": "local",
-    "user": "Данила",
-    "pc_name": "DESKTOP-BF7JB87",
-    "active_window": "api.py - rat_server - Visual Studio Code",
-    "last_active": "13:29:45",
-    "ip": "127.0.0.1",
-    "os": "Windows 11",
-    "hw": {},
-    "status": "offline",
-    "auth_key": "super_secret"
-  }
-}
+{"ua4e1-Bot-Worker":{"id":"ua4e1-Bot-Worker","loc":"local","user":"Данила","pc_name":"DESKTOP-BF7JB87","active_window":"session.py - test_client - Visual Studio Code","last_active":"14:50:06","ip":"127.0.0.1","os":"Windows 11","hw":{},"status":"offline","auth_key":"super_secret"}}

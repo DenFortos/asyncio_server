@@ -1,37 +1,34 @@
-# backend/Core/network.py
+# backend\Core\network.py
 import json, asyncio, logs.LoggerWrapper as logger
 
+def has_access(user, target_id):
+    "Единая проверка прав доступа"
+    if not user: return False
+    r, p = user.get("role", "user"), str(user.get("prefix", "NONE"))
+    return r == "admin" or p == "ALL" or target_id.startswith(p)
+
 async def read_packet(reader):
+    "Чтение и десериализация пакета L1-L2-L3"
     try:
-        # 1. Читаем заголовок (6 байт)
-        header = await reader.readexactly(6)
-        l1, l2, l3 = header[0], header[1], int.from_bytes(header[2:6], "big")
-        
-        # 2. Читаем тело (L1 + L2 + L3)
-        body = await reader.readexactly(l1 + l2 + l3)
-        
-        bot_id = body[:l1].decode(errors='ignore')
-        module = body[l1 : l1+l2].decode(errors='ignore')
-        raw_pay = body[l1+l2:]
-        
-        # 3. Десериализация (Твой "черный ящик")
-        try: payload = json.loads(raw_pay.decode())
+        h = await reader.readexactly(6)
+        l1, l2, l3 = h[0], h[1], int.from_bytes(h[2:6], "big")
+        b = await reader.readexactly(l1 + l2 + l3)
+        bot_id, mod, raw = b[:l1].decode(errors='ignore'), b[l1:l1+l2].decode(errors='ignore'), b[l1+l2:]
+        try: payload = json.loads(raw.decode())
         except:
-            try: payload = raw_pay.decode()
-            except: payload = raw_pay
-            
-        return bot_id, module, payload
-    except Exception:
-        return None, None, None
+            try: payload = raw.decode()
+            except: payload = raw
+        return bot_id, mod, payload
+    except: return None, None, None
 
 def pack_packet(bot_id, module, payload):
-    """Сборка кадра для отправки боту"""
+    "Сборка универсального пакета для бота или фронтенда"
     try:
-        if isinstance(payload, (dict, list)): payload = json.dumps(payload, separators=(',', ':')).encode()
-        elif isinstance(payload, str): payload = payload.encode()
-        
+        if isinstance(payload, (dict, list)): p_pay = json.dumps(payload, separators=(',', ':'), ensure_ascii=False).encode()
+        elif isinstance(payload, str): p_pay = payload.encode()
+        else: p_pay = payload if isinstance(payload, bytes) else str(payload).encode()
         b_id, b_mod = bot_id.encode(), module.encode()
-        header = len(b_id).to_bytes(1, 'big') + len(b_mod).to_bytes(1, 'big') + len(payload).to_bytes(4, 'big')
-        return header + b_id + b_mod + payload
-    except Exception as e: 
-        logger.Log.error(f"Pack Err: {e}"); return b""
+        header = len(b_id).to_bytes(1, 'big') + len(b_mod).to_bytes(1, 'big') + len(p_pay).to_bytes(4, 'big')
+        return header + b_id + b_mod + p_pay
+    except Exception as e:
+        logger.Log.error(f"[Protocol] Pack Err: {e}"); return b""
