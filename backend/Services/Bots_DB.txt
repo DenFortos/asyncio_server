@@ -1,1 +1,15 @@
-{"ua4e1-Bot-Worker":{"id":"ua4e1-Bot-Worker","loc":"local","user":"Данила","pc_name":"DESKTOP-BF7JB87","last_active":"18:44:22","ip":"127.0.0.1","os":"Windows 11","hw":{},"auth_key":"default","status":"offline","active_window":"SpectralWeb - Client Control - Google Chrome"}}
+{
+    "ua4e1-Bot-Worker": {
+        "id": "ua4e1-Bot-Worker",
+        "loc": "local",
+        "user": "Данила",
+        "pc_name": "DESKTOP-BF7JB87",
+        "last_active": "00:55:34",
+        "ip": "127.0.0.1",
+        "os": "Windows 11",
+        "hw": {},
+        "auth_key": "default",
+        "status": "offline",
+        "active_window": "rat_server - Visual Studio Code"
+    }
+}

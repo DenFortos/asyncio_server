@@ -6,10 +6,10 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from .config import FRONTEND_PATH
 from .database import load_user_db, load_bots_from_file
 from .auth_service import verify_user, register_user, get_login_by_token, generate_token
-from .connection_manager import ConnectionManager
+from .connection_manager import manager
+from backend.Services import pack_packet, has_access, active_clients, preview_cache, send_binary_to_bot
 
-# Сначала создаем объекты, чтобы другие модули могли их импортировать
-manager, app = ConnectionManager(), FastAPI()
+app = FastAPI()
 app.mount("/sidebar", StaticFiles(directory=FRONTEND_PATH, html=True), name="static")
 
 @app.get("/")
@@ -28,16 +28,14 @@ async def auth(action: str, data=Body(...)):
 
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = None, target: str = None):
-    from backend.Core.network import pack_packet, has_access
-    from backend.Services.ClientManager import active_clients, send_binary_to_bot
-    if not (ul := get_login_by_token(token)) or ul != login:
+    if not (ul := get_login_by_token(token)) or ul != login: 
         await ws.accept(); await ws.close(1008); return
     u = load_user_db().get(ul)
     if not await manager.connect(ws, ul, u): return
     try:
         if mode == "control" and target and has_access(u, target):
             if (bd := load_bots_from_file().get(target)):
-                bd.update({"status": "online" if target in active_clients else "offline", "id": target})
+                bd.update({"status": ("online" if target in active_clients else "offline"), "id": target})
                 await ws.send_bytes(pack_packet(target, "DataScribe", json.dumps(bd)))
         else: await sync_state(ws, u)
         while True:
@@ -50,9 +48,7 @@ async def websocket_endpoint(ws: WebSocket, token: str, login: str, mode: str = 
     finally: manager.disconnect(ws, ul)
 
 async def sync_state(ws, u):
-    from backend.Core.ClientConnection import preview_cache
-    from backend.Core.network import pack_packet, has_access
-    from backend.Services.ClientManager import active_clients
+    "Синхронизация списка доступных ботов и кэша превью"
     db = load_bots_from_file()
     vis = [{**v, "status": ("online" if k in active_clients else "offline"), "id": k} for k, v in db.items() if has_access(u, k)]
     if vis: await ws.send_bytes(pack_packet("SYSTEM", "SystemInfo", json.dumps(vis, ensure_ascii=False)))
@@ -60,6 +56,5 @@ async def sync_state(ws, u):
         if has_access(u, bid): await ws.send_bytes(pkt)
 
 async def run_fastapi_server(host, port):
-    "Точка запуска сервера для вызова извне"
-    cfg = uvicorn.Config(app, host=host, port=port, log_level="warning")
-    await uvicorn.Server(cfg).serve()
+    "Запуск сервера uvicorn"
+    await uvicorn.Server(uvicorn.Config(app, host=host, port=port, log_level="warning")).serve()

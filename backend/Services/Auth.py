@@ -1,48 +1,36 @@
 # backend/Services/Auth.py
 import asyncio, json, logs.LoggerWrapper as logger
 from pathlib import Path
-from backend.Core.network import read_packet
+from .network import read_packet
 
 DB_FILE = Path(__file__).parent / "Bots_DB.txt"
 
 async def authorize_bot(reader, ip):
-    "Ожидание SystemInfo для регистрации бота с пропуском лишних пакетов"
+    "Авторизация бота через SystemInfo"
     try:
-        # Даем боту 10 секунд на то, чтобы он прислал хоть что-то
         while True:
-            p = await asyncio.wait_for(read_packet(reader), 10)
-            if not p[0]: return None # Соединение разорвано
-            
+            if not (p := await asyncio.wait_for(read_packet(reader), 10))[0]: return None
             bid, mod, data = p
-            
             if mod == "SystemInfo" and isinstance(data, dict):
-                if data.get('ip') in ["0.0.0.0", "127.0.0.1", None]: 
-                    data['ip'] = ip
+                if data.get('ip') in ["0.0.0.0", "127.0.0.1", None]: data['ip'] = ip
                 return bid, sync_bot_data(bid, data)
-            
-            # Если пришел Heartbeat или Preview до авторизации - просто игнорируем и ждем SystemInfo
-            logger.Log.info(f"[Auth] Skip early packet: {mod} from {ip}")
-            
-    except Exception as e: 
-        logger.Log.error(f"[Auth] Protocol Error: {e}")
+            logger.Log.info(f"[Auth] Skip early: {mod} from {ip}")
+    except Exception as e: logger.Log.error(f"[Auth] Protocol Err: {e}")
     return None
 
 def get_full_db():
-    "Загрузка базы данных из файла"
+    "Загрузка БД"
     try: return json.loads(DB_FILE.read_text(encoding="utf-8")) if DB_FILE.exists() and DB_FILE.stat().st_size > 0 else {}
     except: return {}
 
-def sync_bot_data(bot_id, payload):
-    "Обновление метаданных бота в БД"
+def sync_bot_data(bid, pay):
+    "Синхронизация данных бота с вертикальной записью JSON"
     try:
-        db = get_full_db()
-        info = db.get(bot_id, {"id": bot_id})
-        # Фильтруем пустые/технические значения и обновляем
-        clean_pay = {k: v for k, v in payload.items() if v not in [None, "", "??", "Loading...", "Idle"]}
-        info.update(clean_pay)
-        info['status'] = 'offline' if payload.get('status') == 'offline' else 'online'
-        db[bot_id] = info
-        DB_FILE.write_text(json.dumps(db, ensure_ascii=False, separators=(',', ':')), encoding="utf-8")
+        db, info = get_full_db(), get_full_db().get(bid, {"id": bid})
+        clean = {k: v for k, v in pay.items() if v not in [None, "", "??", "Loading...", "Idle"]}
+        info.update(clean)
+        info['status'] = 'offline' if pay.get('status') == 'offline' else 'online'
+        db[bid] = info
+        DB_FILE.write_text(json.dumps(db, ensure_ascii=False, indent=4), encoding="utf-8")
         return info
-    except Exception as e:
-        logger.Log.error(f"[Auth] DB Error: {e}"); return payload
+    except Exception as e: logger.Log.error(f"[Auth] DB Err: {e}"); return pay
