@@ -1,5 +1,5 @@
 # backend/API/api.py
-import json, uvicorn, logs.LoggerWrapper as logger
+import json, uvicorn, backend.LoggerWrapper as logger
 from fastapi import FastAPI, WebSocket, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse, JSONResponse

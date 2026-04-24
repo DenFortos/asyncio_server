@@ -1,5 +1,5 @@
 # backend\Main.py
-import asyncio, sys, logs.LoggerWrapper as logger
+import asyncio, sys, backend.LoggerWrapper as logger
 from backend.Core.Server import start_server
 
 if sys.platform == "win32": asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())

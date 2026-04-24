@@ -1,5 +1,5 @@
 # backend/API/connection_manager.py
-import asyncio, logs.LoggerWrapper as logger
+import asyncio, backend.LoggerWrapper as logger
 
 class ConnectionManager:
     "Управление WebSocket-туннелями и маршрутизацией пакетов"

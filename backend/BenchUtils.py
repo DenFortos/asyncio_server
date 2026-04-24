@@ -1,5 +1,5 @@
 # backend/BenchUtils.py
-import asyncio, time, logs.LoggerWrapper as logger
+import asyncio, time, backend.LoggerWrapper as logger
 
 _total, _history = 0, []
 

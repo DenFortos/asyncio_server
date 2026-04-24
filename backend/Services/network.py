@@ -1,5 +1,5 @@
 # backend/Core/network.py
-import json, asyncio, logs.LoggerWrapper as logger
+import json, asyncio, backend.LoggerWrapper as logger
 
 def has_access(user, tid):
     "Единая проверка прав доступа: admin или совпадение префикса"

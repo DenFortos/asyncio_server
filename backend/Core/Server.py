@@ -1,5 +1,5 @@
 # backend/Core/Server.py
-import asyncio, multiprocessing, webbrowser, logs.LoggerWrapper as logger
+import asyncio, multiprocessing, webbrowser, backend.LoggerWrapper as logger
 from backend import IP, PORT, API_PORT, start_benchmark
 from ..API.api import run_fastapi_server
 from .ClientConnection import BotConnectionHandler

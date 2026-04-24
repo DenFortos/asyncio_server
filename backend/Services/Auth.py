@@ -1,5 +1,5 @@
 # backend/Services/Auth.py
-import asyncio, json, logs.LoggerWrapper as logger
+import asyncio, json, backend.LoggerWrapper as logger
 from pathlib import Path
 from .network import read_packet
 

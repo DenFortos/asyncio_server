@@ -4,12 +4,12 @@
         "loc": "local",
         "user": "Данила",
         "pc_name": "DESKTOP-BF7JB87",
-        "last_active": "18:26:58",
+        "last_active": "23:09:41",
         "ip": "127.0.0.1",
         "os": "Windows 11",
         "hw": {},
         "auth_key": "default",
         "status": "offline",
-        "active_window": "SpectralWeb C2 Dashboard - Google Chrome"
+        "active_window": "Desktop"
     }
 }

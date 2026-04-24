@@ -1,5 +1,5 @@
 # backend/Services/ClientManager.py
-import asyncio, logs.LoggerWrapper as logger
+import asyncio, backend.LoggerWrapper as logger
 from .network import pack_packet
 
 # Глобальное состояние

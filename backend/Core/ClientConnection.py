@@ -1,5 +1,5 @@
 # backend/Core/ClientConnection.py
-import json, asyncio, socket, logs.LoggerWrapper as logger
+import json, asyncio, socket, backend.LoggerWrapper as logger
 from backend.Services import read_packet, pack_packet, authorize_bot, get_full_db, sync_bot_data
 from backend.Services import active_clients, preview_cache
 from backend.API import manager
