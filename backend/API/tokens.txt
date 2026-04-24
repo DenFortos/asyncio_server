@@ -1,3 +1,0 @@
-{
-    "2ea7b549863d2f15a3cdf6a308aefbeab9c687ccce27ba75": "admin"
-}

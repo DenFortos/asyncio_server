@@ -1,52 +1,76 @@
-# logs/LoggerWrapper.py
+# backend/LoggerWrapper.py
 
 import sys
-from loguru import logger as _logger
+import os
+from loguru import logger as internal_logger
+
+internal_logger.remove()
+
 
 class Log:
-    @staticmethod
-    def setup(log_file_path: str = "server.log"):
-        """Настраивает логгер для записи в файл и консоль."""
-        _logger.remove()
+    """
+    Класс-обертка над библиотекой loguru для централизованного управления логами.
+    
+    Схема вывода:
+    - Консоль (stdout): уровень INFO, цветной формат.
+    - Файл (server.log): уровень DEBUG, ротация 10 МБ.
+    """
 
-        # 1. Запись в файл (БЕЗ цветовых кодов, чтобы файл был чистым)
-        _logger.add(
+    @staticmethod
+    def setup(log_file_path: str) -> None:
+        """
+        Инициализация конфигурации логгера.
+        
+        Создает директории, если они отсутствуют, и устанавливает обработчики
+        для консольного и файлового вывода.
+        """
+        internal_logger.remove()
+
+        log_directory: str = os.path.dirname(log_file_path)
+        if log_directory and not os.path.exists(log_directory):
+            os.makedirs(log_directory, exist_ok=True)
+
+        internal_logger.add(
             log_file_path,
-            format="{time:HH:mm:ss} | {level:8} | {message}",
+            format="{time:YYYY-MM-DD HH:mm:ss} | {level:8} | {message}",
             level="DEBUG",
             enqueue=True,
-            colorize=False  # Файлу цвета не нужны
+            rotation="10 MB"
         )
 
-        # 2. Вывод в консоль (через стандартный обработчик loguru)
-        # Мы используем sys.stderr (стандарт для логов) вместо print
-        _logger.add(
+        internal_logger.add(
             sys.stderr,
             format="<green>{time:HH:mm:ss}</green> | <level>{level:7}</level> | {message}",
             level="INFO",
-            colorize=True, # Loguru сама поймет, если терминал не поддерживает цвета
             enqueue=True
         )
 
     @staticmethod
-    async def start_queue_listener(queue=None):
-        """Больше не требуется, оставлен для совместимости интерфейса."""
-        pass
+    def info(message: str) -> None:
+        """Запись информационного сообщения."""
+        internal_logger.info(message)
 
     @staticmethod
-    def info(msg: str):      _logger.info(msg)
+    def warning(message: str) -> None:
+        """Запись предупреждения."""
+        internal_logger.warning(message)
 
     @staticmethod
-    def warning(msg: str):   _logger.warning(msg)
+    def error(message: str) -> None:
+        """Запись ошибки."""
+        internal_logger.error(message)
 
     @staticmethod
-    def error(msg: str):     _logger.error(msg)
+    def debug(message: str) -> None:
+        """Запись отладочной информации."""
+        internal_logger.debug(message)
 
     @staticmethod
-    def debug(msg: str):     _logger.debug(msg)
+    def critical(message: str) -> None:
+        """Запись критической ошибки."""
+        internal_logger.critical(message)
 
     @staticmethod
-    def critical(msg: str):  _logger.critical(msg)
-
-    @staticmethod
-    def exception(msg: str): _logger.exception(msg)
+    def exception(message: str) -> None:
+        """Запись ошибки с дампом стека вызовов."""
+        internal_logger.exception(message)

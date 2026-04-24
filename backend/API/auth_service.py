@@ -1,25 +1,44 @@
 # backend/API/auth_service.py
+
 import secrets
-from .database import load_user_db, save_user_db, load_tokens, save_tokens
+from typing import Any, Dict, Optional
+from backend.Database import db_get_users, db_get_token, db_save_token
 
-def generate_token(login):
-    "Генерация нового токена с удалением старых сессий пользователя"
-    tokens = {t: u for t, u in load_tokens().items() if u != login}
-    tokens[(new_t := secrets.token_hex(24))] = login
-    save_tokens(tokens); return new_t
 
-def get_login_by_token(token):
-    "Получение логина по токену"
-    return load_tokens().get(token) if token else None
+def generate_token(login: str) -> str:
+    """
+    Генерирует уникальный токен сессии и сохраняет его в базе данных.
+    
+    Схема данных:
+    [secrets.token_hex] -> token -> db_save_token(token, login)
+    """
+    session_token: str = secrets.token_hex(24)
+    db_save_token(session_token, login)
+    
+    return session_token
 
-def verify_user(login, pwd):
-    "Проверка учетных данных"
-    u = load_user_db().get(login)
-    return u if u and str(u.get("password")) == str(pwd) else None
 
-def register_user(login, pwd):
-    "Регистрация нового пользователя с генерацией префикса"
-    db = load_user_db()
-    if login in db: return False
-    db[login] = {"password": pwd, "role": "user", "prefix": f"u{secrets.token_hex(2)}"}
-    return save_user_db(db)
+def get_login_by_token(token: Optional[str]) -> Optional[str]:
+    """
+    Возвращает логин пользователя, ассоциированный с предоставленным токеном.
+    """
+    if not token:
+        return None
+        
+    return db_get_token(token)
+
+
+def verify_user(login: str, password_text: str) -> Optional[Dict[str, Any]]:
+    """
+    Выполняет аутентификацию пользователя по логину и паролю.
+    
+    Сравнение производится путем приведения обоих значений к строковому типу.
+    Возвращает объект пользователя при успехе или None при ошибке.
+    """
+    users_database: Dict[str, Any] = db_get_users()
+    user_object: Optional[Dict[str, Any]] = users_database.get(login)
+
+    if user_object and str(user_object.get("password")) == str(password_text):
+        return user_object
+
+    return None
