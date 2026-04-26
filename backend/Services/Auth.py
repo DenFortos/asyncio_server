@@ -14,32 +14,33 @@ async def authorize_bot(
     ip_address: str
 ) -> Optional[Tuple[str, Dict[str, Any]]]:
     """
-    Выполняет первичную авторизацию бота при подключении.
-    
-    Схема данных:
-    [Packet] -> (bot_id, module, payload)
-    Авторизация успешна, если module == "SystemInfo".
+    Выполняет первичную авторизацию бота по ТЗ V7.2 (Анонс + Стрим).
     """
     try:
-        packet: Tuple[str, str, Union[dict, str, bytes]] = await asyncio.wait_for(
-            read_packet(reader), 
-            timeout=10
-        )
-        
-        if not (bot_identifier := packet[0]):
+        packet_announcement = await asyncio.wait_for(read_packet(reader), timeout=10)
+        bot_id, mod_body, size = packet_announcement
+
+        if not bot_id or "SystemInfo" not in (mod_body or ""):
             return None
 
-        module_name: str = packet[1]
-        payload_data: Union[dict, str, bytes] = packet[2]
+        if not isinstance(size, int):
+            return None
 
-        if module_name == "SystemInfo" and isinstance(payload_data, dict):
+        packet_stream = await asyncio.wait_for(read_packet(reader), timeout=5)
+        bot_id_s, mod_body_s, payload_data = packet_stream
+
+        if bot_id_s != bot_id or "SystemInfoStream" not in (mod_body_s or ""):
+            return None
+
+        if isinstance(payload_data, dict):
             if payload_data.get("ip") in ["0.0.0.0", "127.0.0.1", None]:
                 payload_data["ip"] = ip_address
             
-            return bot_identifier, sync_bot_data(bot_identifier, payload_data)
+            logger.Log.info(f"[Auth] Bot {bot_id} authorized")
+            return bot_id, sync_bot_data(bot_id, payload_data)
 
     except Exception as error:
-        logger.Log.error(f"[Auth] Authorization Error: {error}")
+        logger.Log.error(f"[Auth] Authorization Critical Error: {error}")
     
     return None
 
@@ -53,10 +54,7 @@ def get_full_db() -> Dict[str, Any]:
 
 def sync_bot_data(bot_identifier: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Синхронизация состояния бота с базой данных.
-    
-    Фильтрация мусорных значений: [None, "", "??", "Loading...", "Idle"].
-    Схема обновления: [Payload] -> DB_Update -> Info_Object.
+    Синхронизация состояния бота с БД.
     """
     database_state: Dict[str, Any] = get_full_db()
     bot_info: Dict[str, Any] = database_state.get(bot_identifier, {"id": bot_identifier})
@@ -68,7 +66,7 @@ def sync_bot_data(bot_identifier: str, payload: Dict[str, Any]) -> Dict[str, Any
     }
     
     bot_info.update(clean_payload)
-    bot_info["status"] = "offline" if payload.get("status") == "offline" else "online"
+    bot_info["status"] = "online"
     
     db_update_bot(bot_identifier, bot_info)
     

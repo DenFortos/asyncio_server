@@ -9,12 +9,7 @@ import backend.LoggerWrapper as logger
 
 def has_access(user_data: Dict[str, Any], target_identifier: str) -> bool:
     """
-    Единая проверка прав доступа: admin или совпадение префикса.
-    
-    Логика:
-    1. Если роль 'admin' — доступ разрешен.
-    2. Если префикс 'ALL' — доступ разрешен.
-    3. Если target_identifier начинается с префикса пользователя — доступ разрешен.
+    Проверка прав доступа пользователя к конкретному боту по роли или префиксу.
     """
     if not user_data:
         return False
@@ -27,10 +22,7 @@ def has_access(user_data: Dict[str, Any], target_identifier: str) -> bool:
 
 async def read_packet(reader: asyncio.StreamReader) -> Tuple[Optional[str], Optional[str], Any]:
     """
-    Чтение и десериализация пакета.
-    
-    Схема байт (Header): [L1:1][L2:1][L3:4]
-    Схема тела (Body): [ID:L1][MOD:L2][PAYLOAD:L3]
+    Чтение и парсинг пакета V7.2 с автоматической конвертацией анонсов в int.
     """
     try:
         header_bytes: bytes = await reader.readexactly(6)
@@ -42,50 +34,52 @@ async def read_packet(reader: asyncio.StreamReader) -> Tuple[Optional[str], Opti
         body_bytes: bytes = await reader.readexactly(id_length + module_length + payload_length)
         
         bot_identifier: str = body_bytes[:id_length].decode(errors="ignore")
-        module_name: str = body_bytes[id_length : id_length + module_length].decode(errors="ignore")
+        module_body: str = body_bytes[id_length : id_length + module_length].decode(errors="ignore")
         raw_payload: bytes = body_bytes[id_length + module_length:]
         
+        if len(raw_payload) == 4 and "Stream" not in module_body:
+            return bot_identifier, module_body, int.from_bytes(raw_payload, "big")
+
         try:
-            decoded_payload: str = raw_payload.decode()
-            payload: Any = json.loads(decoded_payload)
-        except Exception:
+            decoded_text = raw_payload.decode('utf-8')
             try:
-                payload = raw_payload.decode()
-            except Exception:
-                payload = raw_payload
+                payload = json.loads(decoded_text)
+            except json.JSONDecodeError:
+                payload = decoded_text
+        except UnicodeDecodeError:
+            payload = raw_payload
                 
-        return bot_identifier, module_name, payload
+        return bot_identifier, module_body, payload
         
-    except Exception:
+    except (asyncio.IncompleteReadError, ConnectionError):
+        return None, None, None
+    except Exception as error:
+        logger.Log.error(f"[Protocol] Read Error: {error}")
         return None, None, None
 
 
-def pack_packet(bot_identifier: str, module_name: str, payload: Any) -> bytes:
+def pack_packet(bot_id: str, module_meta: str, payload: Any) -> bytes:
     """
-    Сборка бинарного пакета для отправки.
-    
-    Схема: [L1][L2][L3][ID][MOD][PAYLOAD]
-    L1, L2 — 1 байт. L3 — 4 байта (Big-endian).
+    Универсальная упаковка V7.2 для C2 -> Frontend.
+    Формат: [id_len(1)][mod_len(1)][pay_len(4)][ID][MOD:META][PAYLOAD]
     """
-    try:
-        if isinstance(payload, (dict, list)):
-            encoded_payload: bytes = json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode()
-        elif isinstance(payload, str):
-            encoded_payload = payload.encode()
-        else:
-            encoded_payload = payload if isinstance(payload, bytes) else str(payload).encode()
-            
-        byte_id: bytes = bot_identifier.encode()
-        byte_module: bytes = module_name.encode()
-        
-        header: bytes = (
-            len(byte_id).to_bytes(1, "big") + 
-            len(byte_module).to_bytes(1, "big") + 
-            len(encoded_payload).to_bytes(4, "big")
-        )
-        
-        return header + byte_id + byte_module + encoded_payload
-        
-    except Exception as error:
-        logger.Log.error(f"[Protocol] Pack Error: {error}")
-        return b""
+    # 1. Готовим Payload
+    if isinstance(payload, bytes):
+        p_bytes = payload
+    elif isinstance(payload, (dict, list)):
+        p_bytes = json.dumps(payload, separators=(',', ':')).encode()
+    else:
+        p_bytes = str(payload).encode()
+
+    # 2. Готовим ID и MOD
+    id_bytes = bot_id.encode()
+    mod_bytes = module_meta.encode()
+
+    # 3. Сборка заголовка (6 байт)
+    header = (
+        len(id_bytes).to_bytes(1, 'big') +
+        len(mod_bytes).to_bytes(1, 'big') +
+        len(p_bytes).to_bytes(4, 'big')
+    )
+
+    return header + id_bytes + mod_bytes + p_bytes

