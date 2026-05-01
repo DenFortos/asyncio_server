@@ -1,34 +1,20 @@
 // frontend/dashboard/js/modules/data/stats.js
+
+/** Пересчет и отображение статистики онлайн/оффлайн **/
 import { getAllClients } from './clients.js';
 
-/**
- * Подписка на обновление данных для пересчета счетчиков в Header
- */
-window.addEventListener('clientsUpdated', () => {
-    const list = getAllClients();
-    
-    // Считаем количество по статусам
-    const stats = list.reduce((acc, { status }) => {
-        if (status === 'online') {
-            acc.online++;
-        } else {
-            acc.offline++;
-        }
-        return acc;
-    }, { online: 0, offline: 0 });
-    
-    // Маппинг ID элементов из HTML на значения
-    const counts = {
-        'online-count': stats.online,
-        'offline-count': stats.offline,
-        'total-count': list.length
-    };
+const $ = id => document.getElementById(id);
 
-    // Обновляем текст в DOM
-    Object.entries(counts).forEach(([id, val]) => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.textContent = val;
-        }
-    });
+window.addEventListener('clientsUpdated', () => {
+    const clients = getAllClients();
+    const stats = clients.reduce((acc, c) => {
+        acc[c.status === 'online' ? 'on' : 'off']++;
+        return acc;
+    }, { on: 0, off: 0 });
+
+    const update = (id, val) => $(id) && ($(id).textContent = val);
+
+    update('online-count', stats.on);
+    update('offline-count', stats.off);
+    update('total-count', clients.length);
 });

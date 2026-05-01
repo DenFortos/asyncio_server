@@ -1,11 +1,11 @@
-# backend/Config.py
+# backend/Config.py 188.190.156.120 127.0.0.1
 
 import os
 from pathlib import Path
 from typing import List
 
 # Сетевые настройки
-IP: str = "127.0.0.1"
+IP: str = "188.190.156.120"
 PORT: int = 50001
 API_PORT: int = 8001
 

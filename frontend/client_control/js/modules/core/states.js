@@ -1,35 +1,33 @@
 // frontend/client_control/js/modules/core/states.js
 
-// Глобальный объект состояния приложения и методы его сброса
+/** Глобальный стейт приложения под протокол V8.0 **/
 export const AppState = {
-  // Извлечение ID целевого клиента из параметров URL
   clientId: new URLSearchParams(window.location.search).get('id'),
-
   desktop: { observe: false, control: false },
   webcam: { active: false },
   audio: { input: false, output: false },
+  lastSystemData: null,
 
-  // Полный сброс всех флагов состояния и очистка UI индикаторов
+  /** Полный сброс состояния при смене клиента или ошибке **/
   reset() {
     const $ = id => document.getElementById(id);
     const [dot, txt] = [$('status-indicator'), $('status-text')];
 
-    // Сброс логических состояний
+    // Сброс логики
     this.desktop = { observe: false, control: false };
     this.webcam.active = false;
     this.audio = { input: false, output: false };
+    this.lastSystemData = null;
 
-    // Массовая очистка визуальных компонентов
+    // Сброс UI
     document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.stream-overlay').forEach(o => o.style.display = 'flex');
 
-    // Обновление статуса подключения в шапке
     dot?.classList.remove('online');
     txt && (txt.textContent = 'offline');
 
-    console.log("[State] Cleared for:", this.clientId);
+    console.log(`[State] Reset for client: ${this.clientId}`);
   }
 };
 
-// Регистрация в глобальном пространстве имен для отладки
 window.AppState = AppState;

@@ -12,12 +12,28 @@ preview_cache: Dict[str, bytes] = {}
 
 async def close_client_session(bot_identifier: str, send_termination_command: bool = True) -> bool:
     """
-    Завершает сетевую сессию бота и освобождает ресурсы в оперативной памяти.
+    Завершает сетевую сессию бота и освобождает ресурсы в оперативной памяти и БД.
     """
+    # 1. Извлекаем сессию и удаляем из активных
     session_data: Optional[Tuple[asyncio.StreamReader, asyncio.StreamWriter]] = active_clients.pop(
         bot_identifier, 
         None
     )
+
+    # 2. Очистка кэша изображений НЕМЕДЛЕННО
+    if bot_identifier in preview_cache:
+        preview_cache.pop(bot_identifier, None)
+
+    # 3. Синхронизация статуса в БД
+    try:
+        from backend.Database import db_get_bots, db_update_bot
+        all_bots = db_get_bots()
+        if bot_identifier in all_bots:
+            bot_profile = all_bots[bot_identifier]
+            bot_profile["status"] = "offline"
+            db_update_bot(bot_identifier, bot_profile)
+    except Exception as db_err:
+        logger.Log.error(f"[ClientManager] Failed to update offline status in DB: {db_err}")
 
     if not session_data:
         return False
@@ -26,8 +42,6 @@ async def close_client_session(bot_identifier: str, send_termination_command: bo
 
     try:
         if send_termination_command and not stream_writer.transport.is_closing():
-            # Формируем пакет "усыпления" согласно стандарту V8.0
-            # [RemoteControl:str:STOP:none] + "sleep"
             termination_packet: bytes = NetworkProtocol.pack_packet(
                 bot_identifier,
                 "RemoteControl",
@@ -44,12 +58,8 @@ async def close_client_session(bot_identifier: str, send_termination_command: bo
             await asyncio.wait_for(stream_writer.wait_closed(), timeout=2.0)
 
     except Exception as runtime_error:
-        logger.Log.debug(f"[ClientManager] Resource cleanup error for {bot_identifier}: {runtime_error}")
+        logger.Log.debug(f"[ClientManager] Socket cleanup error for {bot_identifier}: {runtime_error}")
     finally:
-        # Очистка кэша изображений для экономии RAM
-        if bot_identifier in preview_cache:
-            preview_cache.pop(bot_identifier, None)
-            
         logger.Log.info(f"[ClientManager] Resources for {bot_identifier} have been released")
     
     return True

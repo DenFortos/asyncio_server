@@ -1,4 +1,4 @@
-// frontend/client_control/js/client_control.js
+// frontend\client_control\js\client_control.js
 import { AppState } from './modules/core/states.js';
 import { initSidebar } from './modules/ui/sidebar.js';
 import { initHeaderControls } from './modules/ui/header.js';

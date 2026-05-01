@@ -1,155 +1,115 @@
-// frontend\client_control\js\modules\features\screen_renderer.js
-
-/**
- * МОДУЛЬ SCREENVIEW RENDERER (V7.2)
- * Путь: frontend/client_control/js/modules/features/screen_renderer.js
- */
+// frontend/client_control/js/modules/features/screen_renderer.js
 
 let jmuxer = null;
 let isJpegMode = null;
-let visTimer = null;
 
-const vid = document.getElementById('desktopVideo');
-const cvs = document.getElementById('desktopCanvas');
-const ovl = document.getElementById('desktopOverlay');
-const btn = document.getElementById('btn-desktop-stream');
+const $ = id => document.getElementById(id);
 
-/**
- * Остановка стрима (Отправка 0 согласно ТЗ)
- */
-export const stopStreaming = () => {
-    if (window.AppState?.desktop) {
-        window.AppState.desktop.observe = false;
-    }
-    
-    // Отправка команды остановки боту
-    if (window.sendToBot) {
-        window.sendToBot("ScreenView:None", 0);
-    }
-    
-    btn?.classList.remove('active');
-    resetRenderer();
-};
-
-/**
- * Сброс состояния плеера
- */
 export const resetRenderer = () => {
+    const vid = document.getElementById('desktopVideo');
+    const ovl = document.getElementById('desktopOverlay');
+    
     if (jmuxer) {
-        try { jmuxer.destroy(); } catch (e) {}
+        try { 
+            jmuxer.destroy(); 
+            console.log("[Renderer] JMuxer destroyed");
+        } catch (e) {
+            console.error("[Renderer] Destroy error:", e);
+        }
         jmuxer = null;
     }
-    
+
     if (vid) {
         vid.pause();
         vid.src = "";
+        vid.load(); // Очистка ресурсов браузера
         vid.style.display = 'none';
-        vid.load();
     }
-    
-    ovl?.classList.remove('hidden');
+
+    if (ovl) {
+        ovl.classList.remove('hidden');
+    }
+
     isJpegMode = null;
+    console.log("[Renderer] State fully reset");
 };
 
-/**
- * Рендеринг потока ScreenView (V7.2)
- * Принимает ArrayBuffer (байты кадра)
- */
 export async function renderScreenRGBA(payload) {
-    // Игнорируем анонсы (числа), скрытую вкладку и некорректные данные
-    if (document.hidden || !payload || typeof payload === 'number' || payload.byteLength < 10) {
-        return;
-    }
+    const vid = document.getElementById('desktopVideo');
+    const cvs = document.getElementById('desktopCanvas');
+    const ovl = document.getElementById('desktopOverlay');
+    
+    if (document.hidden || !payload || payload.byteLength < 10) return;
 
-    const videoData = new Uint8Array(payload);
+    const data = new Uint8Array(payload);
 
-    // Определение формата (JPEG vs H264) по магическим числам (FF D8 - JPEG)
+    // 1. Детект формата (один раз за сессию)
     if (isJpegMode === null) {
-        isJpegMode = (videoData[0] === 0xFF && videoData[1] === 0xD8);
-        console.log(`[ScreenView] Stream format: ${isJpegMode ? 'JPEG' : 'H264'}`);
+        isJpegMode = (data[0] === 0xFF && data[1] === 0xD8);
+        console.log(`[Renderer] Mode detected: ${isJpegMode ? 'JPEG' : 'H.264'}`);
+        
+        if (!isJpegMode && vid) {
+            // Принудительно готовим видео-тег
+            vid.style.display = 'block';
+            vid.muted = true;
+            vid.setAttribute('autoplay', '');
+            vid.setAttribute('playsinline', '');
+            
+            vid.onwaiting = () => console.warn("[Video] Buffering...");
+            vid.onerror = () => console.error("[Video] Error:", vid.error);
+            vid.onplaying = () => {
+                console.log("[Video] Playing started!");
+                ovl?.classList.add('hidden');
+            };
+        }
     }
 
     if (!isJpegMode) {
-        // --- VIDEO MODE (H264 + JMuxer) ---
+        // --- H.264 MODE ---
         if (!jmuxer) {
             jmuxer = new window.JMuxer({
                 node: vid,
                 mode: 'video',
-                fps: 60,
                 flushingTime: 0, // Минимальная задержка
                 clearBuffer: true,
-                onError: () => resetRenderer()
+                fps: 30, // Желательно указать явно
+                debug: false 
             });
-        }
-
-        if (vid.style.display === 'none' || !vid.style.display) {
-            vid.style.display = 'block';
+            console.log("[Renderer] JMuxer initialized");
+            
+            // Скрываем заглушку сразу при инициализации муксера
             ovl?.classList.add('hidden');
         }
 
-        // Подача данных в декодер
-        jmuxer.feed({ video: videoData });
-
-        // Авто-плей
-        if (vid.paused && vid.readyState >= 1) {
-            vid.play().catch(() => {});
+        try {
+            jmuxer.feed({ video: data });
+        } catch (e) {
+            console.error("[Renderer] JMuxer feed error:", e);
         }
 
-        // Синхронизация Low Latency (прыгаем в конец буфера, если отстаем)
-        if (vid.buffered.length > 0) {
-            const end = vid.buffered.end(vid.buffered.length - 1);
-            if (end - vid.currentTime > 0.2) {
-                vid.currentTime = end - 0.01;
-            }
+        // Принудительный старт, если браузер поставил на паузу
+        if (vid.paused) {
+            vid.play().catch(err => console.error("[Video] Play failed:", err));
         }
+
     } else {
-        // --- IMAGE MODE (JPEG) ---
-        const url = URL.createObjectURL(new Blob([videoData], { type: 'image/jpeg' }));
+        // --- JPEG MODE ---
+        if (vid) vid.style.display = 'none';
+        
+        const url = URL.createObjectURL(new Blob([data], { type: 'image/jpeg' }));
         const img = new Image();
         img.onload = () => {
             if (cvs) {
-                if (cvs.width !== img.width) {
+                if (cvs.width !== img.width || cvs.height !== img.height) {
                     cvs.width = img.width;
                     cvs.height = img.height;
                 }
-                cvs.getContext('2d').drawImage(img, 0, 0);
+                const ctx = cvs.getContext('2d');
+                ctx.drawImage(img, 0, 0);
             }
+            ovl?.classList.add('hidden');
             URL.revokeObjectURL(url);
         };
         img.src = url;
-        ovl?.classList.add('hidden');
-    }
-
-    // Синхронизация размеров Canvas с Video (критично для RemoteControl)
-    if (!isJpegMode && vid.videoWidth > 0 && cvs && cvs.width !== vid.videoWidth) {
-        cvs.width = vid.videoWidth;
-        cvs.height = vid.videoHeight;
     }
 }
-
-/**
- * Логика управления видимостью вкладки (Пауза 120 сек)
- */
-const handleVisibility = () => {
-    if (document.hidden) {
-        visTimer = setTimeout(() => {
-            if (btn?.classList.contains('active')) {
-                stopStreaming();
-            }
-            if (btn) {
-                btn.dataset.paused = 'true';
-                btn.title = 'Stream paused';
-            }
-        }, 120000);
-    } else {
-        clearTimeout(visTimer);
-        if (btn?.dataset.paused === 'true') {
-            btn.dataset.paused = 'false';
-            btn.title = 'Start/Stop Stream';
-        }
-    }
-};
-
-// Инициализация событий
-document.addEventListener('visibilitychange', handleVisibility);
-window.addEventListener('beforeunload', stopStreaming);

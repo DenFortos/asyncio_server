@@ -3,9 +3,7 @@
 import json
 import asyncio
 from typing import Any, Dict, Optional, Tuple, Union
-
 import backend.LoggerWrapper as logger
-
 
 class NetworkProtocol:
     """
@@ -24,31 +22,45 @@ class NetworkProtocol:
 
         user_role: str = user_data.get("role", "user")
         user_prefix: str = str(user_data.get("prefix", "NONE"))
+        
+        clean_id = target_identifier.strip('\x00').strip()
 
-        return user_role == "admin" or user_prefix == "ALL" or target_identifier.startswith(user_prefix)
+        return user_role == "admin" or user_prefix == "ALL" or clean_id.startswith(user_prefix)
 
     @staticmethod
     async def read_packet(reader: asyncio.StreamReader) -> Tuple[Optional[str], Optional[Dict[str, str]], Any]:
         """
-        Чтение 8 байт заголовка и парсинг сегментированного тела MOD_BODY.
-        Возвращает кортеж (bot_id, metadata_dict, parsed_payload).
+        КЛАССИЧЕСКИЙ МЕТОД (используется в Auth и простых модулях).
+        Читает заголовок и возвращает только распарсенные данные.
+        """
+        try:
+            _, bot_id, meta, payload = await NetworkProtocol.read_packet_full(reader)
+            return bot_id, meta, payload
+        except Exception:
+            return None, None, None
+
+    @staticmethod
+    async def read_packet_full(reader: asyncio.StreamReader) -> Tuple[bytes, Optional[str], Optional[Dict[str, str]], Any]:
+        """
+        ОПТИМИЗИРОВАННЫЙ МЕТОД (для ClientConnection).
+        Возвращает (весь_пакет_байтами, bot_id, metadata, payload).
         """
         try:
             header_bytes: bytes = await reader.readexactly(8)
 
-            identifier_length: int = header_bytes[0]
-            module_body_length: int = int.from_bytes(header_bytes[1:3], "big")
-            payload_length: int = int.from_bytes(header_bytes[3:8], "big")
+            id_len: int = header_bytes[0]
+            mod_len: int = int.from_bytes(header_bytes[1:3], "big")
+            pay_len: int = int.from_bytes(header_bytes[3:8], "big")
 
-            total_body_length: int = identifier_length + module_body_length + payload_length
+            total_body_length: int = id_len + mod_len + pay_len
             body_content: bytes = await reader.readexactly(total_body_length)
+            
+            # Сохраняем полный пакет для транзита без перепаковки
+            full_raw_packet = header_bytes + body_content
 
-            identifier_end: int = identifier_length
-            module_end: int = identifier_length + module_body_length
-
-            bot_identifier: str = body_content[:identifier_end].decode(errors="ignore")
-            module_raw_string: str = body_content[identifier_end:module_end].decode(errors="ignore")
-            payload_raw_bytes: bytes = body_content[module_end:]
+            bot_identifier: str = body_content[:id_len].decode(errors="ignore").strip('\x00').strip()
+            module_raw_string: str = body_content[id_len : id_len + mod_len].decode(errors="ignore")
+            payload_raw_bytes: bytes = body_content[id_len + mod_len:]
 
             segments: list = module_raw_string.split(":")
             metadata_dictionary: Dict[str, str] = {
@@ -58,28 +70,29 @@ class NetworkProtocol:
                 "extra": segments[3] if len(segments) > 3 else "None"
             }
 
-            if metadata_dictionary["type"] == "int":
-                return bot_identifier, metadata_dictionary, int.from_bytes(payload_raw_bytes, "big")
+            # Парсинг Payload
+            parsed_payload = payload_raw_bytes
+            p_type = metadata_dictionary["type"]
+            
+            if p_type == "json":
+                parsed_payload = json.loads(payload_raw_bytes.decode("utf-8"))
+            elif p_type == "str":
+                parsed_payload = payload_raw_bytes.decode("utf-8", errors="ignore")
+            elif p_type == "int":
+                parsed_payload = int.from_bytes(payload_raw_bytes, "big")
 
-            if metadata_dictionary["type"] == "json":
-                return bot_identifier, metadata_dictionary, json.loads(payload_raw_bytes.decode("utf-8"))
-
-            if metadata_dictionary["type"] == "str":
-                return bot_identifier, metadata_dictionary, payload_raw_bytes.decode("utf-8", errors="ignore")
-
-            return bot_identifier, metadata_dictionary, payload_raw_bytes
+            return full_raw_packet, bot_identifier, metadata_dictionary, parsed_payload
 
         except (asyncio.IncompleteReadError, ConnectionError):
-            return None, None, None
+            return b"", None, None, None
         except Exception as runtime_error:
             logger.Log.error(f"[NetworkProtocol] Read Error: {runtime_error}")
-            return None, None, None
+            return b"", None, None, None
 
     @staticmethod
     def pack_packet(bot_identifier: str, module_name: str, data_type: str, action: str, extra: str, payload: Any) -> bytes:
         """
         Упаковка данных в пакет V8.0 для отправки.
-        Поддерживает автоматическую сериализацию типов json, str, int и bin.
         """
         try:
             payload_bytes: bytes = b""
@@ -91,7 +104,7 @@ class NetworkProtocol:
             elif data_type == "str":
                 payload_bytes = str(payload).encode()
             elif data_type == "int" and isinstance(payload, int):
-                payload_bytes = payload.to_bytes(5, "big")
+                payload_bytes = payload.to_bytes(4, "big")
             else:
                 payload_bytes = payload if isinstance(payload, bytes) else b""
 

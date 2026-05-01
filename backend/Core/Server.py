@@ -4,14 +4,11 @@ import asyncio
 import webbrowser
 from typing import List, Optional
 
-from backend.Config import STORAGE_DIR, IP, PORT, API_PORT
+from backend.Config import IP, PORT, API_PORT
 import backend.LoggerWrapper as logger
 from backend import start_benchmark
 from backend.API.api import run_fastapi_server
 from backend.Core.ClientConnection import BotConnectionHandler
-
-logger.Log.setup(str(STORAGE_DIR / "server.log"))
-
 
 class CommandControlServer:
     """
@@ -46,7 +43,7 @@ class CommandControlServer:
 
         start_benchmark(asyncio.get_running_loop())
 
-        administration_url: str = f"http://127.0.0.1:{API_PORT}/"
+        administration_url: str = f"http://{IP}:{API_PORT}/"
         logger.Log.info(f"[{self.__class__.__name__}] API Infrastructure launching at {administration_url}")
 
         await asyncio.sleep(1)
@@ -63,7 +60,6 @@ class CommandControlServer:
                 
                 await asyncio.gather(*api_server_tasks, return_exceptions=True)
                 logger.Log.info(f"[{self.__class__.__name__}] All server components stopped.")
-
 
 async def start_server() -> None:
     """

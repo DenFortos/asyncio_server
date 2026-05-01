@@ -1,9 +1,11 @@
 // frontend/dashboard/js/modules/ui/renderer.js
-const getFlag = l => (!l || l.length !== 2) ? '🏳️' : l.toUpperCase().replace(/./g, c => String.fromCodePoint(c.charCodeAt(0) + 127397));
+
+/** Рендеринг списка клиентов (Таблица/Сетка) с поддержкой динамических обновлений **/
 const $ = id => document.getElementById(id);
+const getFlag = loc => (!loc || loc.length !== 2) ? '🏳️' : loc.toUpperCase().replace(/./g, c => String.fromCodePoint(c.charCodeAt(0) + 127397));
 
 let isGridView = false;
-const MIN_SKELETONS = 25; // Вернул как просил
+const MIN_SKELETONS = 25;
 
 export const Renderer = {
     getIsGridView: () => isGridView,
@@ -11,17 +13,15 @@ export const Renderer = {
     toggleView() {
         isGridView = !isGridView;
         const btn = $('toggleView');
-        if (btn) {
-            btn.innerHTML = isGridView ? '<i class="fas fa-list"></i> <span>Table View</span>' : '<i class="fas fa-th"></i> <span>Grid View</span>';
-        }
+        btn && (btn.innerHTML = isGridView ? '<i class="fas fa-list"></i> <span>Table View</span>' : '<i class="fas fa-th"></i> <span>Grid View</span>');
         return isGridView;
     },
 
-    _getRowTemplate: c => `
+    _getRowTemplate: (c) => `
         <td><div class="status-wrapper"><span class="status-dot-mini ${c.status}"></span> ${getFlag(c.loc)}</div></td>
         <td><span class="cell-content truncate">${c.user || '—'}</span></td>
         <td><span class="cell-content truncate">${c.pc_name || '—'}</span></td>
-        <td><span class="cell-content truncate">${c.last_active || '—'}</span></td>
+        <td><span class="cell-content truncate" style="color: var(--accent-color)">${c.last_active || 'Just now'}</span></td>
         <td><span class="cell-content truncate">${c.ip || '—'}</span></td>
         <td><span class="cell-content truncate active-window-text" title="${c.active_window || ''}">${c.active_window || '—'}</span></td>
         <td><span class="cell-content truncate client-id-cell">${c.id}</span></td>`,
@@ -44,6 +44,7 @@ export const Renderer = {
     render(list) {
         const tc = $('table-container'), gc = $('grid-view');
         if (!tc || !gc) return;
+
         tc.classList.toggle('hidden', isGridView);
         gc.classList.toggle('hidden', !isGridView);
 
@@ -54,18 +55,20 @@ export const Renderer = {
     drawTable(list) {
         const tbody = $('clients-list');
         if (!tbody) return;
-        tbody.innerHTML = list.map(bot => `<tr class="client-row ${bot.status}" data-client-id="${bot.id}">${this._getRowTemplate(bot)}</tr>`).join('');
-        const skels = Math.max(0, MIN_SKELETONS - list.length);
-        tbody.insertAdjacentHTML('beforeend', this._getSkeletonRow().repeat(skels));
+
+        const rows = list.map(bot => `<tr class="client-row ${bot.status}" data-client-id="${bot.id}">${this._getRowTemplate(bot)}</tr>`).join('');
+        const skels = this._getSkeletonRow().repeat(Math.max(0, MIN_SKELETONS - list.length));
+        tbody.innerHTML = rows + skels;
     },
 
-    drawGrid(list, cont) {
+    drawGrid(list, container) {
         const cards = list.map(c => `
             <div class="client-card ${c.status}" data-client-id="${c.id}">
                 <div class="bot-preview">
                     <img src="${c.lastPreview || ''}" 
                          id="prev-${c.id}" 
-                         style="${c.lastPreview ? 'opacity:1' : 'opacity:0'}"
+                         class="preview-img"
+                         style="opacity: ${c.lastPreview ? 1 : 0}"
                          onerror="this.style.opacity='0';">
                 </div>
                 <div class="bot-card-body">
@@ -79,7 +82,8 @@ export const Renderer = {
                     </div>
                 </div>
             </div>`).join('');
-        const skels = Math.max(0, MIN_SKELETONS - list.length);
-        cont.innerHTML = cards + this._getSkeletonCard().repeat(skels);
+
+        const skels = this._getSkeletonCard().repeat(Math.max(0, MIN_SKELETONS - list.length));
+        container.innerHTML = cards + skels;
     }
 };

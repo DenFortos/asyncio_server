@@ -1,58 +1,98 @@
 // frontend/dashboard/js/modules/websocket/protocol.js
+
 const dec = new TextDecoder();
-const enc = new TextEncoder();
+const enc = new TextEncoder(); // ДОБАВЛЕНО: Теперь энкодер определен
 
-export const decodePacket = (buf) => {
-    if (!buf || buf.byteLength < 6) return null;
+/** Декодирует входящий пакет V8.0 **/
+export const decodePacket = (buffer) => {
+    if (!buffer || buffer.byteLength < 8) return null;
+
     try {
-        const v = new DataView(buf);
-        const idL = v.getUint8(0);
-        const modL = v.getUint8(1);
-        const payL = v.getUint32(2, false);
+        const view = new DataView(buffer);
+        
+        // 1. HEADER (8 bytes)
+        const id_len = view.getUint8(0);
+        const mod_len = view.getUint16(1, false); // BigEndian
+        
+        // Читаем 5 байт pay_len (3-7 байты включительно)
+        const p1 = view.getUint8(3);
+        const p2 = view.getUint32(4, false);
+        const pay_len = (p1 * 0x100000000) + p2;
 
-        const id = dec.decode(new Uint8Array(buf, 6, idL)).replace(/\0/g, '');
-        const rawModule = dec.decode(new Uint8Array(buf, 6 + idL, modL));
-        const [module, meta] = rawModule.includes(':') ? rawModule.split(':') : [rawModule, 'None'];
+        // 2. Читаем ID
+        const id = dec.decode(new Uint8Array(buffer, 8, id_len));
+        
+        // 3. Читаем MOD_BODY
+        const mod_offset = 8 + id_len;
+        const mod_raw = dec.decode(new Uint8Array(buffer, mod_offset, mod_len));
+        
+        const [module, type, action, extra] = mod_raw.split(':');
 
-        // КРИТИЧЕСКОЕ ИЗМЕНЕНИЕ: Создаем независимый массив байтов для Payload
-        const payloadOffset = 6 + idL + modL;
-        let payload = buf.slice(payloadOffset, payloadOffset + payL);
+        // 4. Читаем PAYLOAD
+        const pay_offset = mod_offset + mod_len;
+        const payload_raw = new Uint8Array(buffer, pay_offset, pay_len);
 
-        // Если это превью или стрим, возвращаем как ArrayBuffer
-        if (module.startsWith("Preview") || module.includes("Stream")) {
-            return { id, module, meta, payload };
+        let finalPayload = payload_raw;
+
+        if (type === 'bin') {
+            finalPayload = payload_raw.slice().buffer; 
+        } else {
+            const text = dec.decode(payload_raw);
+            if (type === 'json') {
+                try { finalPayload = JSON.parse(text); } catch { finalPayload = {}; }
+            } else if (type === 'int') {
+                finalPayload = parseInt(text) || 0;
+            } else {
+                finalPayload = text; // str
+            }
         }
 
-        if (payload.byteLength === 4) {
-            return { id, module, meta, payload: new DataView(payload).getUint32(0, false) };
-        }
-
-        const str = dec.decode(payload);
-        try { return { id, module, meta, payload: JSON.parse(str) }; } 
-        catch (e) { return { id, module, meta, payload: str }; }
+        return { id, module, type, action, extra, payload: finalPayload };
     } catch (e) {
-        console.error("[Protocol] Decode Error:", e);
+        console.error("[V8] Decode Failure:", e);
         return null;
     }
 };
 
-export const encodePacket = (id, mod, pay = "") => {
-    const bId = enc.encode(id);
-    const bMod = enc.encode(mod);
-    let bPay;
-    if (pay instanceof Uint8Array) bPay = pay;
-    else if (pay instanceof ArrayBuffer) bPay = new Uint8Array(pay);
-    else if (typeof pay === "number") { bPay = new Uint8Array(4); new DataView(bPay.buffer).setUint32(0, pay, false); }
-    else if (typeof pay === "object" && pay !== null) bPay = enc.encode(JSON.stringify(pay));
-    else bPay = enc.encode(String(pay));
+/** Кодирует данные в пакет V8.0 **/
+export const encodePacket = (id, module, type = 'str', action = 'None', extra = 'None', payload = "") => {
+    // 1. Подготовка текстовых компонентов
+    const cleanId = String(id).trim();
+    const b_id = enc.encode(cleanId);
+    const b_mod = enc.encode(`${module}:${type}:${action}:${extra}`);
+    
+    // 2. Подготовка Payload
+    let b_pay;
+    if (payload instanceof ArrayBuffer) {
+        b_pay = new Uint8Array(payload);
+    } else if (payload instanceof Uint8Array) {
+        b_pay = payload;
+    } else if (type === 'int') {
+        b_pay = new Uint8Array(4);
+        new DataView(b_pay.buffer).setUint32(0, Number(payload), false);
+    } else if (type === 'json') {
+        b_pay = enc.encode(JSON.stringify(payload));
+    } else {
+        b_pay = enc.encode(String(payload));
+    }
 
-    const res = new Uint8Array(6 + bId.length + bMod.length + bPay.length);
-    const v = new DataView(res.buffer);
-    v.setUint8(0, bId.length);
-    v.setUint8(1, bMod.length);
-    v.setUint32(2, bPay.length, false);
-    res.set(bId, 6);
-    res.set(bMod, 6 + bId.length);
-    res.set(bPay, 6 + bId.length + bMod.length);
+    // 3. Сборка финального буфера (Header 8 bytes + Body)
+    const res = new Uint8Array(8 + b_id.length + b_mod.length + b_pay.length);
+    const view = new DataView(res.buffer);
+
+    // Заполнение заголовка
+    view.setUint8(0, b_id.length);
+    view.setUint16(1, b_mod.length, false);
+    
+    // 5 байт длины payload
+    const pLen = b_pay.length;
+    view.setUint8(3, Math.floor(pLen / 0x100000000));
+    view.setUint32(4, pLen % 0x100000000, false);
+
+    // Копирование данных
+    res.set(b_id, 8);
+    res.set(b_mod, 8 + b_id.length);
+    res.set(b_pay, 8 + b_id.length + b_mod.length);
+
     return res.buffer;
 };

@@ -7,22 +7,15 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import backend.LoggerWrapper as logger
 from backend.Config import USERS_DB, AUTH_DB, BOTS_DB
 
-# --- ИНИЦИАЛИЗАЦИЯ ФАЙЛОВОЙ СИСТЕМЫ ---
-
 def _ensure_infrastructure() -> None:
     """
     Создает необходимые директории для баз данных перед началом работы.
     """
     for db_path in [USERS_DB, AUTH_DB, BOTS_DB]:
-        directory = Path(db_path).parent
+        directory: Path = Path(db_path).parent
         if not directory.exists():
             directory.mkdir(parents=True, exist_ok=True)
             logger.Log.info(f"[Database] Created infrastructure directory: {directory}")
-
-# Запускаем создание папок немедленно при импорте модуля
-_ensure_infrastructure()
-
-# --- ЯДРО РАБОТЫ С БД ---
 
 def _query(
     database_path: Union[str, Path], 
@@ -48,43 +41,35 @@ def _query(
                 connection.commit()
                 
             return True
-    except Exception as e:
-        logger.Log.error(f"[Database] Query Error ({database_path}): {e}")
+    except Exception as error:
+        logger.Log.error(f"[Database] Query Error ({database_path}): {error}")
         return [] if fetch_results else False
-
 
 def init_dbs() -> None:
     """
     Инициализация таблиц и создание файлов БД (если они отсутствуют).
     """
-    # 1. База пользователей и прав
     _query(
         USERS_DB, 
         "CREATE TABLE IF NOT EXISTS users (login TEXT PRIMARY KEY, password TEXT, role TEXT, prefix TEXT)"
     )
     
-    # Дефолтный админ
     _query(
         USERS_DB, 
         "INSERT OR IGNORE INTO users VALUES (?, ?, ?, ?)", 
         ("admin", "admin", "admin", "ALL")
     )
     
-    # 2. База активных сессий (токенов) API
     _query(
         AUTH_DB, 
         "CREATE TABLE IF NOT EXISTS tokens (token TEXT PRIMARY KEY, login TEXT)"
     )
     
-    # 3. База инвентаря ботов (информация о системе)
     _query(
         BOTS_DB, 
         "CREATE TABLE IF NOT EXISTS bots (bid TEXT PRIMARY KEY, data TEXT)"
     )
     logger.Log.success("[Database] All systems initialized and ready")
-
-
-# --- ФУНКЦИИ ВЗАИМОДЕЙСТВИЯ ---
 
 def db_get_users() -> Dict[str, Dict[str, str]]:
     """Получает всех зарегистрированных пользователей."""
@@ -98,7 +83,6 @@ def db_get_users() -> Dict[str, Dict[str, str]]:
         for row in rows
     }
 
-
 def db_add_user(login: str, password_text: str, role: str, prefix: str) -> bool:
     """Регистрация нового пользователя."""
     return _query(
@@ -106,7 +90,6 @@ def db_add_user(login: str, password_text: str, role: str, prefix: str) -> bool:
         "INSERT INTO users VALUES (?, ?, ?, ?)", 
         (login, password_text, role, prefix)
     )
-
 
 def db_get_token(token: str) -> Optional[str]:
     """Проверка токена сессии."""
@@ -118,12 +101,10 @@ def db_get_token(token: str) -> Optional[str]:
     )
     return results[0][0] if results else None
 
-
 def db_save_token(token: str, login: str) -> bool:
     """Сохранение нового токена сессии."""
     _query(AUTH_DB, "DELETE FROM tokens WHERE login=?", (login,))
     return _query(AUTH_DB, "INSERT INTO tokens VALUES (?, ?)", (token, login))
-
 
 def db_get_bots() -> Dict[str, Any]:
     """Загружает список всех известных ботов."""
@@ -132,10 +113,9 @@ def db_get_bots() -> Dict[str, Any]:
         "SELECT bid, data FROM bots", 
         fetch_results=True
     )
-    # Если данных нет, вернет пустой словарь
-    if not rows: return {}
+    if not rows: 
+        return {}
     return {row[0]: json.loads(row[1]) for row in rows}
-
 
 def db_update_bot(bot_id: str, bot_data: Dict[str, Any]) -> bool:
     """Обновление данных о боте (UPSERT)."""
@@ -145,5 +125,5 @@ def db_update_bot(bot_id: str, bot_data: Dict[str, Any]) -> bool:
     """
     return _query(BOTS_DB, sql_statement, (bot_id, json.dumps(bot_data, separators=(',', ':'))))
 
-# Финальный аккорд инициализации
+_ensure_infrastructure()
 init_dbs()
