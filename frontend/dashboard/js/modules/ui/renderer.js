@@ -1,30 +1,88 @@
 // frontend/dashboard/js/modules/ui/renderer.js
 
-/** Рендеринг списка клиентов (Таблица/Сетка) с поддержкой динамических обновлений **/
-const $ = id => document.getElementById(id);
-const getFlag = loc => (!loc || loc.length !== 2) ? '🏳️' : loc.toUpperCase().replace(/./g, c => String.fromCodePoint(c.charCodeAt(0) + 127397));
+const $ = (element_id) => document.getElementById(element_id);
 
-let isGridView = false;
-const MIN_SKELETONS = 25;
+/**
+ * Преобразует двухбуквенный код страны в эмодзи флага.
+ * [DATA_SCHEME]: String(2) -> Emoji
+ */
+const get_flag_emoji = (country_code) => {
+    if (!country_code || country_code.length !== 2) {
+        return "🏳️";
+    }
+    return country_code
+        .toUpperCase()
+        .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397));
+};
+
+let is_grid_view_enabled = false;
+const MINIMUM_SKELETON_ROWS = 25;
 
 export const Renderer = {
-    getIsGridView: () => isGridView,
+    getIsGridView: () => is_grid_view_enabled,
 
-    toggleView() {
-        isGridView = !isGridView;
-        const btn = $('toggleView');
-        btn && (btn.innerHTML = isGridView ? '<i class="fas fa-list"></i> <span>Table View</span>' : '<i class="fas fa-th"></i> <span>Grid View</span>');
-        return isGridView;
+    /**
+     * Точечное обновление данных в DOM без полной перерисовки.
+     */
+    patch(client_data) {
+        const client_row_element = document.querySelector(`.client-row[data-client-id="${client_data.id}"]`);
+        
+        if (client_row_element) {
+            if (client_data.status && !client_row_element.classList.contains(client_data.status)) {
+                client_row_element.className = `client-row ${client_data.status}`;
+                client_row_element.innerHTML = this._getRowTemplate(client_data);
+            } else {
+                const window_text_element = client_row_element.querySelector(".active-window-text");
+                if (window_text_element) {
+                    window_text_element.textContent = client_data.active_window || "—";
+                }
+                
+                const last_active_element = client_row_element.querySelector(".last-active-cell");
+                if (last_active_element) {
+                    last_active_element.textContent = client_data.last_active;
+                }
+            }
+        }
+
+        const client_card_element = document.querySelector(`.client-card[data-client-id="${client_data.id}"]`);
+        if (client_card_element && client_data.status) {
+            client_card_element.className = `client-card ${client_data.status}`;
+        }
     },
 
-    _getRowTemplate: (c) => `
-        <td><div class="status-wrapper"><span class="status-dot-mini ${c.status}"></span> ${getFlag(c.loc)}</div></td>
-        <td><span class="cell-content truncate">${c.user || '—'}</span></td>
-        <td><span class="cell-content truncate">${c.pc_name || '—'}</span></td>
-        <td><span class="cell-content truncate" style="color: var(--accent-color)">${c.last_active || 'Just now'}</span></td>
-        <td><span class="cell-content truncate">${c.ip || '—'}</span></td>
-        <td><span class="cell-content truncate active-window-text" title="${c.active_window || ''}">${c.active_window || '—'}</span></td>
-        <td><span class="cell-content truncate client-id-cell">${c.id}</span></td>`,
+    /**
+     * Переключение между табличным и плиточным интерфейсом.
+     */
+    toggleView() {
+        is_grid_view_enabled = !is_grid_view_enabled;
+        const toggle_button = $("toggleView");
+        
+        if (toggle_button) {
+            toggle_button.innerHTML = is_grid_view_enabled 
+                ? '<i class="fas fa-list"></i> <span>Table View</span>' 
+                : '<i class="fas fa-th"></i> <span>Grid View</span>';
+        }
+        
+        return is_grid_view_enabled;
+    },
+
+    /**
+     * Генерация HTML структуры для строки таблицы.
+     * Использует ключ 'location' (совместимость с SystemInfo).
+     */
+    _getRowTemplate: (client) => `
+        <td>
+            <div class="status-wrapper">
+                <span class="status-dot-mini ${client.status}"></span> 
+                ${get_flag_emoji(client.location || client.loc)}
+            </div>
+        </td>
+        <td><span class="cell-content truncate">${client.user || "—"}</span></td>
+        <td><span class="cell-content truncate">${client.pc_name || "—"}</span></td>
+        <td><span class="cell-content truncate last-active-cell" style="color: var(--accent-color)">${client.last_active || "Just now"}</span></td>
+        <td><span class="cell-content truncate">${client.ip || "—"}</span></td>
+        <td><span class="cell-content truncate active-window-text" title="${client.active_window || ""}">${client.active_window || "—"}</span></td>
+        <td><span class="cell-content truncate client-id-cell">${client.id}</span></td>`,
 
     _getSkeletonRow: () => `
         <tr class="skeleton-row">
@@ -41,49 +99,71 @@ export const Renderer = {
             </div>
         </div>`,
 
-    render(list) {
-        const tc = $('table-container'), gc = $('grid-view');
-        if (!tc || !gc) return;
+    /**
+     * Основной рендер списка клиентов.
+     */
+    render(client_list) {
+        const table_container = $("table-container");
+        const grid_container = $("grid-view");
+        
+        if (!table_container || !grid_container) return;
 
-        tc.classList.toggle('hidden', isGridView);
-        gc.classList.toggle('hidden', !isGridView);
+        table_container.classList.toggle("hidden", is_grid_view_enabled);
+        grid_container.classList.toggle("hidden", !is_grid_view_enabled);
 
-        const displayList = isGridView ? list.filter(c => c.status === 'online') : list;
-        isGridView ? this.drawGrid(displayList, gc) : this.drawTable(displayList);
+        const display_list = is_grid_view_enabled 
+            ? client_list.filter((client) => client.status === "online") 
+            : client_list;
+
+        is_grid_view_enabled 
+            ? this.drawGrid(display_list, grid_container) 
+            : this.drawTable(display_list);
     },
 
-    drawTable(list) {
-        const tbody = $('clients-list');
-        if (!tbody) return;
+    /**
+     * Отрисовка списка в виде таблицы.
+     */
+    drawTable(client_list) {
+        const table_body = $("clients-list");
+        if (!table_body) return;
 
-        const rows = list.map(bot => `<tr class="client-row ${bot.status}" data-client-id="${bot.id}">${this._getRowTemplate(bot)}</tr>`).join('');
-        const skels = this._getSkeletonRow().repeat(Math.max(0, MIN_SKELETONS - list.length));
-        tbody.innerHTML = rows + skels;
+        const rows_html = client_list
+            .map((client) => `<tr class="client-row ${client.status}" data-client-id="${client.id}">${this._getRowTemplate(client)}</tr>`)
+            .join("");
+        
+        const skeleton_count = Math.max(0, MINIMUM_SKELETON_ROWS - client_list.length);
+        const skeletons_html = this._getSkeletonRow().repeat(skeleton_count);
+        
+        table_body.innerHTML = rows_html + skeletons_html;
     },
 
-    drawGrid(list, container) {
-        const cards = list.map(c => `
-            <div class="client-card ${c.status}" data-client-id="${c.id}">
+    /**
+     * Отрисовка списка в виде сетки (Grid).
+     */
+    drawGrid(client_list, container_element) {
+        const cards_html = client_list.map((client) => `
+            <div class="client-card ${client.status}" data-client-id="${client.id}">
                 <div class="bot-preview">
-                    <img src="${c.lastPreview || ''}" 
-                         id="prev-${c.id}" 
+                    <img src="${client.lastPreview || ""}" 
+                         id="prev-${client.id}" 
                          class="preview-img"
-                         style="opacity: ${c.lastPreview ? 1 : 0}"
+                         style="opacity: ${client.lastPreview ? 1 : 0}"
                          onerror="this.style.opacity='0';">
                 </div>
                 <div class="bot-card-body">
                     <div class="bot-info-row">
-                        <span class="flag-emoji">${getFlag(c.loc)}</span>
+                        <span class="flag-emoji">${get_flag_emoji(client.location || client.loc)}</span>
                         <div class="bot-data-string">
-                             <span>${c.ip || '0.0.0.0'}</span>
+                             <span>${client.ip || "0.0.0.0"}</span>
                              <span class="data-separator">|</span>
-                             <span class="data-part-id">${c.id}</span>
+                             <span class="data-part-id">${client.id}</span>
                         </div>
                     </div>
                 </div>
-            </div>`).join('');
+            </div>`).join("");
 
-        const skels = this._getSkeletonCard().repeat(Math.max(0, MIN_SKELETONS - list.length));
-        container.innerHTML = cards + skels;
+        const skeleton_count = Math.max(0, MINIMUM_SKELETON_ROWS - client_list.length);
+        const skeletons_html = this._getSkeletonCard().repeat(skeleton_count);
+        container_element.innerHTML = cards_html + skeletons_html;
     }
 };

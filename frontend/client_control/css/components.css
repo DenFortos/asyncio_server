@@ -172,17 +172,16 @@
 ========================================================================== */
 .terminal-overlay {
     position: absolute;
-    /* Центрирование: ставим в 50% от родителя (.workspace) */
+    /* Центрирование */
     top: 50%; 
     left: 50%;
-    /* Сдвигаем назад на половину своей ширины/высоты */
     transform: translate(-50%, -50%);
     
     width: 500px; 
     height: 350px;
     min-width: 300px;
     min-height: 200px;
-    max-width: 95vw; /* Ограничение, чтобы не вылезло за экран */
+    max-width: 95vw; 
     max-height: 85vh;
     
     background: rgba(0, 0, 0, 0.95);
@@ -193,6 +192,7 @@
     box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
     overflow: hidden;
     resize: both;
+    z-index: 1000;
 }
 
 /* Если окно скрыто */
@@ -223,9 +223,17 @@
     white-space: pre-wrap;
     background: rgba(0,0,0,0.3);
     word-break: break-all;
-    /* Кастомный скроллбар для терминала */
     scrollbar-width: thin;
     scrollbar-color: var(--accent-green) transparent;
+}
+
+/* Стилизация скроллбара терминала для Chrome/Edge/Safari */
+.terminal-body::-webkit-scrollbar {
+    width: 6px;
+}
+.terminal-body::-webkit-scrollbar-thumb {
+    background: var(--accent-green);
+    border-radius: 3px;
 }
 
 .terminal-input-area {
@@ -233,24 +241,42 @@
     background: var(--panel-dark);
     border-top: 1px solid var(--border-bright);
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Выравнивание по верху для многострочного ввода */
 }
 
 .terminal-input-area::before {
     content: ">";
     color: var(--accent-green);
     margin-right: 8px;
+    margin-top: 6px; /* Небольшой отступ, чтобы стрелка была вровень с первой строкой */
     font-family: var(--font-mono);
 }
 
 #terminal-cmd {
     flex: 1;
+    resize: none; 
+    overflow-y: hidden; /* Будет меняться на 'auto' через JS */
+    width: 100%;
     background: transparent;
     border: none;
-    color: var(--text-main);
-    font-family: var(--font-mono);
+    color: #00ff00;
     outline: none;
-    font-size: 12px;
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    padding: 5px;
+    display: block;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 255, 65, 0.5) transparent;
+}
+
+/* Скроллбар внутри самого поля ввода (появляется при больших скриптах) */
+#terminal-cmd::-webkit-scrollbar {
+    width: 4px;
+}
+#terminal-cmd::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 65, 0.3);
+    border-radius: 2px;
 }
 
 /* ==========================================================================

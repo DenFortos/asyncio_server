@@ -113,13 +113,11 @@
     position: relative;
     overflow: hidden;
     background: #000;
-    /* Управляем отступом: когда сайдбар есть, контент подвинут */
     margin-left: var(--sidebar-width);
-    /* cubic-bezier должен быть идентичен сайдбару для исключения щелей */
     transition: margin-left var(--transition) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ГЛАВНАЯ ПРАВКА: Убираем черную полосу, расширяя контент на весь экран */
+/* Расширение контента при скрытом сайдбаре */
 .sidebar.hidden + .sidebar-tab + .app-main,
 .sidebar.hidden ~ .app-main {
     margin-left: 0;
@@ -160,26 +158,29 @@
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    
-    /* ФОРСИРУЕМ GPU РЕНДЕРИНГ */
     will-change: transform, contents;
     transform: translateZ(0); 
-    
-    /* УЛУЧШАЕМ ЧИТАЕМОСТЬ ТЕКСТА */
-    /* Отключает интерполяцию, делая пиксели четкими (как в RDP) */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
     image-rendering: pixelated;
-
-    /* УБИРАЕМ ЗАДЕРЖКИ ОТРИСОВКИ */
     z-index: 10;
     background-color: #000;
 }
 
+/* Тот самый исправленный оверлей */
 .stream-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 15;
-    pointer-events: none; /* Чтобы клики пролетали сквозь иконку к видео */
-    backdrop-filter: blur(4px); /* Если есть блюр, оставь, но он ест ресурсы */
+    pointer-events: none; 
+    background-color: #1a1a1a; /* Тот самый серый фон вместо пустоты */
+    backdrop-filter: blur(4px);
 }
 
 #desktopCanvas {
@@ -190,6 +191,7 @@
     max-width: 100%;
     max-height: 100%;
     pointer-events: none;
+    z-index: 20;
 }
 
 #desktopCanvas.control-active {
@@ -200,6 +202,7 @@
     position: absolute;
     bottom: 20px;
     right: 20px;
+    z-index: 30;
 }
 
 
@@ -208,10 +211,11 @@
    ========================================================================== */
 
 .app-main:fullscreen {
-    margin-left: 0;
+    margin-left: 0 !important;
 }
 
-.app-main:fullscreen .sidebar {
+.app-main:fullscreen .sidebar,
+.app-main:fullscreen .sidebar-tab {
     display: none !important;
 }
 
@@ -225,8 +229,6 @@
     height: 100vh;
     object-fit: contain;
     pointer-events: none;
-    
-    /* В полноэкранном режиме особенно важно убрать лишние слои */
     background: #000;
 }
 
@@ -237,8 +239,9 @@
     transform: translate(-50%, -50%);
     max-width: 100vw;
     max-height: 100vh;
-    width: 100%;
-    height: 100%;
+    /* Оставляем auto, чтобы JS мог подстроить размер под поток */
+    width: auto; 
+    height: auto;
 }
 
 .app-main:fullscreen .header {
@@ -249,6 +252,7 @@
     transform: translateY(-100%);
     transition: transform 0.3s ease;
     pointer-events: none;
+    z-index: 2010;
 }
 
 .app-main:fullscreen .header.header-show {

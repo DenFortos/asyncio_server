@@ -2,7 +2,6 @@
 
 import { AppState } from '../core/states.js';
 
-/** Инициализация кнопок управления V8.0 **/
 export const initHeaderControls = () => {
   const $ = id => document.getElementById(id);
   
@@ -14,7 +13,6 @@ export const initHeaderControls = () => {
     { id: 'btn-audio-mic', ref: AppState.audio, key: 'input', mod: 'AudioPulse', extra: 'Mic' }
   ];
 
-  /** Переключение START/STOP и визуализация **/
   const toggleAction = (a, force = null, silent = false) => {
       const btn = $(a.id), state = force ?? !a.ref[a.key];
       if (a.ref[a.key] === state && force === null) return;
@@ -28,28 +26,38 @@ export const initHeaderControls = () => {
         state && cvs?.focus();
       }
 
-      // ИСПРАВЛЕНО: Используем правильный ID из AppState
-      const targetBot = AppState.clientId; 
-      const actionCmd = state ? 'START' : 'STOP';
-      
-      console.log(`[UI:Header] Action: ${a.mod} | Cmd: ${actionCmd} | Bot: ${targetBot}`);
-
       if (!silent && window.sendToBot) {
-          // Добавлен аргумент PAYLOAD (пустая строка для команд управления)
-          window.sendToBot(a.mod, "", actionCmd, a.extra || 'none');
-      } else if (!window.sendToBot) {
-          console.error(`[UI:Header] CRITICAL: window.sendToBot is undefined!`);
+          window.sendToBot(a.mod, "", state ? 'START' : 'STOP', a.extra || 'none');
       }
   };
 
-  /** Обработка оверлеев **/
+  const stopAllActivities = () => {
+      actions.forEach(a => a.ref[a.key] && toggleAction(a, false));
+      ['terminal-overlay', 'files-overlay'].forEach(id => $(id)?.classList.add('hidden'));
+      ['btn-terminal-toggle', 'btn-files-toggle'].forEach(id => $(id)?.classList.remove('active'));
+  };
+
+  // Динамическое обновление статуса (вызывается из WS connection)
+  window.updateBotStatus = (status) => {
+      const dot = $('status-indicator'), txt = $('status-text');
+      if (!dot || !txt) return;
+      const isOnline = status === 'online';
+      dot.className = `status-dot ${isOnline ? 'online' : 'offline'}`;
+      txt.textContent = status;
+      if (!isOnline) stopAllActivities();
+  };
+
+  // Авто-стоп при потере фокуса вкладки или закрытии
+  document.addEventListener('visibilitychange', () => document.hidden && stopAllActivities());
+  window.addEventListener('beforeunload', () => stopAllActivities());
+
   const setupToggle = (id, ovlId, onOpen) => {
     const btn = $(id), ovl = $(ovlId);
     if (!btn || !ovl) return;
     btn.onclick = () => {
       const isH = ovl.classList.toggle('hidden');
       btn.classList.toggle('active', !isH);
-      !isH && onOpen?.();
+      if (!isH) onOpen?.();
     };
   };
 
@@ -62,22 +70,11 @@ export const initHeaderControls = () => {
 
   actions.forEach(a => {
     const el = $(a.id);
-    el && (el.onclick = () => toggleAction(a));
+    if (el) el.onclick = () => toggleAction(a);
   });
 
-  /** Авто-стоп конфликтующих ресурсов **/
   window.syncModeResources = mode => {
-    const termOvl = $('terminal-overlay'), filesOvl = $('files-overlay');
-    const termBtn = $('btn-terminal-toggle'), filesBtn = $('btn-files-toggle');
-    
-    [termOvl, filesOvl].forEach(el => el?.classList.add('hidden'));
-    [termBtn, filesBtn].forEach(el => el?.classList.remove('active'));
-    
-    if (mode === 'webcam') {
-      toggleAction(actions[0], false); 
-      toggleAction(actions[1], false); 
-    } else if (mode === 'desktop') {
-      toggleAction(actions[2], false); 
-    }
+    if (mode === 'webcam') { toggleAction(actions[0], false); toggleAction(actions[1], false); }
+    else if (mode === 'desktop') { toggleAction(actions[2], false); }
   };
 };

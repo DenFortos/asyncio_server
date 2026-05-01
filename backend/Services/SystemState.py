@@ -12,46 +12,49 @@ class SystemStateService:
     """
 
     def get_bot_full_info(self, bot_id: str) -> Optional[Dict[str, Any]]:
-        all_bots = db_get_bots()
-        # Получаем данные из БД.
-        bot_data = all_bots.get(bot_id)
+        """Получение расширенной информации о боте с проверкой RAM статуса."""
+        all_bots: Dict[str, Any] = db_get_bots()
+        bot_data: Optional[Dict[str, Any]] = all_bots.get(bot_id)
         
         if not bot_data:
             return None
 
-        # СТРОГАЯ ПРОВЕРКА: статус онлайн только если есть живое соединение в RAM
-        is_actually_online = bot_id in active_clients
+        is_actually_online: bool = bot_id in active_clients
         bot_data["status"] = "online" if is_actually_online else "offline"
         
-        # Мы НЕ обновляем last_active здесь. Оно берется из БД "как есть".
         return bot_data
 
     def get_global_update_packet(self) -> bytes:
-        """Сборка пакета SystemInfo для всех ботов."""
-        bot_list = []
-        all_bots_in_db = db_get_bots()
+        """Сборка пакета SystemInfo для всех ботов (используется при входе)."""
+        bot_list: List[Dict[str, Any]] = []
+        all_bots_in_db: Dict[str, Any] = db_get_bots()
         
-        # Итерируемся по всем ботам, которые когда-либо были в базе
-        for bid in all_bots_in_db.keys():
-            info = self.get_bot_full_info(bid)
-            if info: 
+        for identifier in all_bots_in_db.keys():
+            if (info := self.get_bot_full_info(identifier)):
                 bot_list.append(info)
         
         return NetworkProtocol.pack_packet(
             "SERVER", "SystemInfo", "json", "none", "none", bot_list
         )
 
+    def get_single_bot_packet(self, bot_id: str) -> bytes:
+        """Сборка пакета SystemInfo для конкретного бота (точечное обновление)."""
+        if (info := self.get_bot_full_info(bot_id)):
+            return NetworkProtocol.pack_packet(
+                bot_id, "SystemInfo", "json", "none", "none", info
+            )
+        return b""
+
     def get_preview_packet(self, bot_id: str, image_bytes: Optional[bytes] = None) -> Optional[bytes]:
         """Сборка пакета Preview. Возвращает данные только если бот онлайн."""
-        # Если бот офлайн и нам не передали свежие байты принудительно - ничего не шлем
         if bot_id not in active_clients and image_bytes is None:
             return None
 
-        data = image_bytes or preview_cache.get(bot_id)
+        data: Optional[bytes] = image_bytes or preview_cache.get(bot_id)
         if data:
             return NetworkProtocol.pack_packet(
                 bot_id, "Preview", "bin", "none", "none", data
             )
         return None
     
-system_state = SystemStateService()
+system_state: SystemStateService = SystemStateService()
