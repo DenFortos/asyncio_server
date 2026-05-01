@@ -2,36 +2,25 @@
 
 let jmuxer = null;
 let isJpegMode = null;
-
-const $ = id => document.getElementById(id);
+const TARGET_FPS = 60; // Синхронизируем с твоим конфигом бота
 
 export const resetRenderer = () => {
     const vid = document.getElementById('desktopVideo');
     const ovl = document.getElementById('desktopOverlay');
     
     if (jmuxer) {
-        try { 
-            jmuxer.destroy(); 
-            console.log("[Renderer] JMuxer destroyed");
-        } catch (e) {
-            console.error("[Renderer] Destroy error:", e);
-        }
+        try { jmuxer.destroy(); } catch (e) {}
         jmuxer = null;
     }
 
     if (vid) {
         vid.pause();
-        vid.src = "";
-        vid.load(); // Очистка ресурсов браузера
+        vid.removeAttribute('src'); 
+        vid.load();
         vid.style.display = 'none';
     }
-
-    if (ovl) {
-        ovl.classList.remove('hidden');
-    }
-
+    if (ovl) ovl.classList.remove('hidden');
     isJpegMode = null;
-    console.log("[Renderer] State fully reset");
 };
 
 export async function renderScreenRGBA(payload) {
@@ -43,73 +32,67 @@ export async function renderScreenRGBA(payload) {
 
     const data = new Uint8Array(payload);
 
-    // 1. Детект формата (один раз за сессию)
     if (isJpegMode === null) {
         isJpegMode = (data[0] === 0xFF && data[1] === 0xD8);
-        console.log(`[Renderer] Mode detected: ${isJpegMode ? 'JPEG' : 'H.264'}`);
-        
         if (!isJpegMode && vid) {
-            // Принудительно готовим видео-тег
             vid.style.display = 'block';
-            vid.muted = true;
+            // Критично для 60 FPS: отключаем всё, что может вызвать лаг
             vid.setAttribute('autoplay', '');
+            vid.setAttribute('muted', '');
             vid.setAttribute('playsinline', '');
             
-            vid.onwaiting = () => console.warn("[Video] Buffering...");
-            vid.onerror = () => console.error("[Video] Error:", vid.error);
-            vid.onplaying = () => {
-                console.log("[Video] Playing started!");
-                ovl?.classList.add('hidden');
+            // "Доводчик" времени: если отстаем от буфера более чем на 0.2 сек - прыгаем в конец
+            vid.ontimeupdate = () => {
+                if (vid.buffered.length > 0) {
+                    const delta = vid.buffered.end(0) - vid.currentTime;
+                    if (delta > 0.2) { 
+                        vid.currentTime = vid.buffered.end(0) - 0.01;
+                    }
+                }
             };
         }
     }
 
     if (!isJpegMode) {
-        // --- H.264 MODE ---
         if (!jmuxer) {
             jmuxer = new window.JMuxer({
                 node: vid,
                 mode: 'video',
-                flushingTime: 0, // Минимальная задержка
-                clearBuffer: true,
-                fps: 30, // Желательно указать явно
+                flushingTime: 0,      // Немедленный вывод
+                clearBuffer: true,    // Очистка старых кадров
+                fps: TARGET_FPS,      // Явно 60
+                readOnly: false,
                 debug: false 
             });
-            console.log("[Renderer] JMuxer initialized");
-            
-            // Скрываем заглушку сразу при инициализации муксера
             ovl?.classList.add('hidden');
         }
 
-        try {
-            jmuxer.feed({ video: data });
-        } catch (e) {
-            console.error("[Renderer] JMuxer feed error:", e);
-        }
+        // Подаем данные. JMuxer сам разберется с H.264 чанками
+        jmuxer.feed({ video: data });
 
-        // Принудительный старт, если браузер поставил на паузу
-        if (vid.paused) {
-            vid.play().catch(err => console.error("[Video] Play failed:", err));
+        // Force play для обхода политик браузера
+        if (vid.paused && vid.readyState >= 2) {
+            vid.play().catch(() => {});
         }
-
     } else {
-        // --- JPEG MODE ---
-        if (vid) vid.style.display = 'none';
-        
-        const url = URL.createObjectURL(new Blob([data], { type: 'image/jpeg' }));
-        const img = new Image();
-        img.onload = () => {
-            if (cvs) {
-                if (cvs.width !== img.width || cvs.height !== img.height) {
-                    cvs.width = img.width;
-                    cvs.height = img.height;
-                }
-                const ctx = cvs.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-            }
-            ovl?.classList.add('hidden');
-            URL.revokeObjectURL(url);
-        };
-        img.src = url;
+        // JPEG Mode (оставляем как есть, но это не для 60 FPS)
+        renderJpeg(data, cvs, ovl);
     }
+}
+
+function renderJpeg(data, cvs, ovl) {
+    const url = URL.createObjectURL(new Blob([data], { type: 'image/jpeg' }));
+    const img = new Image();
+    img.onload = () => {
+        if (cvs) {
+            if (cvs.width !== img.width || cvs.height !== img.height) {
+                cvs.width = img.width;
+                cvs.height = img.height;
+            }
+            cvs.getContext('2d', { alpha: false }).drawImage(img, 0, 0);
+        }
+        ovl?.classList.add('hidden');
+        URL.revokeObjectURL(url);
+    };
+    img.src = url;
 }

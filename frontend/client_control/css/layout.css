@@ -156,20 +156,30 @@
     justify-content: center;
 }
 
-/* Видео и Калька (Canvas) */
 #desktopVideo {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    
+    /* ФОРСИРУЕМ GPU РЕНДЕРИНГ */
+    will-change: transform, contents;
+    transform: translateZ(0); 
+    
+    /* УЛУЧШАЕМ ЧИТАЕМОСТЬ ТЕКСТА */
+    /* Отключает интерполяцию, делая пиксели четкими (как в RDP) */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+
+    /* УБИРАЕМ ЗАДЕРЖКИ ОТРИСОВКИ */
+    z-index: 10;
+    background-color: #000;
 }
 
 .stream-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    z-index: 15;
+    pointer-events: none; /* Чтобы клики пролетали сквозь иконку к видео */
+    backdrop-filter: blur(4px); /* Если есть блюр, оставь, но он ест ресурсы */
 }
 
 #desktopCanvas {
@@ -215,6 +225,9 @@
     height: 100vh;
     object-fit: contain;
     pointer-events: none;
+    
+    /* В полноэкранном режиме особенно важно убрать лишние слои */
+    background: #000;
 }
 
 .app-main:fullscreen #desktopCanvas {
