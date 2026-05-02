@@ -1,4 +1,4 @@
-# backend\Services\network.py
+# backend/Services/network.py
 
 import json
 import asyncio
@@ -8,8 +8,9 @@ import backend.LoggerWrapper as logger
 class NetworkProtocol:
     """
     Статический класс для реализации универсального протокола V8.0.
-    Схема заголовка: [id_length: 1b] [module_length: 2b] [payload_length: 5b] (BigEndian)
-    Схема данных: [L1+L2+L3] -> Body (Identifier + ModuleBody + Payload)
+    Схема заголовка (8 байт): [id_len: 1b] [mod_len: 2b] [pay_len: 5b] (BigEndian)
+    Схема данных: Header + Identifier + ModuleBody + Payload
+    ModuleBody сегментируется через '|'
     """
 
     @staticmethod
@@ -23,7 +24,8 @@ class NetworkProtocol:
         user_role: str = user_data.get("role", "user")
         user_prefix: str = str(user_data.get("prefix", "NONE"))
         
-        clean_id = target_identifier.strip('\x00').strip()
+        # Очистка ID от возможных нулевых байтов
+        clean_id: str = target_identifier.strip('\x00').strip()
 
         return user_role == "admin" or user_prefix == "ALL" or clean_id.startswith(user_prefix)
 
@@ -46,23 +48,27 @@ class NetworkProtocol:
         Возвращает (весь_пакет_байтами, bot_id, metadata, payload).
         """
         try:
+            # 1. Читаем заголовок
             header_bytes: bytes = await reader.readexactly(8)
 
             id_len: int = header_bytes[0]
             mod_len: int = int.from_bytes(header_bytes[1:3], "big")
             pay_len: int = int.from_bytes(header_bytes[3:8], "big")
 
+            # 2. Читаем тело на основе длин из заголовка
             total_body_length: int = id_len + mod_len + pay_len
             body_content: bytes = await reader.readexactly(total_body_length)
             
-            # Сохраняем полный пакет для транзита без перепаковки
+            # Сохраняем полный пакет для транзита (proxy-mode)
             full_raw_packet = header_bytes + body_content
 
+            # 3. Сегментация данных
             bot_identifier: str = body_content[:id_len].decode(errors="ignore").strip('\x00').strip()
             module_raw_string: str = body_content[id_len : id_len + mod_len].decode(errors="ignore")
             payload_raw_bytes: bytes = body_content[id_len + mod_len:]
 
-            segments: list = module_raw_string.split(":")
+            # 4. Парсинг метаданных модуля (ИСПОЛЬЗУЕМ '|')
+            segments: list = module_raw_string.split("|")
             metadata_dictionary: Dict[str, str] = {
                 "module": segments[0] if len(segments) > 0 else "Unknown",
                 "type": segments[1] if len(segments) > 1 else "bin",
@@ -70,7 +76,7 @@ class NetworkProtocol:
                 "extra": segments[3] if len(segments) > 3 else "None"
             }
 
-            # Парсинг Payload
+            # 5. Десериализация Payload
             parsed_payload = payload_raw_bytes
             p_type = metadata_dictionary["type"]
             
@@ -97,6 +103,7 @@ class NetworkProtocol:
         try:
             payload_bytes: bytes = b""
 
+            # Сериализация полезной нагрузки
             if data_type == "bin" and isinstance(payload, bytes):
                 payload_bytes = payload
             elif data_type == "json":
@@ -106,18 +113,24 @@ class NetworkProtocol:
             elif data_type == "int" and isinstance(payload, int):
                 payload_bytes = payload.to_bytes(4, "big")
             else:
-                payload_bytes = payload if isinstance(payload, bytes) else b""
+                # Fallback для неопознанных бинарных данных
+                payload_bytes = payload if isinstance(payload, (bytes, bytearray)) else b""
 
             identifier_bytes: bytes = bot_identifier.encode()
-            module_body_string: bytes = f"{module_name}:{data_type}:{action}:{extra}".encode()
+            
+            # Сборка MOD_BODY с разделителем '|'
+            module_body_string: str = f"{module_name}|{data_type}|{action}|{extra}"
+            module_body_bytes: bytes = module_body_string.encode()
 
+            # Сборка заголовка (1 + 2 + 5 = 8 байт)
             header_bytes: bytes = (
                 len(identifier_bytes).to_bytes(1, "big") +
-                len(module_body_string).to_bytes(2, "big") +
+                len(module_body_bytes).to_bytes(2, "big") +
                 len(payload_bytes).to_bytes(5, "big")
             )
 
-            return header_bytes + identifier_bytes + module_body_string + payload_bytes
+            return header_bytes + identifier_bytes + module_body_bytes + payload_bytes
+            
         except Exception as packing_error:
             logger.Log.error(f"[NetworkProtocol] Packing Error: {packing_error}")
             return b""

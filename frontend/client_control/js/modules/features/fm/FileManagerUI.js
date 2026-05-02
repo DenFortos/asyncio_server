@@ -1,10 +1,9 @@
-// frontend/client_control/js/modules/features/fm/FileManagerUI.js
+// frontend\client_control\js\modules\features\fm\FileManagerUI.js
 
 export const FileManagerUI = {
-  // Быстрое создание DOM-элемента с заданными свойствами
+  
   $el: (tag, props = {}) => Object.assign(document.createElement(tag), props),
 
-  // Преобразование числа байтов в читаемый текст (напр. 1.2 MB)
   formatSize: (s) => {
     if (s === 0) return '0 B';
     if (!s || isNaN(s)) return '';
@@ -14,16 +13,14 @@ export const FileManagerUI = {
   },
 
   /**
-   * Отрисовка списка элементов в окне проводника
+   * Отрисовка списка элементов
    */
   renderItems: (container, items, callbacks) => {
-    // Очистка контейнера или показ надписи "Пусто"
-    container.innerHTML = items?.length ? '' : '<div class="empty-notice">Пусто</div>';
+    container.innerHTML = items?.length ? '' : '<div class="empty-notice">Пусто или доступ ограничен</div>';
 
     items?.forEach(item => {
-      const { type, name, size, is_hidden } = item;
+      const { type, name, size, is_hidden, path } = item;
       
-      // Определяем иконку и класс в зависимости от типа объекта
       const isDrive = type === 'drive';
       const isDir = type === 'dir' || type === 'directory';
       const icon = isDrive ? 'fa-hard-drive' : (isDir ? 'fa-folder' : 'fa-file');
@@ -38,18 +35,18 @@ export const FileManagerUI = {
           ${(size && !isDir && !isDrive) ? `<span class="file-size-tag">${FileManagerUI.formatSize(size)}</span>` : ''}`
       });
 
-      // Событие при клике (открытие папки/диска)
+      // КЛИК: Передаем весь объект item в callback
       el.onclick = e => { 
         e.stopPropagation(); 
+        console.log(`[UI] Interaction with: ${name} | Path: ${path}`);
         callbacks.onOpen(item); 
       };
 
-      // Событие правой кнопки мыши (контекстное меню)
+      // ПКМ: Контекстное меню
       el.oncontextmenu = e => {
         e.preventDefault(); 
         e.stopPropagation();
-        // Диски обычно не имеют контекстного меню удаления
-        !isDrive && callbacks.onContext(e, item);
+        if (!isDrive) callbacks.onContext(e, item);
       };
 
       container.appendChild(el);
@@ -57,31 +54,28 @@ export const FileManagerUI = {
   },
 
   /**
-   * Позиционирование и показ контекстного меню
+   * Управление контекстным меню
    */
   showMenu: (menu, e, container, isItem) => {
     const rect = container.getBoundingClientRect();
     
-    // Шаблон для файлов/папок
     const itemTpl = `
-      <div class="ctx-item" onclick="fm_cmd('download')"><i class="fas fa-download"></i> Скачать (.zip)</div>
+      <div class="ctx-item" onclick="fm_cmd('download')"><i class="fas fa-download"></i> Скачать</div>
       <div class="ctx-item" onclick="fm_cmd('run')"><i class="fas fa-play"></i> Запустить</div>
       <div class="ctx-separator"></div>
       <div class="ctx-item danger" onclick="fm_cmd('delete')"><i class="fas fa-trash"></i> Удалить</div>`;
 
-    // Шаблон для пустого места (создание/загрузка)
     const bgTpl = `
-      <div class="ctx-item" onclick="fm_cmd('upload')"><i class="fas fa-upload"></i> Загрузить сюда</div>
-      <div class="ctx-item" onclick="fm_cmd('mkdir')"><i class="fas fa-folder-plus"></i> Новая папка</div>`;
+      <div class="ctx-item" onclick="fm_cmd('upload')"><i class="fas fa-upload"></i> Загрузить</div>
+      <div class="ctx-item" onclick="fm_cmd('mkdir')"><i class="fas fa-folder-plus"></i> Новая папка</div>
+      <div class="ctx-item" onclick="fm_cmd('refresh')"><i class="fas fa-sync"></i> Обновить</div>`;
 
     menu.innerHTML = isItem ? itemTpl : bgTpl;
 
-    // Установка позиции меню относительно контейнера проводника
     Object.assign(menu.style, {
       left: `${e.clientX - rect.left}px`,
       top: `${e.clientY - rect.top}px`,
-      display: 'block',
-      zIndex: '10000'
+      display: 'block'
     });
     
     menu.classList.remove('hidden');

