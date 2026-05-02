@@ -11,30 +11,22 @@ export const initFileManager = () => {
     const ctx = UI.$el('div', { className: 'file-context-menu hidden' });
     const upInput = UI.$el('input', { type: 'file', multiple: true, style: 'display:none' });
     
-    // Состояние текущего скачивания
     let dlState = { name: '', size: 0, received: 0, chunks: [] };
     let state = { selected: null };
 
     const getPath = () => pathDisp?.innerText.trim() || "";
     container.append(ctx, upInput);
 
-    // --- 1. СБРОС ПОЗИЦИИ (Центрирование) ---
+    // --- 1. ПЕРЕМЕЩЕНИЕ И ОКНО (Без изменений) ---
     window.resetFileManagerPosition = () => {
         if (!term) return;
-        // Удаляем инлайновые стили, чтобы сработал CSS (центр)
         ['left', 'top', 'width', 'height', 'transform', 'margin'].forEach(p => term.style[p] = '');
     };
 
-    // --- 2. ПЕРЕМЕЩЕНИЕ ОКНА (Drag & Drop) ---
     if (head && term) {
         head.style.cursor = 'move';
         head.onmousedown = (e) => {
             if (e.target.closest('.file-nav-btn')) return;
-            e.preventDefault();
-            e.stopPropagation();
-
-            // Если окно зафиксировано через CSS transform (в центре), 
-            // пересчитываем его в реальные координаты перед движением
             if (getComputedStyle(term).transform !== 'none') {
                 const rect = term.getBoundingClientRect();
                 const parentRect = term.offsetParent?.getBoundingClientRect() || { left: 0, top: 0 };
@@ -43,27 +35,19 @@ export const initFileManager = () => {
                 term.style.transform = 'none';
                 term.style.margin = '0';
             }
-
             const offX = e.clientX - term.offsetLeft;
             const offY = e.clientY - term.offsetTop;
-
             const move = (ev) => {
-                ev.stopPropagation();
                 term.style.left = `${ev.clientX - offX}px`;
                 term.style.top = `${ev.clientY - offY}px`;
             };
-
-            const stop = (ev) => {
-                ev.stopPropagation();
-                document.removeEventListener('mousemove', move, true);
-            };
-
+            const stop = () => document.removeEventListener('mousemove', move, true);
             document.addEventListener('mousemove', move, true);
             document.addEventListener('mouseup', stop, { once: true, capture: true });
         };
     }
 
-    // --- 3. ЛОГИКА ПОЛЯ ПУТИ ---
+    // --- 2. ЛОГИКА ПУТИ ---
     if (pathDisp) {
         pathDisp.setAttribute('contenteditable', 'true');
         pathDisp.onkeydown = (e) => {
@@ -76,10 +60,9 @@ export const initFileManager = () => {
         };
     }
 
-    // --- 4. ОБРАБОТКА ДАННЫХ ОТ БОТА ---
+    // --- 3. ОБРАБОТКА ДАННЫХ ОТ БОТА (LIST) ---
     window.renderFileSystem = (data) => {
         const { type, items, current_path, status, refresh } = data;
-
         if (type === "list") {
             if (document.activeElement !== pathDisp) {
                 pathDisp.innerText = (current_path === "Computer" || !current_path) ? "" : current_path;
@@ -89,24 +72,25 @@ export const initFileManager = () => {
                 onContext: (e, i) => { state.selected = i; UI.showMenu(ctx, e, container, true); }
             });
         }
-
-        if (type === "status" && status === "success" && refresh) {
-            API.send('open', refresh);
-        }
+        if (type === "status" && status === "success" && refresh) API.send('open', refresh);
     };
 
-    // --- 5. СБОРКА ФАЙЛА (DOWNLOAD) ---
-    window.addEventListener('FileTransfer_Start', e => {
-        const { name, size } = e.detail;
-        dlState = { name, size, received: 0, chunks: [] };
+    // --- 4. СБОРКА ФАЙЛА (DT - Download Transfer) ---
+    // Слушаем новое событие анонса: FileManager:DT_START
+    window.addEventListener('FileManager:DT_START', e => {
+        const fileName = e.detail.extra; // Имя файла из заголовка
+        const fileSize = parseInt(e.detail.payload); // Размер из payload
+        console.log(`[DT] Анонс файла: ${fileName}, размер: ${fileSize}`);
+        dlState = { name: fileName, size: fileSize, received: 0, chunks: [] };
     });
 
-    window.addEventListener('FileTransfer_Chunk', e => {
-        const { name, data } = e.detail;
-        if (name !== dlState.name) return;
+    // Слушаем чанки данных: FileManager:DT_DATA
+    window.addEventListener('FileManager:DT_DATA', e => {
+        const chunk = e.detail.payload; 
+        if (!dlState.name) return;
 
-        dlState.chunks.push(new Uint8Array(data));
-        dlState.received += data.byteLength;
+        dlState.chunks.push(new Uint8Array(chunk));
+        dlState.received += chunk.byteLength;
 
         if (dlState.received >= dlState.size) {
             const blob = new Blob(dlState.chunks);
@@ -116,44 +100,58 @@ export const initFileManager = () => {
             });
             a.click();
             URL.revokeObjectURL(a.href);
-            dlState.chunks = [];
+            dlState = { name: '', size: 0, received: 0, chunks: [] };
+            console.log(`[DT] Файл ${dlState.name} успешно сохранен`);
         }
     });
 
-    // --- 6. КОМАНДЫ UI ---
+    // --- 5. КОМАНДЫ UI (RUN, DELETE, MKDIR, DOWNLOAD) ---
     window.fm_cmd = (act) => {
         const target = state.selected?.path || getPath();
         ctx.classList.add('hidden');
         
-        if (act === 'download') API.send('download', target);
+        if (act === 'download') API.send('DOWNLOAD', target);
         if (act === 'upload') upInput.click();
-        if (act === 'run') API.send('run', target);
-        if (act === 'delete' && confirm('Удалить?')) API.send('delete', target);
+        if (act === 'run') API.send('RUN', target);
+        if (act === 'delete' && confirm('Удалить объект?')) API.send('DELETE', target);
         if (act === 'mkdir') { 
-            const n = prompt("Имя папки:"); 
-            if (n) API.send('mkdir', getPath(), { name: n }); 
+            const n = prompt("Имя новой папки:"); 
+            if (n) API.send('MKDIR', getPath() + '\\' + n); 
         }
     };
 
     upInput.onchange = async () => {
         const p = getPath();
         for (const f of upInput.files) await API.upload(f, p);
-        
-        // Ждем 1 секунду, чтобы бот успел сохранить и закрыть файл
         setTimeout(() => API.send('open', p), 1000); 
         upInput.value = '';
     };
 
-    // --- 7. КНОПКИ НАВИГАЦИИ ---
+    // --- 6. НАВИГАЦИЯ ---
+    // Исправленный обработчик кнопки "Назад" в initFileManager (files.js)
     $('file-back-btn').onclick = () => {
-        let p = getPath().replace(/[\\/]$/, '');
-        if (!p) return API.send('list_drives');
+        let currentPath = getPath().trim();
+        
+        // Если пути нет или мы уже в "Компьютере" - запрашиваем диски
+        if (!currentPath || currentPath === "Computer") {
+            return API.send('list_drives');
+        }
+
+        // Убираем слеш в конце для удобства парсинга
+        let p = currentPath.replace(/[\\/]$/, '');
+        
+        // Ищем последний разделитель пути
         const lastIdx = Math.max(p.lastIndexOf('\\'), p.lastIndexOf('/'));
+        
         if (lastIdx !== -1) {
             let up = p.substring(0, lastIdx);
-            if (up.length === 2 && up[1] === ':') up += '\\';
+            // Если после обрезки осталась буква диска (например "C:"), добавляем слеш для корректности
+            if (up.length === 2 && up[1] === ':') {
+                up += '\\';
+            }
             API.send('open', up);
         } else {
+            // Если разделителей больше нет (например, были в "C:\"), выходим в корень системы
             API.send('list_drives');
         }
     };
@@ -163,8 +161,7 @@ export const initFileManager = () => {
     const viewBtn = $('file-view-btn');
     if (viewBtn) viewBtn.onclick = () => {
         viewBtn.classList.toggle('active');
-        const p = getPath();
-        API.send(p ? 'open' : 'list_drives', p);
+        API.send(getPath() ? 'open' : 'list_drives', getPath());
     };
 
     body.oncontextmenu = (e) => {
@@ -177,17 +174,16 @@ export const initFileManager = () => {
 
     document.addEventListener('mousedown', e => !ctx.contains(e.target) && ctx.classList.add('hidden'), { capture: true });
 
-    // --- 8. ОТКРЫТИЕ / ПЕРЕЗАПУСК (Reset State) ---
     window.openFileManager = () => { 
-        // Сброс позиции окна
-        window.resetFileManagerPosition();
-        
-        // Очистка состояний UI
+        window.resetFileManagerPosition?.();
         state.selected = null;
-        if (pathDisp) pathDisp.innerText = "";
-        if (body) body.innerHTML = '<div class="loading-status">Запрос списка дисков...</div>';
         
-        // Первичный запрос к боту
-        API.send('list_drives'); 
+        if (pathDisp) pathDisp.innerText = "";
+        if (body) {
+            body.innerHTML = '<div class="loading-status">Получение списка дисков...</div>';
+        }
+        
+        // Явно вызываем с пустым путем, чтобы API.send отправил ""
+        API.send('list_drives', ""); 
     };
 };

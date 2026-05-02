@@ -26,9 +26,9 @@ export const initHeaderControls = () => {
         state && cvs?.focus();
       }
 
-      if (!silent && window.sendToBot) {
-          window.sendToBot(a.mod, "", state ? 'START' : 'STOP', a.extra || 'none');
-      }
+    if (!silent && window.sendToBot) {
+        window.sendToBot(a.mod, "", state ? 'START' : 'STOP', a.extra || 'none');
+    }
   };
 
   const stopAllActivities = () => {
