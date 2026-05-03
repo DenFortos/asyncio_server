@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List
 
 # Сетевые настройки
-IP: str = "188.190.156.120"
+IP: str = "127.0.0.1"
 PORT: int = 50001
 API_PORT: int = 8001
 

@@ -1,83 +1,134 @@
 // frontend\client_control\js\modules\features\fm\FileManagerUI.js
 
+/**
+ * UI компоненты и рендеринг для File Manager
+ */
 export const FileManagerUI = {
-  
-  $el: (tag, props = {}) => Object.assign(document.createElement(tag), props),
+    // Хелпер для создания элементов
+    $el: (tag, props = {}) => Object.assign(document.createElement(tag), props),
 
-  formatSize: (s) => {
-    if (s === 0) return '0 B';
-    if (!s || isNaN(s)) return '';
-    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(s) / Math.log(1024));
-    return `${(s / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
-  },
+    // Форматирование размера файла
+    formatSize: (s) => {
+        if (!s || isNaN(s)) return '0 B';
+        const i = Math.floor(Math.log(s) / Math.log(1024));
+        return `${(s / Math.pow(1024, i)).toFixed(1)} ${['B', 'KB', 'MB', 'GB', 'TB'][i]}`;
+    },
 
-  /**
-   * Отрисовка списка элементов
-   */
-  renderItems: (container, items, callbacks) => {
-    container.innerHTML = items?.length ? '' : '<div class="empty-notice">Пусто или доступ ограничен</div>';
+    // Остановка всплытия событий, чтобы клики внутри ФМ не трогали основной интерфейс
+    setupIsolation: (term) => {
+        if (!term) return;
+        ['mousedown', 'mouseup', 'click', 'dblclick', 'contextmenu', 'wheel'].forEach(type => {
+            term.addEventListener(type, (e) => e.stopPropagation());
+        });
+    },
 
-    items?.forEach(item => {
-      const { type, name, size, is_hidden, path } = item;
-      
-      const isDrive = type === 'drive';
-      const isDir = type === 'dir' || type === 'directory';
-      const icon = isDrive ? 'fa-hard-drive' : (isDir ? 'fa-folder' : 'fa-file');
-      
-      const cls = `file-item ${isDrive ? 'drive' : (isDir ? 'directory' : 'file')} ${is_hidden ? 'file-hidden' : ''}`;
+    // Сброс позиции окна
+    resetWindow: (term) => {
+        if (!term) return;
+        ['left', 'top', 'width', 'height', 'transform', 'margin'].forEach(p => term.style[p] = '');
+    },
 
-      const el = FileManagerUI.$el('div', {
-        className: cls,
-        innerHTML: `
-          <i class="fas ${icon}"></i>
-          <div class="file-name" title="${name}">${name}</div>
-          ${(size && !isDir && !isDrive) ? `<span class="file-size-tag">${FileManagerUI.formatSize(size)}</span>` : ''}`
-      });
+    // Логика перетаскивания окна за хедер
+    initDrag: (head, term) => {
+        if (!head || !term) return;
+        head.style.cursor = 'move';
+        head.onmousedown = (e) => {
+            if (e.target.closest('.file-nav-btn') || e.target.closest('input')) return;
+            e.stopPropagation();
+            
+            if (getComputedStyle(term).transform !== 'none') {
+                const r = term.getBoundingClientRect();
+                const p = term.offsetParent?.getBoundingClientRect() || { left: 0, top: 0 };
+                Object.assign(term.style, {
+                    left: `${r.left - p.left}px`, top: `${r.top - p.top}px`,
+                    transform: 'none', margin: '0'
+                });
+            }
+            
+            const offX = e.clientX - term.offsetLeft;
+            const offY = e.clientY - term.offsetTop;
 
-      // КЛИК: Передаем весь объект item в callback
-      el.onclick = e => { 
-        e.stopPropagation(); 
-        console.log(`[UI] Interaction with: ${name} | Path: ${path}`);
-        callbacks.onOpen(item); 
-      };
+            const move = (ev) => {
+                term.style.left = `${ev.clientX - offX}px`;
+                term.style.top = `${ev.clientY - offY}px`;
+            };
 
-      // ПКМ: Контекстное меню
-      el.oncontextmenu = e => {
-        e.preventDefault(); 
-        e.stopPropagation();
-        if (!isDrive) callbacks.onContext(e, item);
-      };
+            const stop = () => document.removeEventListener('mousemove', move, true);
+            document.addEventListener('mousemove', move, true);
+            document.addEventListener('mouseup', stop, { once: true, capture: true });
+        };
+    },
 
-      container.appendChild(el);
-    });
-  },
+    /**
+     * Отрисовка контекстного меню
+     */
+    showMenu: (menu, event, container, isItemClick = false) => {
+        const { clientX: x, clientY: y } = event;
+        menu.innerHTML = '';
+        const actions = [];
 
-  /**
-   * Управление контекстным меню
-   */
-  showMenu: (menu, e, container, isItem) => {
-    const rect = container.getBoundingClientRect();
-    
-    const itemTpl = `
-      <div class="ctx-item" onclick="fm_cmd('download')"><i class="fas fa-download"></i> Скачать</div>
-      <div class="ctx-item" onclick="fm_cmd('run')"><i class="fas fa-play"></i> Запустить</div>
-      <div class="ctx-separator"></div>
-      <div class="ctx-item danger" onclick="fm_cmd('delete')"><i class="fas fa-trash"></i> Удалить</div>`;
+        if (isItemClick) {
+            // Меню для конкретного файла/папки
+            actions.push({ label: 'Запустить', icon: 'fa-play', cmd: 'run' });
+            actions.push({ label: 'Скачать (ZIP)', icon: 'fa-download', cmd: 'download' });
+            actions.push({ label: 'Удалить', icon: 'fa-trash', cmd: 'delete', class: 'danger' });
+        } else {
+            // Меню для пустого места в папке
+            actions.push({ label: 'Загрузить сюда', icon: 'fa-upload', cmd: 'upload' });
+            actions.push({ label: 'Создать папку', icon: 'fa-folder-plus', cmd: 'mkdir' });
+        }
 
-    const bgTpl = `
-      <div class="ctx-item" onclick="fm_cmd('upload')"><i class="fas fa-upload"></i> Загрузить</div>
-      <div class="ctx-item" onclick="fm_cmd('mkdir')"><i class="fas fa-folder-plus"></i> Новая папка</div>
-      <div class="ctx-item" onclick="fm_cmd('refresh')"><i class="fas fa-sync"></i> Обновить</div>`;
+        actions.forEach(act => {
+            const btn = FileManagerUI.$el('div', {
+                className: `ctx-item ${act.class || ''}`,
+                innerHTML: `<i class="fas ${act.icon}"></i> <span>${act.label}</span>`
+            });
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                window.fm_cmd(act.cmd);
+            };
+            menu.appendChild(btn);
+        });
 
-    menu.innerHTML = isItem ? itemTpl : bgTpl;
+        menu.classList.remove('hidden');
+        const rect = container.getBoundingClientRect();
+        menu.style.left = `${x - rect.left}px`;
+        menu.style.top = `${y - rect.top}px`;
+    },
 
-    Object.assign(menu.style, {
-      left: `${e.clientX - rect.left}px`,
-      top: `${e.clientY - rect.top}px`,
-      display: 'block'
-    });
-    
-    menu.classList.remove('hidden');
-  }
+    /**
+     * Отрисовка списка файлов
+     */
+    renderItems: (container, items, callbacks) => {
+        container.innerHTML = items?.length ? '' : '<div class="empty-notice">Пусто</div>';
+        
+        items?.forEach(item => {
+            const isFolder = item.type === 'dir' || item.type === 'directory';
+            const isDrive = item.type === 'drive';
+            const typeClass = isDrive ? 'drive' : (isFolder ? 'directory' : 'file');
+            
+            const el = FileManagerUI.$el('div', {
+                className: `file-item ${typeClass} ${item.is_hidden ? 'file-hidden' : ''}`,
+                innerHTML: `
+                    <i class="fas ${isDrive ? 'fa-hard-drive' : (isFolder ? 'fa-folder' : 'fa-file')}"></i>
+                    <div class="file-name" title="${item.name}">${item.name}</div>
+                    ${(!isFolder && !isDrive && item.size) ? `<span class="file-size-tag">${FileManagerUI.formatSize(item.size)}</span>` : ''}
+                `
+            });
+
+            el.onclick = (e) => { 
+                e.stopPropagation(); 
+                callbacks.onOpen(item); 
+            };
+
+            el.oncontextmenu = (e) => { 
+                e.preventDefault(); 
+                e.stopPropagation();
+                // Для дисков контекстное меню обычно не нужно
+                if (!isDrive) callbacks.onContext(e, item); 
+            };
+
+            container.appendChild(el);
+        });
+    }
 };

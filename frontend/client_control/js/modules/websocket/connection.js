@@ -7,70 +7,52 @@ import { renderScreenRGBA } from '../features/screen_renderer.js';
 let socket = null;
 const $ = id => document.getElementById(id);
 
-// Обновление текстовых элементов UI
+// Универсальное обновление текста в UI
 const ui = (id, val) => { if ($(id)) $(id).textContent = val ?? '...'; };
 
-// Визуальный индикатор статуса сети
-const setOnline = (on) => {
-    const el = $('status-indicator');
-    el?.classList.toggle('online', on);
-    el?.classList.toggle('offline', !on);
-    ui('status-text', on ? 'online' : 'offline');
-};
-
 /**
- * Обработка входящих пакетов данных
+ * Обработка входящих пакетов
  */
 const handleIncomingData = (buf) => {
     const pkg = decodePacket(buf);
     if (!pkg) return;
 
-    const { module, type, action, payload, extra } = pkg;
+    const { module, type, action, payload } = pkg;
 
-    // --- Логика трансляции экрана ---
-    if (module === 'ScreenView') {
-        if (action === 'STOP') return window.resetRenderer?.();
-        if (type === 'bin') return renderScreenRGBA(payload);
-        return;
-    }
+    switch (module) {
+        case 'ScreenView':
+            if (action === 'STOP') return window.resetRenderer?.();
+            if (type === 'bin') return renderScreenRGBA(payload);
+            break;
 
-    // --- Логика системной информации ---
-    if (module === 'SystemInfo') {
-        const data = payload;
-        if (data && typeof data === 'object') {
-            if (data.ip) ui('display-ip', data.ip);
-            if (data.id) ui('display-id', data.id);
-            if (data.status) window.updateBotStatus?.(data.status);
-        }
-        return;
-    }
+        case 'SystemInfo':
+            if (payload?.ip) ui('display-ip', payload.ip);
+            if (payload?.id) ui('display-id', payload.id);
+            // Вызываем глобальный метод из header.js для синхронизации кнопок
+            if (payload?.status) window.updateBotStatus?.(payload.status);
+            break;
 
-    // --- Логика FileManager (Упрощенная: только LIST) ---
-    if (module === 'FileManager') {
-        console.log(`[WS] FileManager Response: ${action}`);
-
-        // Обрабатываем только ответ на запрос списка файлов/дисков
-        if (action === 'LIST') {
-            if (window.renderFileSystem) {
-                // Отправляем payload (JSON список) в files.js
+        case 'FileManager':
+            if (action === 'LIST' && window.renderFileSystem) {
                 window.renderFileSystem(payload);
             }
-            return;
-        }
-    }
+            break;
 
-    // Универсальное событие для остальных модулей (например, терминала)
-    window.dispatchEvent(new CustomEvent(`${module}:${action}`, { detail: payload }));
+        default:
+            // Для терминала и прочих модулей
+            // Передаем весь объект pkg, чтобы были доступны action, extra и payload
+            window.dispatchEvent(new CustomEvent(`${module}:${action}`, { detail: pkg }));
+    }
 };
 
 /**
- * Инициализация WebSocket соединения
+ * Инициализация WebSocket
  */
 export const initControlConnection = () => {
     const { clientId: tid } = AppState;
     const [token, login] = ['auth_token', 'user_login'].map(k => localStorage.getItem(k));
     
-    if (!token || !tid) return console.error("[WS] Missing Auth Data");
+    if (!token || !tid) return;
 
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
     const url = `${protocol}//${location.host}/ws?token=${token}&login=${login}&mode=control&target=${encodeURIComponent(tid)}`;
@@ -78,26 +60,26 @@ export const initControlConnection = () => {
     socket = new WebSocket(url);
     socket.binaryType = 'arraybuffer';
     
-    socket.onopen = () => setOnline(true);
-    socket.onclose = () => setOnline(false);
+    // Используем единую точку входа для статуса
+    socket.onopen = () => window.updateBotStatus?.('online');
+    socket.onclose = () => window.updateBotStatus?.('offline');
     socket.onmessage = (e) => handleIncomingData(e.data);
 
     /**
-     * Глобальная функция отправки команд боту
-     * Реализована строго по формуле: [HEADER] + [ID] + [MOD:TYPE:ACT:EXTRA] + [PAYLOAD]
+     * Глобальная функция отправки (Формула: MOD:TYPE:ACT:EXTRA)
      */
     window.sendToBot = (modName, pay, action = 'DATA', extra = 'none') => {
         if (socket?.readyState !== 1) return;
 
         let type = 'str';
-        if (pay instanceof ArrayBuffer || pay instanceof Uint8Array) {
-            type = 'bin';
-        } else if (typeof pay === 'object' && pay !== null) {
-            type = 'json';
-        }
+        if (pay instanceof ArrayBuffer || pay instanceof Uint8Array) type = 'bin';
+        else if (typeof pay === 'object' && pay !== null) type = 'json';
         
-        // Форсируем тип json для навигации, чтобы бот корректно парсил пакет
-        if (action === 'LIST') type = 'json';
+        // LIST всегда требует JSON
+        if (action === 'LIST') {
+            type = 'json';
+            pay = pay || {}; 
+        }
 
         socket.send(encodePacket(tid, modName, type, action, extra, pay));
     };

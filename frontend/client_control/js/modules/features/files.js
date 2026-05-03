@@ -1,162 +1,177 @@
-// frontend\client_control\js\modules\features\files.js
+ // frontend\client_control\js\modules\features\files.js
 
 import { FileManagerUI as UI } from './fm/FileManagerUI.js';
+import { FileOperations as Ops } from './fm/file_operations.js';
+import { FileTransfer } from './fm/file_transfer.js';
 
+/**
+ * Управление файловым менеджером
+ */
 export const initFileManager = () => {
     const $ = id => document.getElementById(id);
     
+    // Элементы DOM
     const body = $('files-body');
     const pathDisp = $('file-path-display');
     const term = $('files-overlay');
     const head = term?.querySelector('.terminal-header');
-    const searchInput = $('file-search-input');
     const container = document.querySelector('.app-main') || document.body;
+    
+    const backBtn = $('file-back-btn');
+    const homeBtn = $('file-home-btn');
+    const viewHiddenBtn = $('file-view-btn');
 
-    // Стилизация строки пути
-    if (pathDisp) {
-        Object.assign(pathDisp.style, {
-            flex: "1",
-            minWidth: "200px",
-            overflow: "hidden",
-            whiteSpace: "nowrap"
-        });
-        pathDisp.setAttribute('contenteditable', 'true');
-    }
+    // Внутреннее состояние
+    let state = {
+        selectedItem: null,
+        showHidden: false, 
+        lastData: null     
+    };
 
+    // --- НОВАЯ ЧАСТЬ: СЛУШАТЕЛИ СОБЫТИЙ ---
+    // Слушаем все события от FileManager и направляем в renderFileSystem
+    window.addEventListener('FileManager:LIST', (e) => window.renderFileSystem(e.detail.payload, e.detail));
+    window.addEventListener('FileManager:DT_START', (e) => window.renderFileSystem(e.detail.payload, e.detail));
+    window.addEventListener('FileManager:DT_DATA', (e) => window.renderFileSystem(e.detail.payload, e.detail));
+    // --------------------------------------
+
+    // Инициализация базового UI
+    UI.initDrag(head, term);
+    UI.setupIsolation(term);
+
+    // Создание контекстного меню
     const ctxMenu = UI.$el('div', { className: 'file-context-menu hidden' });
     container.append(ctxMenu);
 
-    let state = { 
-        selectedItem: null, 
-        currentItems: [] 
-    };
+    const hideMenu = () => ctxMenu.classList.add('hidden');
 
     /**
-     * Отправка команды LIST боту
+     * ГЛАВНЫЙ ОБРАБОТЧИК ДАННЫХ (Вызывается из ws_handler или через события выше)
      */
-    const sendCommand = (action, path = "") => {
-        if (!window.sendToBot) return;
+    window.renderFileSystem = (data, meta = {}) => {
+        console.log("[FM] Received Packet:", { action: meta.action, extra: meta.extra, dataType: typeof data });
 
-        let targetPath = (path === "Computer" || !path) ? "Computer" : path;
-        
-        // Оставляем только замену слэшей, НЕ удаляем слэш в конце
-        targetPath = targetPath.replace(/\\/g, '/');
+        const action = meta.action || "";
 
-        console.log(`[JS -> Bot] Requesting: ${action} | Path: ${targetPath}`);
-        window.sendToBot('FileManager', {}, action, targetPath);
-    };
+        // Сценарий 1: Получение списка файлов (LIST)
+        if (action === "LIST" || (data && data.type === "list")) {
+            state.lastData = data; 
+            pathDisp.innerText = data.current_path;
 
-    const getCurrentPath = () => pathDisp?.innerText.trim() || "";
+            const itemsToRender = state.showHidden 
+                ? data.items 
+                : data.items.filter(item => !item.is_hidden);
 
-    /**
-     * Рендеринг интерфейса
-     */
-    const renderUI = (items, updateState = true) => {
-        if (updateState) state.currentItems = items;
-        
-        UI.renderItems(body, items, {
-            onOpen: (item) => {
-                // Если это папка или диск — запрашиваем путь, который прислал бот
-                const isNavigable = ['dir', 'directory', 'drive'].includes(item.type);
-                if (isNavigable && item.path) {
-                    sendCommand('LIST', item.path);
+            UI.renderItems(body, itemsToRender, {
+                onOpen: (item) => {
+                    hideMenu();
+                    if (['dir', 'directory', 'drive'].includes(item.type)) {
+                        sendNavCommand(item.path);
+                    } else {
+                        Ops.sendControlCommand('RUN', item.path);
+                    }
+                },
+                onContext: (e, item) => {
+                    state.selectedItem = item;
+                    UI.showMenu(ctxMenu, e, container, true);
                 }
-            },
-            onContext: (e, item) => {
-                state.selectedItem = item;
-                UI.showMenu(ctxMenu, e, container, true);
-            }
-        });
-    };
-
-    /**
-     * Прием данных от бота
-     */
-    window.renderFileSystem = (data) => {
-        if (data.type === "list") {
-            if (searchInput) searchInput.value = '';
-
-            if (document.activeElement !== pathDisp) {
-                pathDisp.innerText = data.current_path;
-            }
-            renderUI(data.items);
-        }
-    };
-
-    /**
-     * Обработка команд контекстного меню
-     */
-    window.fm_cmd = (action) => {
-        ctxMenu.classList.add('hidden');
-        const path = state.selectedItem?.path || getCurrentPath();
-        
-        if (action === 'refresh') sendCommand('LIST', getCurrentPath());
-        else console.log(`[Action] ${action} on ${path}`);
-    };
-
-    /**
-     * Навигация: Назад (UP)
-     */
-    $('file-back-btn').onclick = () => {
-        let current = getCurrentPath().replace(/\/+$/, '');
-        
-        // Если корень или Computer — выходим в список дисков
-        if (current === "Computer" || current.length <= 3) {
-            sendCommand('LIST', "Computer");
+            });
             return;
         }
 
-        const parts = current.split('/');
-        parts.pop();
-        let parent = parts.join('/');
-        if (parent.endsWith(':')) parent += '/';
-        
-        sendCommand('LIST', parent || "Computer");
-    };
+        // Сценарий 2: Скачивание (DT_START / DT_DATA)
+        const fileName = meta.extra;
 
-    $('file-home-btn').onclick = () => sendCommand('LIST', "Computer");
-
-    // Ручной ввод пути
-    pathDisp.onkeydown = (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            sendCommand('LIST', getCurrentPath());
-            pathDisp.blur();
+        if (action === "DT_START") {
+            FileTransfer.handleDownloadStart(fileName, data); 
+        } 
+        else if (action === "DT_DATA") {
+            if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
+                FileTransfer.handleDownloadData(fileName, data);
+            } else if (data instanceof Blob) {
+                data.arrayBuffer().then(buf => {
+                    FileTransfer.handleDownloadData(fileName, buf);
+                });
+            }
         }
     };
 
-    // Закрытие меню при клике мимо
-    document.addEventListener('mousedown', (e) => {
-        if (!ctxMenu.contains(e.target)) ctxMenu.classList.add('hidden');
-    }, { capture: true });
-
-    // Drag & Drop окна
-    if (head && term) {
-        head.onmousedown = (e) => {
-            if (e.target.closest('.file-nav-btn') || e.target.closest('input')) return;
-            const shiftX = e.clientX - term.offsetLeft;
-            const shiftY = e.clientY - term.offsetTop;
-
-            const moveAt = (ev) => {
-                term.style.left = (ev.clientX - shiftX) + 'px';
-                term.style.top = (ev.clientY - shiftY) + 'px';
-                term.style.transform = 'none';
-                term.style.margin = '0';
-            };
-
-            const onMouseMove = (ev) => moveAt(ev);
-            document.addEventListener('mousemove', onMouseMove);
-            document.onmouseup = () => {
-                document.removeEventListener('mousemove', onMouseMove);
-                document.onmouseup = null;
-            };
+    if (viewHiddenBtn) {
+        viewHiddenBtn.onclick = (e) => {
+            e.preventDefault();
+            state.showHidden = !state.showHidden;
+            viewHiddenBtn.classList.toggle('active', state.showHidden);
+            const icon = viewHiddenBtn.querySelector('i');
+            if (icon) icon.className = state.showHidden ? 'fas fa-eye' : 'fas fa-eye-slash';
+            if (state.lastData) window.renderFileSystem(state.lastData);
         };
     }
 
-    // Инициализация (запуск)
+    const sendNavCommand = (path = "") => {
+        if (!window.sendToBot) return;
+        const targetPath = (path === "Computer" || !path) ? "Computer" : path.replace(/\\/g, '/');
+        window.sendToBot('FileManager', {}, 'LIST', targetPath, 'json');
+    };
+
+    window.fm_cmd = (action) => {
+        hideMenu();
+        const currentPath = pathDisp.innerText.trim();
+        if (action === 'download') {
+            Ops.sendControlCommand('DOWNLOAD', state.selectedItem.path);
+        } else if (action === 'upload') {
+            FileTransfer.uploadFile(currentPath);
+        } else {
+            Ops.executeAction(action, state.selectedItem, currentPath, () => sendNavCommand(currentPath));
+        }
+    };
+
+    if (body) {
+        body.oncontextmenu = (e) => {
+            if (e.target === body || e.target.classList.contains('empty-notice')) {
+                e.preventDefault();
+                state.selectedItem = null;
+                UI.showMenu(ctxMenu, e, container, false);
+            }
+        };
+        body.onclick = hideMenu;
+    }
+
+    if (backBtn) {
+        backBtn.onclick = () => {
+            hideMenu();
+            let current = pathDisp.innerText.trim().replace(/\/+$/, '');
+            if (current === "Computer" || current.length <= 3) return sendNavCommand("Computer");
+            const parts = current.split('/');
+            parts.pop();
+            let parent = parts.join('/');
+            if (parent.endsWith(':')) parent += '/';
+            sendNavCommand(parent || "Computer");
+        };
+    }
+
+    if (homeBtn) {
+        homeBtn.onclick = () => {
+            hideMenu();
+            sendNavCommand("Computer");
+        };
+    }
+
+    const closeBtn = term?.querySelector('.close-btn');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            term.classList.add('hidden');
+            hideMenu();
+            UI.resetWindow(term);
+            state.lastData = null;
+        };
+    }
+
     window.openFileManager = () => {
         state.selectedItem = null;
-        if (body) body.innerHTML = 'Загрузка...';
-        sendCommand('LIST', "Computer");
+        hideMenu();
+        if (body) body.innerHTML = '<div class="loading-notice">Загрузка...</div>';
+        UI.resetWindow(term); 
+        term.classList.remove('hidden');
+        sendNavCommand("Computer");
     };
 };
