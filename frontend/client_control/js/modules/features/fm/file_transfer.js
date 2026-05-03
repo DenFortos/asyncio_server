@@ -1,123 +1,93 @@
 // frontend\client_control\js\modules\features\fm\file_transfer.js
 
 /**
- * Модуль потоковой передачи файлов (DT и UT)
+ * Логика передачи данных (Скачивание и Загрузка)
  */
 export const FileTransfer = {
-    _downloads: {}, // Хранилище для входящих файлов { fileName: { chunks: [], size, received } }
+    sessions: {},
 
-    /**
-     * Инициализация скачивания (DT_START)
-     * Вызывается, когда бот сообщает имя архива и его полный размер
-     */
-    handleDownloadStart: (fileName, totalSize) => {
-        FileTransfer._downloads[fileName] = {
-            chunks: [],
-            size: parseInt(totalSize),
-            received: 0
-        };
-        console.log(`[DT] Начинаем прием файла: ${fileName} (${totalSize} bytes)`);
+    // --- СКАЧИВАНИЕ (Download) ---
+    // (Оставляем без изменений, так как прием работает идеально)
+    handleDownloadStart(fileName, totalSize) {
+        if (this.sessions[fileName]) return;
+        this.sessions[fileName] = { chunks: [], received: 0, total: parseInt(totalSize) || 0, isFinished: false };
     },
 
-    /**
-     * Получение чанка данных (DT_DATA)
-     */
-    handleDownloadData: (fileName, data) => {
-        const session = FileTransfer._downloads[fileName];
-        if (!session) {
-            console.error(`[DT] Сессия для ${fileName} не найдена!`);
-            return;
-        }
-
-        // ВАЖНО: Приводим к Uint8Array для корректного хранения в массиве Blob
-        const chunk = data instanceof Uint8Array ? data : new Uint8Array(data);
-        
-        session.chunks.push(chunk);
-        session.received += chunk.byteLength;
-
-        // Лог прогресса раз в 1МБ или на финише
-        if (session.received % (1024 * 1024) === 0 || session.received >= session.size) {
-            const percent = ((session.received / session.size) * 100).toFixed(1);
-            console.log(`[DT] Прогресс ${fileName}: ${percent}% (${session.received}/${session.size} bytes)`);
-        }
-
-        if (session.received >= session.size) {
-            FileTransfer._finalizeDownload(fileName, session);
+    handleDownloadData(fileName, buffer) {
+        const session = this.sessions[fileName];
+        if (!session || session.isFinished) return;
+        session.chunks.push(buffer);
+        session.received += buffer.byteLength;
+        if (session.total > 0 && session.received >= session.total) {
+            this.finalizeDownload(fileName);
+        } else {
+            clearTimeout(session.timeout);
+            session.timeout = setTimeout(() => this.finalizeDownload(fileName), 1500);
         }
     },
 
-    /**
-     * Финализация (сборка архива)
-     */
-    _finalizeDownload: (fileName, session) => {
-        console.log(`[DT] Завершено. Сборка Blob для ${fileName}...`);
-        
-        try {
-            // Создаем Blob из всех накопленных Uint8Array
-            const blob = new Blob(session.chunks, { type: 'application/zip' });
-            const url = window.URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = fileName; 
-            
-            document.body.appendChild(a);
-            a.click();
-            
-            // Очистка
-            setTimeout(() => {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                delete FileTransfer._downloads[fileName];
-                console.log(`[DT] Файл ${fileName} успешно передан браузеру.`);
-            }, 1000);
-        } catch (err) {
-            console.error("[DT] Ошибка при сборке финального файла:", err);
-        }
+    finalizeDownload(fileName) {
+        const session = this.sessions[fileName];
+        if (!session || session.isFinished) return;
+        session.isFinished = true;
+        const blob = new Blob(session.chunks, { type: 'application/octet-stream' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = fileName; a.click();
+        setTimeout(() => { window.URL.revokeObjectURL(url); delete this.sessions[fileName]; }, 500);
     },
 
-    /**
-     * Загрузка файла на бот (UT)
-     * Нарезает локальный файл на куски и отправляет через WebSocket
-     */
-    uploadFile: async (remotePath) => {
+    // --- ЗАГРУЗКА НА БОТ (Upload Transfer - UT) ---
+    uploadFile(targetPath) {
         const input = document.createElement('input');
         input.type = 'file';
         
-        input.onchange = async (e) => {
+        input.onchange = e => {
             const file = e.target.files[0];
-            if (!file) return;
+            if (!file || !window.sendToBot) return;
 
-            // Формируем чистый путь на удаленной машине
-            const cleanDir = remotePath.replace(/\/$/, '').replace(/\\/g, '/');
-            const fullRemotePath = `${cleanDir}/${file.name}`;
-            const totalSize = file.size;
-
-            console.log(`[UT] Подготовка к отправке: ${file.name} (${totalSize} bytes)`);
-
-            // 1. Анонс (UT_START) - передаем размер как число
-            window.sendToBot('FileManager', totalSize, 'UT_START', fullRemotePath, 'int');
-
-            // 2. Отправка данных (UT_DATA)
-            const chunkSize = 64 * 1024; // 64KB - оптимально для WebSocket
-            let offset = 0;
-
-            while (offset < totalSize) {
-                const chunk = file.slice(offset, offset + chunkSize);
-                const buffer = await chunk.arrayBuffer();
-                
-                // Отправляем бинарный пакет
-                window.sendToBot('FileManager', buffer, 'UT_DATA', fullRemotePath, 'bin');
-                
-                offset += chunkSize;
-                
-                // Микро-пауза (backpressure), чтобы не "повесить" сетевой поток
-                if (offset % (chunkSize * 10) === 0) {
-                    await new Promise(r => setTimeout(r, 5));
+            const reader = new FileReader();
+            reader.onload = () => {
+                let cleanPath = targetPath.replace(/\\/g, '/').replace(/\/+$/, '');
+                if (cleanPath === "Computer") {
+                    alert("Выберите диск для загрузки");
+                    return;
                 }
-            }
-            console.log(`[UT] Файл ${file.name} полностью отправлен на бот.`);
+
+                const fullPath = `${cleanPath}/${file.name}`;
+                const fileSize = reader.result.byteLength;
+
+                console.log(`[FM] UT_START: ${fullPath} (${fileSize} bytes)`);
+
+                /**
+                 * ЭТАП 1: Анонс размера (UT_START)
+                 * Протокол требует: [FileManager:int:UT_START:путь] + [размер]
+                 */
+                window.sendToBot(
+                    'FileManager', 
+                    fileSize.toString(), 
+                    'UT_START', 
+                    fullPath, 
+                    'int'
+                );
+
+                /**
+                 * ЭТАП 2: Передача данных (UT_DATA)
+                 * Протокол требует: [FileManager:bin:UT_DATA:путь] + [данные]
+                 */
+                setTimeout(() => {
+                    console.log(`[FM] UT_DATA: Отправка чанка...`);
+                    window.sendToBot(
+                        'FileManager', 
+                        reader.result, 
+                        'UT_DATA', 
+                        fullPath, 
+                        'bin'
+                    );
+                }, 100); // Небольшая задержка, чтобы пакеты не склеились в сокете
+            };
+            
+            reader.readAsArrayBuffer(file);
         };
 
         input.click();

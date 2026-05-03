@@ -14,7 +14,7 @@ export const FileManagerUI = {
         return `${(s / Math.pow(1024, i)).toFixed(1)} ${['B', 'KB', 'MB', 'GB', 'TB'][i]}`;
     },
 
-    // Остановка всплытия событий, чтобы клики внутри ФМ не трогали основной интерфейс
+    // Остановка всплытия событий
     setupIsolation: (term) => {
         if (!term) return;
         ['mousedown', 'mouseup', 'click', 'dblclick', 'contextmenu', 'wheel'].forEach(type => {
@@ -68,12 +68,10 @@ export const FileManagerUI = {
         const actions = [];
 
         if (isItemClick) {
-            // Меню для конкретного файла/папки
             actions.push({ label: 'Запустить', icon: 'fa-play', cmd: 'run' });
             actions.push({ label: 'Скачать (ZIP)', icon: 'fa-download', cmd: 'download' });
             actions.push({ label: 'Удалить', icon: 'fa-trash', cmd: 'delete', class: 'danger' });
         } else {
-            // Меню для пустого места в папке
             actions.push({ label: 'Загрузить сюда', icon: 'fa-upload', cmd: 'upload' });
             actions.push({ label: 'Создать папку', icon: 'fa-folder-plus', cmd: 'mkdir' });
         }
@@ -100,9 +98,15 @@ export const FileManagerUI = {
      * Отрисовка списка файлов
      */
     renderItems: (container, items, callbacks) => {
-        container.innerHTML = items?.length ? '' : '<div class="empty-notice">Пусто</div>';
+        // Очищаем контейнер полностью (убирает и старые списки, и любые временные надписи)
+        container.innerHTML = '';
         
-        items?.forEach(item => {
+        if (!items || items.length === 0) {
+            container.innerHTML = '<div class="empty-notice">Пусто</div>';
+            return;
+        }
+        
+        items.forEach(item => {
             const isFolder = item.type === 'dir' || item.type === 'directory';
             const isDrive = item.type === 'drive';
             const typeClass = isDrive ? 'drive' : (isFolder ? 'directory' : 'file');
@@ -124,7 +128,6 @@ export const FileManagerUI = {
             el.oncontextmenu = (e) => { 
                 e.preventDefault(); 
                 e.stopPropagation();
-                // Для дисков контекстное меню обычно не нужно
                 if (!isDrive) callbacks.onContext(e, item); 
             };
 
